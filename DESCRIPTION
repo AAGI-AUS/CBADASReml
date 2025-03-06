@@ -1,0 +1,51 @@
+Package: CBADASReml
+Title: Provides helper functions for ASReml
+Version: 0.0.0
+Authors@R:
+    person("Jordan", "Brown", , "jordan.brown@curtin.edu.au", role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0004-6579-6959"))
+    person("Kai", "Bagley", , "kai.bagley@curtin.edu.au", role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0004-6579-6959"))
+Description: This package provides helper functions for ASReml, particularly
+    for use with small-plot trials
+License: GPL (>= 3)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports:
+    agricolae,
+    asremlPlus,
+    dplyr,
+    DT,
+    furrr,
+    ggplot2,
+    ggpubr,
+    ggspatial,
+    glue,
+    gstat,
+    htmltools,
+    lifecycle,
+    magrittr,
+    patchwork,
+    purrr,
+    raster,
+    RColorBrewer,
+    readr,
+    rlang,
+    sf,
+    sfdep,
+    spdep,
+    stringr,
+    terra,
+    tibble,
+    tidyr,
+    tidyverse,
+    tmap,
+    tmaptools,
+    units,
+    writexl,
+    xtable
+Suggests:
+    ASExtras4,
+    asreml,
+    rstac
