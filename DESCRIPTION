@@ -48,4 +48,6 @@ Imports:
 Suggests:
     ASExtras4,
     asreml,
-    rstac
+    rstac,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
