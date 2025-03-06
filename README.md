@@ -1,4 +1,4 @@
-# CBADA Package for helping with small-plot analysis, ofe analysis and paddock summaries
+# A collection of helper functions for small-plot trial analysis using ASReml
 
 ## Installation
 
@@ -7,7 +7,7 @@ You can install {CBADASReml} like so:
 ```r
 if (!require("pak"))
   install.packages("pak")
-pak::pak("CCDM-CBADA/CBADA")
+pak::pak("AAGI-AUS/CBADASReml")
 ```
 
 ## Usage

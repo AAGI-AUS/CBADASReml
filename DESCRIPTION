@@ -3,7 +3,7 @@ Title: Provides helper functions for ASReml
 Version: 0.0.0
 Authors@R:
     person("Jordan", "Brown", , "jordan.brown@curtin.edu.au", role = c("aut", "cre"),
-           comment = c(ORCID = "0009-0004-6579-6959"))
+           comment = c(ORCID = "0009-0008-5014-0593"))
     person("Kai", "Bagley", , "kai.bagley@curtin.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0004-6579-6959"))
 Description: This package provides helper functions for ASReml, particularly
