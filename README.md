@@ -5,9 +5,9 @@
 You can install {CBADASReml} like so:
 
 ```r
-if (!require("remotes"))
-  install.packages("devtools")
-devtools::install_github("CCDM-CBADA/CBADA")
+if (!require("pak"))
+  install.packages("pak")
+pak::pak("CCDM-CBADA/CBADA")
 ```
 
 ## Usage
