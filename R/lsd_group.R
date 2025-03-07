@@ -1,11 +1,20 @@
 #' Group treatments using results of paired t-test
 #'
-#' @param treatments
-#' @param means
-#' @param alpha
-#' @param pvalues
+#' @param treatments character vector of the treatment names
+#' @param means numeric vector of the treatment means/fitted values
+#' @param alpha numeric significant difference threshold
+#' @param pvalues symmetric numeric matrix of pvalues calculated via pairwise
+#'     t-tests
 #' @return data.frame of treatments and their associated group
-#'
+#' @export
+#' @examplesIf requireNamespace("asreml", quietly = TRUE)
+#' library(asreml)
+#' model <- asreml(
+#'     fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
+#'     random = ~idv(Blocks) + idv(Blocks):idv(Wplots),
+#'     residual = ~idv(units),
+#'     data = oats
+#' )
 lsd_group <- function(treatments, means, alpha, pvalues) {
     ## Order everything by descending mean
     ord <- order(means, decreasing = TRUE)
@@ -24,7 +33,7 @@ lsd_group <- function(treatments, means, alpha, pvalues) {
         for (trt_j in (trt_i:n_trt + 1)) {
             ## Is their pval significant?
             ## Is trt_j not at the end?
-            if ((trt_j != n_trt + 1) && (pvals[trt_i, trt_j] >= alpha)) {
+            if ((trt_j <= n_trt) && (pvals[trt_i, trt_j] >= alpha)) {
                 ## Continue checking
                 next
             } else {
@@ -40,9 +49,14 @@ lsd_group <- function(treatments, means, alpha, pvalues) {
                     grp[grp_idx],
                     paste0(grp[grp_idx], letter)
                 )
+                ## If trt_j > n_trt, we have nothing left to check
+                ## so we can exit
+                if (trt_j > n_trt) {
+                    return(data.frame(treatment = trts, group = grp))
+                }
                 break
             }
         }
     }
-    return(data.frame(treatment = trts, group = grp))
+    stop("Something bad happened...")
 }
