@@ -11,24 +11,24 @@
 #' }
 #'
 updater <- function(model, niter = 10) {
-    runs <- 0
+  runs <- 0
 
-    while (class(tryCatch(
-        {
-            model <- update(model)
-        },
-        warning = function(w) {
-            1
-        }
-    )) != "asreml") {
-        runs <- runs + 1
-
-        model <- update(model)
-
-        if (runs == niter) {
-            break
-        }
+  while (class(tryCatch(
+    {
+      model <- update(model)
+    },
+    warning = function(w) {
+      1
     }
+  )) != "asreml") {
+    runs <- runs + 1
 
-    return(model)
+    model <- update(model)
+
+    if (runs == niter) {
+      break
+    }
+  }
+
+  return(model)
 }
