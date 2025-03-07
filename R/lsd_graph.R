@@ -1,23 +1,29 @@
-#' A LSD graph making function
+#' Create an LSD plot from an ASReml model
 #'
-#' This function needs the library agricolae, asremlPlus and ggplot2
+#' Generates a table of least significant differences (LSDs) for a given model.
+#'
 #' @param model, an ASReml model.
 #' @param classify, A string specifying which variables to predict and calculate LSDs from.
 #' @param ... Arguments to pass to `predictPlus.asreml`
-#' @keywords LSD
-#' @importFrom ggplot2 ggplot aes geom_bar geom_text geom_errorbar labs coord_cartesian theme_bw theme position_dodge
-#' @export
 #' @returns return a ggplot2 object.
 #' @examplesIf requireNamespace("asreml", quietly = TRUE)
-#' \dontrun{
-#' lsd_wrapper(model, classify = "Nitrogen*Variety", sep_line = T)
-#' }
+#' library(asreml)
+#' model <- asreml(
+#'     fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
+#'     random = ~idv(Blocks) + idv(Blocks):idv(Wplots),
+#'     residual = ~idv(units),
+#'     data = oats
+#' )
+#' lsd_graph(model, classify = "Variety", sep_line = T)
+#' @export
 lsd_graph <- function(model, classify, ...) {
     capture.output(
         pred <- asremlPlus::predictPlus.asreml(
             model,
             classify = classify,
-            wald.tab = as.data.frame(asreml::wald(model)),
+            wald.tab = as.data.frame(
+                asreml::wald(model, denDF = "algebraic")$Wald
+            ),
             ...
         )
     )
@@ -63,7 +69,7 @@ lsd_graph <- function(model, classify, ...) {
         ) +
         ggplot2::geom_bar(
             color = "black",
-            position = position_dodge(.9),
+            position = ggplot2::position_dodge(.9),
             stat = "identity",
             fill = "lightblue"
         ) +
@@ -78,7 +84,7 @@ lsd_graph <- function(model, classify, ...) {
             ggplot2::aes(ymin = means - lsd, ymax = means + lsd),
             width = .1
         ) +
-        theme_bw() +
+        ggplot2::theme_bw() +
         ggplot2::theme(
             axis.line = ggplot2::element_line(linewidth = 3, colour = "grey80")
         ) +
