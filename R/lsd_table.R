@@ -1,23 +1,23 @@
-#' A LSD table making function
+#' Create an LSD table from an ASReml model
 #'
-#' Makes tables of least significant differences (LSDs) for a given model.
+#' Generates a table of least significant differences (LSDs) for a given model.
 #'
-#' @param model an \pkg{ASReml-R} model.
+#' @param model An \pkg{ASReml-R} model.
 #' @param classify A string specifying which variables to predict and calculate
 #'   LSDs from.
-#' @returns `data.frame` with the LSD values.
-#' @export
-#' @examples
+#' @returns A `data.frame` with the LSD values.
+#' @examplesIf requireNamespace("asreml", quietly = TRUE)
+#' library(asreml)
 #' model <- asreml(
 #'     fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
 #'     random = ~idv(Blocks) + idv(Blocks):idv(Wplots),
 #'     residual = ~idv(units),
-#'     data = test_data
+#'     data = oats
 #' )
 #' lsd_table(model, classify = "Variety")
+#' @export
 lsd_table <- function(model, classify) {
-    model <- eval(model)
-
+    ## Suppress all prints
     capture.output(
         pred <- asremlPlus::predictPlus.asreml(
                                 model,

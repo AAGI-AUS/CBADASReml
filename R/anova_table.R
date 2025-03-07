@@ -6,7 +6,7 @@
 #' @param ndig `numeric`, number of digits to round results to.
 #' @export
 #' @return a dataframe containing all anova tables
-#' @examples
+#' @examplesIf requireNamespace("asreml", quietly = TRUE)
 #' library(asreml)
 #' test_data <- oats
 #' test_data["yield2"] <- test_data["yield"] * runif(nrow(test_data["yield"]))
