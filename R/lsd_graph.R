@@ -34,14 +34,9 @@ lsd_graph <- function(model, classify, ...) {
     # LSD Value
     lsd <- pred$LSD$assignedLSD
 
-    # Standard Error
-    std.error <- pred$predictions$standard.error
-
     prob.matrix <- ifelse(is.na(pred$p.differences), 1, pred$p.differences)
-
     treatments <- colnames(prob.matrix)
     means <- pred$predictions$predicted.value
-
     alpha <- 0.05
 
     lsdmeantab <- agricolae::orderPvalue(
