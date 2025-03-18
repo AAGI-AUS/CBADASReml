@@ -16,14 +16,16 @@
 #' )
 #' lsd_table(model, classify = "Variety")
 #' @export
-lsd_table <- function(model, classify) {
+lsd_table <- function(model, classify, ...) {
     ## Suppress all prints
     capture.output(
         pred <- asremlPlus::predictPlus.asreml(
-                                model,
-                                classify = classify,
-                                wald.tab = as.data.frame(asreml::wald(model))
-                            )
+            model,
+            classify = classify,
+            wald.tab = as.data.frame(
+                asreml::wald(model, denDF = "algebraic")$Wald
+            )
+        )
     )
 
     response <- model[["call"]][["fixed"]][[2]]
@@ -41,16 +43,24 @@ lsd_table <- function(model, classify) {
 
     lsdmeantab <-
         agricolae::orderPvalue(
-                       treatments,
-                       means,
-                       alpha,
-                       prob.matrix,
-                       console = TRUE
-                   )
+            treatments,
+            means,
+            alpha,
+            prob.matrix,
+            console = TRUE
+        )
 
-    lsdmeantab$Treatment <- rownames(lsdmeantab)
+    ## lsdmeantab <-
+    ##     lsd_group(
+    ##         treatments,
+    ##         means,
+    ##         alpha,
+    ##         prob.matrix
+    ##     )
 
-    lsdmeantab$LSD <- lsd
+    lsdmeantab$treatments <- rownames(lsdmeantab)
+
+    lsdmeantab$lsds <- lsd
 
     return(lsdmeantab)
 }
