@@ -47,7 +47,7 @@ lsd_graph <- function(model, classify, ...) {
         console = TRUE
     )
 
-    lsdmeantab$Treatment <- rownames(lsdmeantab)
+    lsdmeantab$treatments <- rownames(lsdmeantab)
 
     # Defining the min and max for the graphs
     y_min <- 0.95 * (min(lsdmeantab$means) - lsd)
@@ -57,7 +57,7 @@ lsd_graph <- function(model, classify, ...) {
         ggplot2::ggplot(
             lsdmeantab,
             ggplot2::aes(
-                x = stats::reorder(Treatment, means),
+                x = stats::reorder(treatments, means),
                 y = means
                 # fill = means
             )
