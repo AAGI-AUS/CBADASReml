@@ -2,7 +2,8 @@ model <- asreml(
     fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
     random = ~ idv(Blocks) + idv(Blocks):idv(Wplots),
     residual = ~ idv(units),
-    data = oats
+    data = oats,
+    trace = FALSE
 )
 
 test_that("lsd_graph creates expected outputs", {
