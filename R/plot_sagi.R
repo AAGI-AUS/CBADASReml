@@ -1,11 +1,11 @@
 #' A plotting function for Single-Site and MET Analysis
 #'
-#' This function allows you to observe outliers more easily. Requires the packages stringr, ggplot2, ggpubr.
+#' This function allows you to observe outliers more easily.
 #' @param model, an ASReml model.
 #' @param stndResid Use standardised residuals?
 #' @keywords Outlier
 #' @export
-#' @import stringr ggplot2 ggpubr
+#' @import   stringr ggplot2 ggpubr
 #' @examples
 #' \dontrun{
 #' plot_sagi(model)
