@@ -24,7 +24,8 @@ lsd_table <- function(model, classify, ...) {
             classify = classify,
             wald.tab = as.data.frame(
                 asreml::wald(model, denDF = "algebraic")$Wald
-            )
+            ),
+            ...
         )
     )
 
