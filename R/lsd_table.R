@@ -41,24 +41,22 @@ lsd_table <- function(model, classify, ...) {
 
     alpha <- 0.05
 
+    ## lsdmeantab <-
+    ##     agricolae::orderPvalue(
+    ##                    treatments,
+    ##                    means,
+    ##                    alpha,
+    ##                    prob.matrix,
+    ##                    console = TRUE
+    ##                )
+
     lsdmeantab <-
-        agricolae::orderPvalue(
+        lsd_group(
             treatments,
             means,
             alpha,
-            prob.matrix,
-            console = TRUE
+            prob.matrix
         )
-
-    ## lsdmeantab <-
-    ##     lsd_group(
-    ##         treatments,
-    ##         means,
-    ##         alpha,
-    ##         prob.matrix
-    ##     )
-
-    lsdmeantab$treatments <- rownames(lsdmeantab)
 
     lsdmeantab$lsds <- lsd
 
