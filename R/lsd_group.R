@@ -28,7 +28,7 @@ lsd_group <- function(treatments, means, alpha, pvalues) {
     ltr <- 0
 
     ## Iterate over all treatments
-    for (trt_i in 1:(n_trt - 1)) {
+    for (trt_i in 1:n_trt) {
         ## Check trt i with all other treatments
         for (trt_j in (trt_i:n_trt + 1)) {
             ## Is their pval significant?
