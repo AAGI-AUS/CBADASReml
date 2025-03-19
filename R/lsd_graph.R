@@ -39,15 +39,24 @@ lsd_graph <- function(model, classify, ...) {
     means <- pred$predictions$predicted.value
     alpha <- 0.05
 
-    lsdmeantab <- agricolae::orderPvalue(
+    lsdmeantab <- lsd_group(
         treatments,
         means,
         alpha,
-        prob.matrix,
-        console = TRUE
+        prob.matrix
     )
 
-    lsdmeantab$treatments <- rownames(lsdmeantab)
+    lsdmeantab$means <- means[match(lsdmeantab$treatment, treatments)]
+
+    ## lsdmeantab <- agricolae::orderPvalue(
+    ##     treatments,
+    ##     means,
+    ##     alpha,
+    ##     prob.matrix,
+    ##     console = TRUE
+    ## )
+
+    ## lsdmeantab$treatment <- rownames(lsdmeantab)
 
     # Defining the min and max for the graphs
     y_min <- 0.95 * (min(lsdmeantab$means) - lsd)
@@ -57,7 +66,7 @@ lsd_graph <- function(model, classify, ...) {
         ggplot2::ggplot(
             lsdmeantab,
             ggplot2::aes(
-                x = stats::reorder(treatments, means),
+                x = stats::reorder(treatment, means),
                 y = means
                 # fill = means
             )
@@ -69,7 +78,7 @@ lsd_graph <- function(model, classify, ...) {
             fill = "lightblue"
         ) +
         ggplot2::geom_text(
-            ggplot2::aes(label = groups, y = (means + lsd)),
+            ggplot2::aes(label = group, y = (means + lsd)),
             position = ggplot2::position_dodge(0.5),
             vjust = -0.2,
             ## size = 5
