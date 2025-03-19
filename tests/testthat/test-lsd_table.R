@@ -9,7 +9,7 @@ model <- asreml(
 test_that("table matches output as if we used agricolae::orderPvalue", {
     agricolae_table <-
         data.frame(
-            groups = c(
+            group = c(
                 "a",
                 "a",
                 "ab",
@@ -36,7 +36,7 @@ test_that("table matches output as if we used agricolae::orderPvalue", {
                 "kl",
                 "l"
             ),
-            treatments = c(
+            treatment = c(
                 "19",
                 "20",
                 "13",
@@ -96,6 +96,6 @@ test_that("table matches output as if we used agricolae::orderPvalue", {
     lt$lsds <- round(lt$lsds, 4)
 
     expect_equal(lt$groups, agricolae_table$groups)
-    expect_equal(lt$treatments, agricolae_table$treatments)
+    expect_equal(lt$treatment, agricolae_table$treatment)
     expect_equal(lt$lsds, agricolae_table$lsds)
 })
