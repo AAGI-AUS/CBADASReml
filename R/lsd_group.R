@@ -5,9 +5,12 @@
 #' @param alpha numeric significant difference threshold
 #' @param pvalues symmetric numeric matrix of pvalues calculated via pairwise
 #'     t-tests
+#'
 #' @return data.frame of treatments and their associated group
 #' @export
-#' @examplesIf requireNamespace("asreml", quietly = TRUE)
+#'
+#' @examplesIf requireNamespace("asreml", quietly = TRUE) &
+#'     requireNamespace("asremlPlus", quietly = TRUE)
 #' library(asreml)
 #' model <- asreml(
 #'     fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
@@ -15,6 +18,26 @@
 #'     residual = ~idv(units),
 #'     data = oats
 #' )
+#'
+#' pred <- predictPlus.asreml(
+#'     model,
+#'     classify = classify,
+#'     wald.tab = as.data.frame(asreml::wald(model, denDF = "algebraic")$Wald)
+#' )
+#'
+#' prob.matrix <- ifelse(is.na(pred$p.differences), 1, pred$p.differences)
+#' treatments <- colnames(prob.matrix)
+#' means <- pred$predictions$predicted.value
+#' alpha <- 0.05
+#'
+#' lsdmeantab <-
+#'     lsd_group(
+#'         treatments,
+#'         means,
+#'         alpha,
+#'         prob.matrix
+#'     )
+
 lsd_group <- function(treatments, means, alpha, pvalues) {
     ## Order everything by descending mean
     ord <- order(means, decreasing = TRUE)

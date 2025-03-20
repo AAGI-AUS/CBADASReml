@@ -4,8 +4,12 @@
 #'
 #' @param model An \pkg{ASReml-R} model.
 #' @param classify A string specifying which variables to predict and calculate
-#'   LSDs from.
+#'     LSDs from.
+#' @param ... Arguments to pass to `predictPlus.asreml`
+#'
 #' @returns A `data.frame` with the LSD values.
+#' @export
+#'
 #' @examplesIf requireNamespace("asreml", quietly = TRUE)
 #' library(asreml)
 #' model <- asreml(
@@ -15,7 +19,7 @@
 #'     data = oats
 #' )
 #' lsd_table(model, classify = "Variety")
-#' @export
+
 lsd_table <- function(model, classify, ...) {
     ## Suppress all prints
     capture.output(
@@ -29,27 +33,12 @@ lsd_table <- function(model, classify, ...) {
         )
     )
 
-    response <- model[["call"]][["fixed"]][[2]]
-    response <- toString(response)
-
-    # LSD Value
     lsd <- pred$LSD$assignedLSD
 
     prob.matrix <- ifelse(is.na(pred$p.differences), 1, pred$p.differences)
-
     treatments <- colnames(prob.matrix)
     means <- pred$predictions$predicted.value
-
     alpha <- 0.05
-
-    ## lsdmeantab <-
-    ##     agricolae::orderPvalue(
-    ##                    treatments,
-    ##                    means,
-    ##                    alpha,
-    ##                    prob.matrix,
-    ##                    console = TRUE
-    ##                )
 
     lsdmeantab <-
         lsd_group(

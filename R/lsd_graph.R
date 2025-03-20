@@ -3,9 +3,13 @@
 #' Generates a table of least significant differences (LSDs) for a given model.
 #'
 #' @param model, an ASReml model.
-#' @param classify, A string specifying which variables to predict and calculate LSDs from.
+#' @param classify A string specifying which variables to predict and calculate
+#'     LSDs from.
 #' @param ... Arguments to pass to `predictPlus.asreml`
+#'
 #' @returns return a ggplot2 object.
+#' @export
+#'
 #' @examplesIf requireNamespace("asreml", quietly = TRUE)
 #' library(asreml)
 #' model <- asreml(
@@ -15,7 +19,7 @@
 #'     data = oats
 #' )
 #' lsd_graph(model, classify = "Variety", sep_line = T)
-#' @export
+
 lsd_graph <- function(model, classify, ...) {
     capture.output(
         pred <- asremlPlus::predictPlus.asreml(
@@ -47,16 +51,6 @@ lsd_graph <- function(model, classify, ...) {
     )
 
     lsdmeantab$means <- means[match(lsdmeantab$treatment, treatments)]
-
-    ## lsdmeantab <- agricolae::orderPvalue(
-    ##     treatments,
-    ##     means,
-    ##     alpha,
-    ##     prob.matrix,
-    ##     console = TRUE
-    ## )
-
-    ## lsdmeantab$treatment <- rownames(lsdmeantab)
 
     # Defining the min and max for the graphs
     y_min <- 0.95 * (min(lsdmeantab$means) - lsd)

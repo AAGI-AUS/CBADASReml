@@ -49,17 +49,9 @@ test_that("groups are same as agricolae::orderPvalue", {
         )
     )
 
-    response <- model[["call"]][["fixed"]][[2]]
-    response <- toString(response)
-
-    # LSD Value
-    lsd <- pred$LSD$assignedLSD
-
     prob.matrix <- ifelse(is.na(pred$p.differences), 1, pred$p.differences)
-
     treatments <- colnames(prob.matrix)
     means <- pred$predictions$predicted.value
-
     alpha <- 0.05
 
     lsdmeantab <-
