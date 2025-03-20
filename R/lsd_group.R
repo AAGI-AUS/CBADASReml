@@ -9,8 +9,7 @@
 #' @return data.frame of treatments and their associated group
 #' @export
 #'
-#' @examplesIf requireNamespace("asreml", quietly = TRUE) &
-#'     requireNamespace("asremlPlus", quietly = TRUE)
+#' @examplesIf "&"(requireNamespace("asreml", quietly = TRUE), requireNamespace("asremlPlus", quietly = TRUE))
 #' library(asreml)
 #' model <- asreml(
 #'     fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
@@ -19,9 +18,9 @@
 #'     data = oats
 #' )
 #'
-#' pred <- predictPlus.asreml(
+#' pred <- asremlPlus::predictPlus.asreml(
 #'     model,
-#'     classify = classify,
+#'     classify = "Variety",
 #'     wald.tab = as.data.frame(asreml::wald(model, denDF = "algebraic")$Wald)
 #' )
 #'

@@ -18,7 +18,7 @@
 #'     residual = ~idv(units),
 #'     data = oats
 #' )
-#' lsd_graph(model, classify = "Variety", sep_line = T)
+#' lsd_graph(model, classify = "Variety")
 
 lsd_graph <- function(model, classify, ...) {
     capture.output(

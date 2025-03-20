@@ -1,12 +1,11 @@
-invisible(capture.output(
-    model <- asreml(
-        fixed = yield ~ Variety,
-        random = ~units,
-        residual = ~ ar1v(Row):ar1(Column),
-        data = shf,
-        trace = FALSE
-    )
-))
+library(asreml)
+model <- asreml::asreml(
+    fixed = yield ~ Variety,
+    random = ~units,
+    residual = ~ ar1v(Row):ar1(Column),
+    data = shf,
+    trace = FALSE
+)
 
 test_that("groups are same as agricolae::orderPvalue", {
     agricolae_groups <- c(

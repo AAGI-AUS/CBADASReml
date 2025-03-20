@@ -1,3 +1,4 @@
+library(asreml)
 model <- asreml(
     fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
     random = ~ idv(Blocks) + idv(Blocks):idv(Wplots),

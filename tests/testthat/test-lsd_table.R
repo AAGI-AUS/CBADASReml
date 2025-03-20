@@ -1,3 +1,4 @@
+library(asreml)
 model <- asreml(
     fixed = yield ~ Variety,
     random = ~units,

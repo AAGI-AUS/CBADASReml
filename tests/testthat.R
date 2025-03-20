@@ -7,6 +7,7 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
+library(vdiffr)
 library(CBADASReml)
 
 test_check("CBADASReml")
