@@ -48,7 +48,8 @@ lsd_table <- function(model, classify, ...) {
             prob.matrix
         )
 
-    lsdmeantab$lsds <- lsd
+    lsdmeantab$lsd <- lsd
+    lsdmeantab$means <- means[order(means, decreasing = TRUE)]
 
     return(lsdmeantab)
 }

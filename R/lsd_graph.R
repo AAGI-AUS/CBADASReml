@@ -21,40 +21,14 @@
 #' lsd_graph(model, classify = "Variety")
 
 lsd_graph <- function(model, classify, ...) {
-    capture.output(
-        pred <- asremlPlus::predictPlus.asreml(
-            model,
-            classify = classify,
-            wald.tab = as.data.frame(
-                asreml::wald(model, denDF = "algebraic")$Wald
-            ),
-            ...
-        )
-    )
-
     response <- model[["call"]][["fixed"]][[2]]
     response <- toString(response)
 
-    # LSD Value
-    lsd <- pred$LSD$assignedLSD
-
-    prob.matrix <- ifelse(is.na(pred$p.differences), 1, pred$p.differences)
-    treatments <- colnames(prob.matrix)
-    means <- pred$predictions$predicted.value
-    alpha <- 0.05
-
-    lsdmeantab <- lsd_group(
-        treatments,
-        means,
-        alpha,
-        prob.matrix
-    )
-
-    lsdmeantab$means <- means[match(lsdmeantab$treatment, treatments)]
+    lsdmeantab <- lsd_table(model, classify)
 
     # Defining the min and max for the graphs
-    y_min <- 0.95 * (min(lsdmeantab$means) - lsd)
-    y_max <- 1.05 * (max(lsdmeantab$means) + lsd)
+    y_min <- 0.95 * (min(lsdmeantab$means) - lsdmeantab$lsd[[1]])
+    y_max <- 1.05 * (max(lsdmeantab$means) + lsdmeantab$lsd[[1]])
 
     g <-
         ggplot2::ggplot(

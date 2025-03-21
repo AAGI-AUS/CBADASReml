@@ -64,7 +64,7 @@ test_that("table matches output as if we used agricolae::orderPvalue", {
                 "1",
                 "10"
             ),
-            lsds = c(
+            lsd = c(
                 120.5256,
                 120.5256,
                 120.5256,
@@ -94,9 +94,9 @@ test_that("table matches output as if we used agricolae::orderPvalue", {
         )
 
     lt <- lsd_table(model, "Variety")
-    lt$lsds <- round(lt$lsds, 4)
+    lt$lsd <- round(lt$lsd, 4)
 
-    expect_equal(lt$groups, agricolae_table$groups)
+    expect_equal(lt$group, agricolae_table$group)
     expect_equal(lt$treatment, agricolae_table$treatment)
-    expect_equal(lt$lsds, agricolae_table$lsds)
+    expect_equal(lt$lsd, agricolae_table$lsd)
 })
