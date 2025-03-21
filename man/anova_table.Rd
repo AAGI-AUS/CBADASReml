@@ -4,15 +4,16 @@
 \alias{anova_table}
 \title{An ANOVA table Function}
 \usage{
-anova_table(..., ndig = 3)
+anova_table(..., n_digits = 3)
 }
 \arguments{
 \item{...}{\code{asreml}, any number of asreml models.}
 
-\item{ndig}{\code{numeric}, number of digits to round results to.}
+\item{n_digits}{\code{numeric}, number of digits to round results to.}
 }
 \value{
-a dataframe containing all anova tables
+a dataframe containing all anova tables. Can be used with xtable to
+produce a LaTeX table.
 }
 \description{
 This function allows you to observe the anova table for multiple ASReml
@@ -22,7 +23,7 @@ Models. It outputs a table as well as a printed xtable to the console.
 \dontshow{if (requireNamespace("asreml", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(asreml)
 test_data <- oats
-test_data["yield2"] <- test_data["yield"] * runif(nrow(test_data["yield"]))
+test_data["yield2"] <- oats["yield"] * runif(nrow(oats["yield"]))
 mod1 <- asreml(
     fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
     random = ~idv(Blocks) + idv(Blocks):idv(Wplots),
@@ -35,6 +36,6 @@ mod2 <- asreml(
     residual = ~idv(units),
     data = test_data
 )
-anova_table(mod1, mod2, ndig = 5)
+anova_table(mod1, mod2)
 \dontshow{\}) # examplesIf}
 }
