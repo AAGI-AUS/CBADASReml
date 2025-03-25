@@ -7,11 +7,14 @@
 #' @param data the data used in the Model. Can be found automatically from the model.
 #' @keywords Outlier
 #' @import tidyr DT dplyr
+#' @importFrom magrittr `%>%`
 #' @export
 #' @examples
 #' \dontrun{
 #' outlier_table(model)
 #' }
+#'
+#' @autoglobal
 outlier_table <- function(model, cutoff = 3.5, factors = NULL, data = NULL) {
   Response <- toString(model$formulae$fixed[[2]])
 
@@ -36,15 +39,13 @@ outlier_table <- function(model, cutoff = 3.5, factors = NULL, data = NULL) {
 
   factors_sym <- rlang::syms(factors)
 
-  data <- data %>% unite(TMT, factors, remove = F)
-
+  data <- data %>% unite(TMT, factors, remove = FALSE)
   data$Residual <- round(Std_Residuals, 3)
-  data$outlier <- ifelse(abs(Std_Residuals) > cutoff, 1, 0)
 
   outliers <- which(abs(Std_Residuals) > cutoff)
 
   if (length(outliers) == 0) {
-    outliers <- c(order(abs(Std_Residuals), decreasing = T)[1:3])
+    outliers <- c(order(abs(Std_Residuals), decreasing = TRUE)[1:3])
   }
 
   top_TMT <- unlist(data %>% filter(units %in% outliers) %>% select(TMT))

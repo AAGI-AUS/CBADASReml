@@ -1,7 +1,7 @@
 Package: CBADASReml
 Title: Provides helper functions for ASReml
 Version: 0.1.0
-Authors@R:c(
+Authors@R: c(
     person("Kai", "Bagley", , "kai.bagley@curtin.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0004-6579-6959")),
     person(c("Jordan", "jordan.brown@curtin.edu.au"), "Brown", role = "aut",
@@ -49,10 +49,14 @@ Imports:
 Suggests:
     ASExtras4,
     asreml,
+    roxyglobals,
     rstac,
     testthat (>= 3.0.0),
     vdiffr
 Config/testthat/edition: 3
 Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
+Roxygen: list(markdown = TRUE, roclets = c("collate", "namespace", "rd",
+    "roxyglobals::global_roclet"))
 RoxygenNote: 7.3.2
+Config/roxyglobals/filename: globals.R
+Config/roxyglobals/unique: FALSE

@@ -22,5 +22,6 @@ This function produces a table of the outliers as well the other points from tha
 \dontrun{
 outlier_table(model)
 }
+
 }
 \keyword{Outlier}
