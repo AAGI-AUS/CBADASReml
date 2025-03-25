@@ -2,7 +2,7 @@
 % Please edit documentation in R/outlier_table.R
 \name{outlier_table}
 \alias{outlier_table}
-\title{An outlier Function}
+\title{Produce a table of outliers from an ASReml Model}
 \usage{
 outlier_table(model, cutoff = 3.5, factors = NULL, data = NULL)
 }
