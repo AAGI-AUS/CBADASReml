@@ -4,27 +4,22 @@
 \alias{exploratory_table}
 \title{Produces a summary table for the data with Mean, Median, SD, CV and Range.}
 \usage{
-exploratory_table(data, response, decimal_places = 3, ...)
+exploratory_table(data, response, groupby)
 }
 \arguments{
-\item{data, }{a data set to be summarised}
+\item{data}{a data set to be summarised}
 
-\item{response, }{variable (without quotes) to get summary statistics of.}
+\item{response}{string variable name in the data of the response}
 
-\item{decimal_places, }{number of decimal places to show}
-
-\item{...}{variables (without quotes) to group and arrange the data in.}
+\item{groupby}{vector of strings of the names of the grouping variables in
+the data}
 }
 \value{
-a data.frame
+data.frame
 }
 \description{
 This function outputs the summary statistics of the given data
 }
 \examples{
-\dontrun{
-exploratory_table(mtcars, disp, cyl, gear)
+exploratory_table(mtcars, response = "mpg", groupby = c("cyl", "gear"))
 }
-}
-\keyword{Raw}
-\keyword{statistics}
