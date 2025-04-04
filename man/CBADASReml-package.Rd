@@ -6,7 +6,7 @@
 \alias{CBADASReml-package}
 \title{CBADASReml: Provides helper functions for ASReml}
 \description{
-This package provides helper functions for ASReml, particularly for use with small-plot trials
+This package provides helper functions for ASReml, particularly for use with small-plot trials.
 }
 \author{
 \strong{Maintainer}: Kai Bagley \email{kai.bagley@curtin.edu.au} (\href{https://orcid.org/0009-0004-6579-6959}{ORCID})

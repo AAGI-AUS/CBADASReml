@@ -17,7 +17,7 @@ produce a LaTeX table.
 }
 \description{
 This function allows you to observe the anova table for multiple ASReml
-Models. It outputs a table as well as a printed xtable to the console.
+or glmmTMB models.
 }
 \examples{
 \dontshow{if (requireNamespace("asreml", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}

@@ -25,6 +25,7 @@ Each factor is put on a separate excel sheet.
 }
 \examples{
 \dontshow{if (requireNamespace("asreml", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+library(asreml)
 model <- asreml(
     fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
     random = ~idv(Blocks) + idv(Blocks):idv(Wplots),
@@ -32,9 +33,9 @@ model <- asreml(
     data = oats
 )
 
-prediction_tables(
+report_tables(
     model,
-    classify = "Variety:Nitrogen",
+    classify = "Variety:Nitrogen"
 )
 
 \dontrun{
