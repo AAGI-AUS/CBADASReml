@@ -14,6 +14,7 @@
 #' @export
 #'
 #' @examplesIf requireNamespace("asreml", quietly = TRUE)
+#' library(asreml)
 #' model <- asreml(
 #'     fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
 #'     random = ~idv(Blocks) + idv(Blocks):idv(Wplots),
@@ -21,9 +22,9 @@
 #'     data = oats
 #' )
 #'
-#' prediction_tables(
+#' report_tables(
 #'     model,
-#'     classify = "Variety:Nitrogen",
+#'     classify = "Variety:Nitrogen"
 #' )
 #'
 #' \dontrun{

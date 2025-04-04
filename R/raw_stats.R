@@ -22,7 +22,7 @@ exploratory_table <- function(data, response, groupby) {
 
     compute_stats <- function(x) {
         mn <- mean(x, na.rm = TRUE)
-        med <- median(x, na.rm = TRUE)
+        med <- stats::median(x, na.rm = TRUE)
         sd <- sd(x, na.rm = TRUE)
         cv <- 100 * sd / mn
         reps <- length(x)
@@ -41,7 +41,7 @@ exploratory_table <- function(data, response, groupby) {
     }
 
     # Use aggregate to compute statistics per group
-    aggregated_data <- aggregate(
+    aggregated_data <- stats::aggregate(
         x = data[[response]],
         by = data[groupby],
         FUN = \(x) list(compute_stats(x))

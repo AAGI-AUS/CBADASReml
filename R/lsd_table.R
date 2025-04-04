@@ -22,7 +22,7 @@
 
 lsd_table <- function(model, classify, ...) {
     ## Suppress all prints
-    capture.output(
+    utils::capture.output(
         pred <- asremlPlus::predictPlus.asreml(
             model,
             classify = classify,

@@ -1,4 +1,9 @@
-pred_anova_tab_multi_response <- function(..., classify, all_pval = T, tabcaption = NULL) {
+pred_anova_tab_multi_response <- function(
+    ...,
+    classify,
+    all_pval = T,
+    tabcaption = NULL
+) {
     # Number of factors
     n <- as.numeric(length(strsplit(classify, "[*]")[[1]]))
 
@@ -25,7 +30,11 @@ pred_anova_tab_multi_response <- function(..., classify, all_pval = T, tabcaptio
 
     testo <- models[[1]]
 
-    pred_table <- asreml::predict.asreml(object = testo, classify = classify, sed = TRUE)$pvals[, 1:n]
+    pred_table <- asreml::predict.asreml(
+        object = testo,
+        classify = classify,
+        sed = TRUE
+    )$pvals[, 1:n]
 
     avsed.vec <- rep(NA, c(length(models) + 4))
 
@@ -45,8 +54,8 @@ pred_anova_tab_multi_response <- function(..., classify, all_pval = T, tabcaptio
     a <- colnames(pred_table)
     colnames(pval_table) <- a
 
-    pred_table <- na.omit(pred_table)
-    pval_table <- na.omit(pval_table)
+    pred_table <- stats::na.omit(pred_table)
+    pval_table <- stats::na.omit(pval_table)
 
     print(avsed.vec)
     print(pred_table)
@@ -57,7 +66,5 @@ pred_anova_tab_multi_response <- function(..., classify, all_pval = T, tabcaptio
 
     joint_table <- rbind(pred_table, pval_table)
 
-    print(xtable(joint_table,
-        include.rownames = F
-    ))
+    print(xtable(joint_table, include.rownames = F))
 }

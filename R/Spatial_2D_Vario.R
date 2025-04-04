@@ -33,17 +33,17 @@ spatial_2D_variogram <- function(model, tol = 0) {
     spatial_data$residual <- stats::resid(model)
 
     m_spatial_data <- sf::st_as_sf(
-                              na.omit(spatial_data),
-                              coords = c("dir1", "dir2")
-                          )
+        stats::na.omit(spatial_data),
+        coords = c("dir1", "dir2")
+    )
 
     vario_mod <- gstat::variogram(
-                            residual ~ 1,
-                            data = m_spatial_data,
-                            alpha = c(0, 90),
-                            width = 1,
-                            cutoff = max(dir1_range, dir2_range),
-                            tol.hor = tol
+        residual ~ 1,
+        data = m_spatial_data,
+        alpha = c(0, 90),
+        width = 1,
+        cutoff = max(dir1_range, dir2_range),
+        tol.hor = tol
     )
 
     return(vario_mod)

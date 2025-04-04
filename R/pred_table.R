@@ -11,9 +11,11 @@
 #'     * `glmmTBM`
 #' @param classify
 #'     Variable to make predictions on
-#' @param asrLink
+#' @param link_fun
 #'     Something
 #' @param tmb_component
+#'     Something
+#' @param tmb_type
 #'     Something
 #' @param factor_combine
 #'     Something
@@ -23,17 +25,15 @@
 #' @return
 #'     Something
 #'
-#' @examplesIf
-#'     Something
 #' @export
-tab_pred <- function(
+pred_table <- function(
     mod,
     classify,
-    asrLink = "identity",
-    TMBcomponent = "cond",
-    TMBtype = "response",
-    facCombine = TRUE,
-    trtColLbl = "Treatment"
+    link_fun = "identity",
+    tmb_component = "cond",
+    tmb_type = "response",
+    factor_combine = TRUE,
+    trt_col_label = "Treatment"
 ) {
     modtype <- class(mod)
 
@@ -41,8 +41,8 @@ tab_pred <- function(
         "Model must be of class asreml or glmmTMB" = modtype == "asreml" |
             modtype == "glmmTMB",
         "classify must be type character" = is.character(classify),
-        'asrLink must be one of "identity", "log", "inverse", "sqrt",
-        "logit", "probit", "cloglog"' = asrLink %in%
+        'link_fun must be one of "identity", "log", "inverse", "sqrt",
+        "logit", "probit", "cloglog"' = link_fun %in%
             c(
                 "identity",
                 "log",
@@ -52,11 +52,11 @@ tab_pred <- function(
                 "probit",
                 "cloglog"
             ),
-        'TMBcomponent must be one of "cond", "cmean", "zi", "response"' = TMBcomponent %in%
+        'tmb_component must be one of "cond", "cmean", "zi", "response"' = tmb_component %in%
             c("cond", "cmean", "zi", "response"),
-        'TMBtype must be one of "response"' = TMBtype %in% c("response"),
-        "facCombine must be type logical" = is.logical(facCombine),
-        "trtColLbl must be type character" = is.character(trtColLbl)
+        'tmb_type must be one of "response"' = tmb_type %in% c("response"),
+        "factor_combine must be type logical" = is.logical(factor_combine),
+        "trt_col_label must be type character" = is.character(trt_col_label)
         ## Check/extend conditions
     )
 
@@ -67,7 +67,7 @@ tab_pred <- function(
                 classify = classify,
                 wald.tab = as.data.frame(asreml::wald(mod)),
                 pairwise = TRUE,
-                transform.function = asrLink
+                transform.function = link_fun
             )
         )
         if ("backtransformed.predictions" %in% names(pred$backtransforms)) {
@@ -97,8 +97,8 @@ tab_pred <- function(
                 emmeans::emmeans(
                     mod,
                     specs = spec,
-                    type = TMBtype,
-                    component = TMBcomponent
+                    type = tmb_type,
+                    component = tmb_component
                 )
             )
         tab <- pred[, names(pred) != "df"]
@@ -125,10 +125,10 @@ tab_pred <- function(
     }
 
     ## Format pred table
-    if (facCombine == TRUE) {
+    if (factor_combine == TRUE) {
         ## Last four columns are always present - combine first ncol - 4 names
         if (ncol(tab) - 4 > 1) {
-            tab[[trtColLbl]] <-
+            tab[[trt_col_label]] <-
                 as.factor(
                     apply(
                         tab[, 1:(ncol(tab) - 4)],
@@ -137,13 +137,13 @@ tab_pred <- function(
                     )
                 )
         } else {
-            tab[[trtColLbl]] <- as.factor(
+            tab[[trt_col_label]] <- as.factor(
                 tab[, 1]
             )
         }
         tab <- tab[, (ncol(tab) - 4):ncol(tab)]
         tab <- tab[, c(
-            trtColLbl,
+            trt_col_label,
             "Mean",
             "Standard Error",
             "Lower CL",

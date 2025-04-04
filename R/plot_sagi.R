@@ -16,7 +16,7 @@ plot_sagi <- function(model, stndResid = TRUE) {
     TEMP$ID <- 1:nrow(TEMP)
 
     if (stndResid) {
-        model <- update(model, aom = T)
+        model <- asreml::update.asreml(model, aom = T)
         TEMP$Residuals <- model$aom$R[, 2]
     } else {
         TEMP$Residuals <- stats::resid(model)
