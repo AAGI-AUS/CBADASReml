@@ -1,29 +1,70 @@
-#' A function that returns tablulated predictions from a model
+#' Generate Prediction Table from Model
 #'
-#' This function returns the predictions and confidence intervals of an
-#' `asreml` or `glmmTMB` object.
+#' Generater a table of predicted values and CIs from an
+#' \code{\link[asreml]{asreml}} or \code{\link[glmmTMB]{glmmTMB}} model, for
+#' the specified variables `asreml` or `glmmTMB` object. Created by Matthew
+#' Nguyen.
 #'
 #' @param mod
 #'     The model object to get predictions from.
 #'
 #'     The value may be:
-#'     * `asreml`
-#'     * `glmmTBM`
-#' @param classify
-#'     Variable to make predictions on
-#' @param link_fun
-#'     Something
-#' @param tmb_component
-#'     Something
-#' @param tmb_type
-#'     Something
-#' @param factor_combine
-#'     Something
-#' @param trt_col_label
-#'     Something
+#'     * \code{asreml}
+#'     * \code{glmmTBM}
+#' @param classify \code{character} vector.
+#'     Variable for which predictions will be made.
 #'
-#' @return
-#'     Something
+#'     For \code{asreml} models, it is passed to \code{classify} argument of
+#'     \code{predictPlus.asreml}.
+#'     For \code{glmmTMB} models it is used in the \code{specs} argument of
+#'     \code{\link[emmeans]{emmeans}}
+#' @param link_fun \code{character} vector.
+#'     Specifies the transformation function to apply over the predictions.
+#'     Only applies for \code{asreml} objects.
+#'
+#'     The value may be:
+#'     * \code{"identity"} (default)
+#'     * \code{"log"}
+#'     * \code{"inverse"}
+#'     * \code{"sqrt"}
+#'     * \code{"logit"}
+#'     * \code{"probit"}
+#'     * \code{"cloglog"}
+#' @param tmb_component \code{character} vector.
+#'     Specifies the component of the \code{glmmTMB} model from which to get
+#'     predictions.
+#'
+#'     The value may be:
+#'     * \code{"cond"} (default)
+#'     * \code{"zi"}
+#'     * \code{"cmean"}
+#'     * \code{"response"}
+#' @param tmb_type `character` vector.
+#'     Specifies  the prediction type for \code{glmmTMB} models.
+#'
+#'     Only \code{"response"} is supported at the moment.
+#' @param factor_combine Logical
+#'     Whether or not to combine the factors in \code{classify} into a single
+#'     column in the output table. If \code{TRUE} (default), the factor levels
+#'     are concatenated and labelled using \code{trt_col_label}.
+#'
+#' @param trt_col_label \code{character} vector.
+#'     Specifies the label for the combined factor column when
+#'     \code{factor_combine} is \code{TRUE}. Defaults to \code{"Treatment"}
+#'
+#' @return \code{data.frame}.
+#'     Contains the predicted means, standard errors, and confidence intervals
+#'     for the specified variables. Includes the following columns:
+#' \describe{
+#'   \item{Treatment}{The combined factor levels, if \code{factor_combine} is \code{TRUE}.}
+#'   \item{Mean}{The predicted mean values.}
+#'   \item{Standard Error}{The standard errors of the predicted means.}
+#'   \item{Lower CL}{The lower confidence limits.}
+#'   \item{Upper CL}{The upper confidence limits.}
+#' }
+#'     If \code{factor_combine} is \code{FALSE}, the factors specified in
+#'     \code{classify} remain as separate columns.
+#'
 #'
 #' @export
 pred_table <- function(

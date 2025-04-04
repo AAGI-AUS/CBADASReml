@@ -2,7 +2,7 @@
 % Please edit documentation in R/pred_table.R
 \name{pred_table}
 \alias{pred_table}
-\title{A function that returns tablulated predictions from a model}
+\title{Generate Prediction Table from Model}
 \usage{
 pred_table(
   mod,
@@ -18,27 +18,76 @@ pred_table(
 \item{mod}{The model object to get predictions from.
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{The value may be:
-* `asreml`
-* `glmmTBM`
+* \code{asreml}
+* \code{glmmTBM}
 }\if{html}{\out{</div>}}}
 
-\item{classify}{Variable to make predictions on}
+\item{classify}{\code{character} vector.
+Variable for which predictions will be made.
 
-\item{link_fun}{Something}
+\if{html}{\out{<div class="sourceCode">}}\preformatted{For \code{asreml} models, it is passed to \code{classify} argument of
+\code{predictPlus.asreml}.
+For \code{glmmTMB} models it is used in the \code{specs} argument of
+\code{\link[emmeans]{emmeans}}
+}\if{html}{\out{</div>}}}
 
-\item{tmb_component}{Something}
+\item{link_fun}{\code{character} vector.
+Specifies the transformation function to apply over the predictions.
+Only applies for \code{asreml} objects.
 
-\item{tmb_type}{Something}
+\if{html}{\out{<div class="sourceCode">}}\preformatted{The value may be:
+* \code{"identity"} (default)
+* \code{"log"}
+* \code{"inverse"}
+* \code{"sqrt"}
+* \code{"logit"}
+* \code{"probit"}
+* \code{"cloglog"}
+}\if{html}{\out{</div>}}}
 
-\item{factor_combine}{Something}
+\item{tmb_component}{\code{character} vector.
+Specifies the component of the \code{glmmTMB} model from which to get
+predictions.
 
-\item{trt_col_label}{Something}
+\if{html}{\out{<div class="sourceCode">}}\preformatted{The value may be:
+* \code{"cond"} (default)
+* \code{"zi"}
+* \code{"cmean"}
+* \code{"response"}
+}\if{html}{\out{</div>}}}
+
+\item{tmb_type}{\code{character} vector.
+Specifies  the prediction type for \code{glmmTMB} models.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{Only \code{"response"} is supported at the moment.
+}\if{html}{\out{</div>}}}
+
+\item{factor_combine}{Logical
+Whether or not to combine the factors in \code{classify} into a single
+column in the output table. If \code{TRUE} (default), the factor levels
+are concatenated and labelled using \code{trt_col_label}.}
+
+\item{trt_col_label}{\code{character} vector.
+Specifies the label for the combined factor column when
+\code{factor_combine} is \code{TRUE}. Defaults to \code{"Treatment"}}
 }
 \value{
-\if{html}{\out{<div class="sourceCode">}}\preformatted{Something
-}\if{html}{\out{</div>}}
+\code{data.frame}.
+Contains the predicted means, standard errors, and confidence intervals
+for the specified variables. Includes the following columns:
+\describe{
+\item{Treatment}{The combined factor levels, if \code{factor_combine} is \code{TRUE}.}
+\item{Mean}{The predicted mean values.}
+\item{Standard Error}{The standard errors of the predicted means.}
+\item{Lower CL}{The lower confidence limits.}
+\item{Upper CL}{The upper confidence limits.}
+}
+If \code{factor_combine} is \code{FALSE}, the factors specified in
+\code{classify} remain as separate columns.
 }
 \description{
-This function returns the predictions and confidence intervals of an
-\code{asreml} or \code{glmmTMB} object.
+Generater a table of predicted values and CIs from an
+\code{\link[asreml]{asreml}} or \code{\link[glmmTMB]{glmmTMB}} model, for
+the specified variables \code{asreml} or \code{glmmTMB} object. Created by Matthew
+Nguyen.
 }
