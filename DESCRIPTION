@@ -12,41 +12,26 @@ Authors@R: c(
            comment = "GRDC Project CUR2210-005OPX (AAGI-CU)")
   )
 Description: This package provides helper functions for ASReml,
-    particularly for use with small-plot trials
+    particularly for use with small-plot trials.
 License: GPL (>= 3)
 Imports:
-    agricolae,
     asremlPlus,
     dplyr,
     DT,
-    furrr,
     ggplot2,
     ggpubr,
-    ggspatial,
-    glue,
     gstat,
     htmltools,
-    lifecycle,
     magrittr,
-    patchwork,
-    purrr,
-    raster,
-    RColorBrewer,
-    readr,
     rlang,
     sf,
-    sfdep,
-    spdep,
     stringr,
-    terra,
-    tibble,
     tidyr,
-    tidyverse,
-    tmap,
-    tmaptools,
-    units,
     xtable
 Suggests:
+    emmeans,
+    glmmTMB,
+    car,
     ASExtras4,
     asreml,
     roxyglobals,
