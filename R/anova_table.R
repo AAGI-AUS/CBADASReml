@@ -1,7 +1,7 @@
 #' An ANOVA table Function
 #'
 #' This function allows you to observe the anova table for multiple ASReml
-#' Models. It outputs a table as well as a printed xtable to the console.
+#' or glmmTMB models.
 #' @param ... `asreml`, any number of asreml models.
 #' @param n_digits `numeric`, number of digits to round results to.
 #'
@@ -27,6 +27,9 @@
 #' )
 #' anova_table(mod1, mod2)
 anova_table <- function(..., n_digits = 3) {
+    if (!is.numeric(n_digits)) {
+        stop(paste0("n_digits must be numeric: ", n_digits))
+    }
     UseMethod("anova_table")
 }
 
@@ -34,9 +37,6 @@ anova_table <- function(..., n_digits = 3) {
 #' @export
 anova_table.asreml <- function(..., n_digits = 3) {
     models <- list(...)
-    if (!all(sapply(models, \(x) inherits(x, "asreml")))) {
-        stop("All given dots (...) parameters must be asreml models")
-    }
 
     response_names <- sapply(
         models,
@@ -114,7 +114,7 @@ anova_table.glmmTMB <- function(..., n_digits = 3, zi = FALSE) {
         models,
         \(mod) {
             as.data.frame(
-                glmmTMB:::Anova.II.glmmTMB(
+                car::Anova(
                     mod,
                     component = ifelse(zi, "zi", "cond")
                 )
