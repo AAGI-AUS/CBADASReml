@@ -1,4 +1,5 @@
 set.seed(123)
+library(asreml)
 test_data <- oats
 test_data["yield2"] <- oats["yield"] * runif(nrow(oats["yield"]))
 test_data["yield3"] <- oats["yield"] * runif(nrow(oats["yield"])) * 2
@@ -31,22 +32,19 @@ out <- data.frame(
 
 ## Tests
 test_that("appropriate errors are given for incorrect parameters given", {
-    ## stop("No models passed to this function")
     expect_error(
         anova_table(),
-        "^No models passed.*$"
+        "^no applicable method.*$"
+    )
+    expect_error(
+        anova_table("spaghetti"),
+        "^no applicable method.*$"
     )
 
     ## stop(paste0("n_digits must be numeric: ", n_digits))
     expect_error(
         anova_table(mod1, n_digits = "rigatoni"),
         "^n_digits.*rigatoni$"
-    )
-
-    ## stop("All given dots (...) parameters must be asreml models")
-    expect_error(
-        anova_table("spaghetti"),
-        "^All given dots.*$"
     )
 })
 
