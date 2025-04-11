@@ -8,7 +8,7 @@
 #' If multiple are specified separate with either \code{*} or \code{:}.
 #'     For example \code{Nitrogen:Variety} or \code{Nitrogen*Variety}.
 #'
-#' @returnss A list of data frames. The first data frame is the anova for the
+#' @returns A list of data frames. The first data frame is the anova for the
 #' model. The remaining data frames are the prediction tables from the classify
 #' object.
 #' @export

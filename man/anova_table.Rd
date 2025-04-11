@@ -21,6 +21,7 @@ or glmmTMB models.
 }
 \examples{
 \dontshow{if (requireNamespace("asreml", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+library(CBADASReml)
 library(asreml)
 test_data <- oats
 test_data["yield2"] <- oats["yield"] * runif(nrow(oats["yield"]))
