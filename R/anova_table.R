@@ -10,6 +10,7 @@
 #' @export
 #'
 #' @examplesIf requireNamespace("asreml", quietly = TRUE)
+#' library(CBADASReml)
 #' library(asreml)
 #' test_data <- oats
 #' test_data["yield2"] <- oats["yield"] * runif(nrow(oats["yield"]))
