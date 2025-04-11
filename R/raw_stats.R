@@ -6,7 +6,7 @@
 #' @param groupby vector of strings of the names of the grouping variables in
 #'     the data
 #'
-#' @return data.frame
+#' @returns data.frame
 #' @export
 #'
 #' @examples

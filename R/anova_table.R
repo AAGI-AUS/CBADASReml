@@ -5,7 +5,7 @@
 #' @param ... `asreml`, any number of asreml models.
 #' @param n_digits `numeric`, number of digits to round results to.
 #'
-#' @return a dataframe containing all anova tables. Can be used with xtable to
+#' @returns a dataframe containing all anova tables. Can be used with xtable to
 #'     produce a LaTeX table.
 #' @export
 #'

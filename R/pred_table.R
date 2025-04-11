@@ -52,7 +52,7 @@
 #'     Specifies the label for the combined factor column when
 #'     \code{factor_combine} is \code{TRUE}. Defaults to \code{"Treatment"}
 #'
-#' @return \code{data.frame}.
+#' @returns \code{data.frame}.
 #'     Contains the predicted means, standard errors, and confidence intervals
 #'     for the specified variables. Includes the following columns:
 #' \describe{

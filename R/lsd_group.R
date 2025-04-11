@@ -6,7 +6,7 @@
 #' @param pvalues symmetric numeric matrix of pvalues calculated via pairwise
 #'     t-tests
 #'
-#' @return data.frame of treatments and their associated group
+#' @returns data.frame of treatments and their associated group
 #' @export
 #'
 #' @examplesIf "&"(requireNamespace("asreml", quietly = TRUE), requireNamespace("asremlPlus", quietly = TRUE))

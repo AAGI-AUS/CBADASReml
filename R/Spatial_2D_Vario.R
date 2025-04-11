@@ -3,7 +3,7 @@
 #' This function allows you to observe outliers more easily
 #' @param model `asreml`, an ASReml model with some residual structure.
 #' @param tol `numeric`, tolerance for each angle that is allowed.
-#' @return A `gstat::variogram` object.
+#' @returns A `gstat::variogram` object.
 #' @export
 #' @examplesIf requireNamespace("asreml", quietly = TRUE)
 #' library(asreml)

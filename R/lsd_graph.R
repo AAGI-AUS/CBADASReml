@@ -7,7 +7,7 @@
 #'     LSDs from.
 #' @param ... Arguments to pass to `predictPlus.asreml`
 #'
-#' @returns return a ggplot2 object.
+#' @returnss return a ggplot2 object.
 #' @export
 #'
 #' @examplesIf requireNamespace("asreml", quietly = TRUE)

@@ -7,7 +7,7 @@
 #'     LSDs from.
 #' @param ... Arguments to pass to `predictPlus.asreml`
 #'
-#' @returns A `data.frame` with the LSD values.
+#' @returnss A `data.frame` with the LSD values.
 #' @export
 #'
 #' @examplesIf requireNamespace("asreml", quietly = TRUE)

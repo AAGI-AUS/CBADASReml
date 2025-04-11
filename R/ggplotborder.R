@@ -6,7 +6,7 @@
 #' @keywords design border
 #' @import dplyr xtable
 #' @export
-#' @return a list of the raw stats tables
+#' @returns a list of the raw stats tables
 #' @examples \dontrun{
 #' .data <- data.frame(A = as.factor(rep(1:5, 2)), B = rnorm(10), C = as.factor(rep(1:2, 5)))
 #' raw_stats(.data, response = "B", C, A)
