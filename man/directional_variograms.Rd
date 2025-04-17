@@ -25,7 +25,7 @@ model <- asreml(
     data = wheat
 )
 mod <- directional_variograms(model)
-plot(mod, multipanel = F)
+plot(mod, multipanel = FALSE)
 
 \dontrun{
 # You can also plot using ggplot if you wish

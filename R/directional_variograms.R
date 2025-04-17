@@ -13,7 +13,7 @@
 #'     data = wheat
 #' )
 #' mod <- directional_variograms(model)
-#' plot(mod, multipanel = F)
+#' plot(mod, multipanel = FALSE)
 #'
 #' \dontrun{
 #' # You can also plot using ggplot if you wish
@@ -46,7 +46,7 @@ directional_variograms <- function(model) {
         data = m_spatial_data,
         alpha = c(0, 90),
         width = 1,
-        cutoff = max(m_spatial_data %>% sf::st_coordinates()),
+        cutoff = max(m_spatial_data |> sf::st_coordinates()),
         tol.hor = 0,
         tol.ver = 0
     )
