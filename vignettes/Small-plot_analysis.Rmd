@@ -1,0 +1,195 @@
+---
+title: "Small-plot_analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Small-plot_analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(CBADASReml)
+library(asreml)
+```
+
+# CBADASReml
+
+## Introduction
+
+A typical type of experimental analysis that this package will assist with is
+the small plot trial. The trial design is not handled at all by this package,
+and we recommend the use of \pkg{FielDHub} for creating small plot trial
+designs.
+
+After gathering data from the experiment, it is useful to perform an
+exploratory data analysis on the raw data, and for this you will likely use a
+combination of \pkg{tidyverse} and \pkg{ggplot2} for this, to visualise
+outliers, the data distribution, etc. in order to get a preliminary grasp of
+what you are working with, and to observe the data for any issues that will
+hinder the actual analysis.
+
+Analysis of small plot trials is done using linear mixed-effects models (LMMs),
+using \pkg{asreml} or \pkg{glmmTMB}, and this package contains helper functions
+for this type of model.
+
+## Typical Workflow
+
+The following will outline a typical workflow starting from an existing
+univariate LMM.
+
+### LMMs and ASReml
+
+Let:
+
+\begin{equation*}
+y
+=
+X b
++
+Z u
++
+e
+\end{equation*}
+
+Where
+
+- $y \in \mathbb{R}^{n}$ is the vector of observations.
+- $b \in \mathbb{R}^{p}$ is the vector of fixed effects.
+- $X \in \mathbb{R}^{n \times p}$ is the design matrix for the fixed effects.
+- $u \in \mathbb{R}^{q}$ is the vector of random effects.
+- $Z \in \mathbb{R}^{n \times q}$ is the design matrix for the random effects.
+- $e \in \mathbb{R}^{n}$ is the vector of residuals.
+
+It is assumed that the vectors $u$ and $e$ are independent, and their joint
+distribution is a multivariate Gaussian described by:
+
+\begin{equation*}
+\begin{bmatrix}
+u \\
+e
+\end{bmatrix}
+\sim
+N \bigg(
+  \begin{bmatrix}
+  0 \\
+  0
+  \end{bmatrix}
+  ,
+  \begin{bmatrix}
+  G & 0 \\
+  0 & R
+  \end{bmatrix}
+\bigg)
+\end{equation*}
+
+Where $G$ and $R$ are covariance matrices for $u$ and $e$ and are functions of
+the *variance parameters* $\sigma_g$ and $\sigma_r$, and finally the dependent
+variable $y$ is described by:
+
+\begin{equation*}
+y
+\sim
+N \big(
+X b
+,
+Z G Z^\intercal
++
+R
+\big)
+\end{equation*}
+
+These $G$ and $R$ covariance matrices, or *covariance structures*, are very
+important. These represent the covariance of the random effects and the
+residuals respectively, and $\sigma_g$ and $\sigma_r$, the *covariance
+structure parameters* are the things we try and estimate when we use ASReml.
+
+In the case of independent and identically distributed (IID) residual
+structures, the residual covariance parameter $\sigma_r$ will be some *variance
+component* $\sigma_e^2$.
+
+
+
+We may use the R package \pkg{asreml} as follows to implement an LMM:
+
+```{r}
+mod <- asreml(
+    fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
+    random = ~ idv(Blocks) + idv(Blocks):idv(Wplots),
+    residual = ~ idv(units),
+    data = oats,
+    trace = FALSE
+)
+```
+
+In this case we are using the `oats` data:
+
+- `yield` is our $y$ vector.
+- `Variety`, `Nitrogen` and their interaction `Variety:Nitrogen` are in the $X$
+  matrix.
+- `Blocks` and `Blocks:Wplots` are in the $Z$ matrix. We specify the `idv`
+  variance model function, which is the homogeneous scaled identity variance
+  structure, i.e. $\sigma^2 I$. In other words, the term is IID:
+  + $u_b \sim N(0, \sigma_b^2 I_b)$
+  + $u_{bp} \sim N(0, \sigma_{bp}^2 I_{bp})$
+  + $u = [ \; u_b \; u_{bp} \; ]^\intercal$
+  + $Z = [ \; Z_b \; Z_{bp} \; ]$ (the design matrices for `Blocks` and
+    `Blocks:Wplots`)
+  + Therefore, $G = \bigoplus_{i = 1}^2 G_i = \begin{bmatrix} \sigma_b^2 I_b &
+    0 \\ 0 & \sigma_{bp}^2 I_{bp} \end{bmatrix}$
+- `idv(units)` is the residual variance structure, in this case we are saying
+  the residual term has the homogeneous covariance matrix: $\sigma^2 I$. This
+  is basically saying all observations have the same error distribution (IID):
+  + $e \sim N(0, \sigma_e^2 I_n)$
+  + Therefore, $R = \sigma_e^2 I_n$, the simplest $R$ structure.
+
+Upon executing the above in R, the ASReml-R code will attempt to *estimate* the
+variance components $\sigma_b^2$, $\sigma_{bp}^2$, and $\sigma_e^2$, using the
+REML algorithm.
+
+## CBADASReml
+
+The \pkg{CBADASReml} package has a few functions to make working with LMMs in R
+a bit easier, with consistent outputs.
+
+### `anova_table`
+
+The `anova_table` function takes multiple \pkg{asreml} objects, and returns a
+dataframe containing all of the model's ANOVA tables:
+
+```{r}
+test_data <- oats
+test_data["yield2"] <- oats["yield"] * runif(nrow(oats["yield"]))
+
+mod1 <- asreml(
+    fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
+    random = ~idv(Blocks) + idv(Blocks):idv(Wplots),
+    residual = ~idv(units),
+    data = test_data,
+    trace = FALSE
+)
+mod2 <- asreml(
+    fixed = yield2 ~ Variety + Nitrogen + Variety:Nitrogen,
+    random = ~idv(Blocks) + idv(Blocks):idv(Wplots),
+    residual = ~idv(units),
+    data = test_data,
+    trace = FALSE
+)
+
+wald(mod1)
+
+anova_table(mod1, mod2)
+```
+
+The above example uses the `oats` data included with the \pkg{asreml} package,
+and creates an altered `yield` variable for the purpose of demonstration.
+
+The function returns a dataframe, one row per fixed effect, and $n+1$ columns
+for $n$ models. Each value is the p-value taken from the wald test performed by
+`asreml::wald.asreml`.
