@@ -1,4 +1,5 @@
-# A collection of helper functions for small-plot trial analysis using ASReml
+# CBADASReml <img src="man/figures/logo.png" align="right" height="139" alt="" />
+## A collection of helper functions for small-plot trial analysis using ASReml
 
 ## Installation
 
@@ -22,4 +23,4 @@ All contributions are appreciated, but please make sure to follow the [Contribut
 
 ## Usage
 
-The package is used as follows:
+For a detailed understanding of how the package can be used, here is a fully worked example of a small-plot trial analysis: [Small-Plot Case Study](vignettes/Small-plot_analysis.Rmd). This analysis tries to showcase each function in a useful capacity.  
