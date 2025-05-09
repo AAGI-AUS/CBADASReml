@@ -16,6 +16,10 @@ pak::pak("AAGI-AUS/CBADASReml")
 options(o) # reset options
 ```
 
+## Contributions 
+
+All contributions are appreciated, but please make sure to follow the [Contribution Guidelines](.github/CONTRIBUTING.md). 
+
 ## Usage
 
 The package is used as follows:
