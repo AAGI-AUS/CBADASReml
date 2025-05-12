@@ -6,6 +6,8 @@
 \alias{CBADASReml-package}
 \title{CBADASReml: Provides helper functions for ASReml}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 This package provides helper functions for ASReml, particularly for use with small-plot trials.
 }
 \author{
