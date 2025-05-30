@@ -122,7 +122,7 @@ CBADASReml::exploratory_table(data = oats,
 ### Model Fitting and Validation
 
 We may use the R package \pkg{asreml} as follows to implement an LMM. 
-For the purpose of this vignette we will fit a few different models, so we can demonstrate different techniques from the package
+For the purpose of this vignette we will fit a few different models, so we can demonstrate different techniques from the package.
 
 ```{r}
 # The needs to be ordered so that the model can run
@@ -197,7 +197,7 @@ outlier_summary(mod_rats)
 
 #### `directional_variograms`
 
-The purpose of this function is to view the autocorrelation structure in both directions, rather than the tradional approach with asreml. 
+The purpose of this function is to view the autocorrelation structure in both directions, rather than the traditional approach with asreml. 
 
 ```{r}
 plot(directional_variograms(mod_oats))
