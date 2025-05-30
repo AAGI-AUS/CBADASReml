@@ -1,17 +1,21 @@
 #' Produces a summary table for the data with Mean, Median, SD, CV and Range.
 #'
-#' This function outputs the summary statistics of the given data
-#' @param data a data set to be summarised
-#' @param response string variable name in the data of the response
-#' @param groupby vector of strings of the names of the grouping variables in
-#'     the data
+#' This function outputs the summary statistics of the given data.
 #'
-#' @returns data.frame
-#' @export
+#' @param data `data.frame`
+#'   A data set to be summarised
+#' @param response `character`
+#'   String variable name in the data of the response
+#' @param groupby `character` vector
+#'   Vector of strings of the names of the grouping variables in the data
+#'
+#' @returns `data.frame`
+#'   Summary table
 #'
 #' @examples
 #' exploratory_table(mtcars, response = "mpg", groupby = c("cyl", "gear"))
-
+#'
+#' @export
 exploratory_table <- function(data, response, groupby) {
     if (!response %in% names(data)) {
         stop("response must be a column in the data")

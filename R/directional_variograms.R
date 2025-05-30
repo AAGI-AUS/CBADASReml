@@ -1,9 +1,14 @@
 #' A spatial variogram function for Single Site Data
 #'
-#' This function allows you to observe directional variograms in the 0 (vertical) and 90 (horizontal) directions for gridded small-plot trial data.
-#' @param model `asreml`, an ASReml model with some residual structure.
-#' @returns A `gstat::variogram` object.
-#' @export
+#' This function allows you to observe directional variograms in the 0
+#' (vertical) and 90 (horizontal) directions for gridded small-plot trial data.
+#'
+#' @param model `asreml`
+#'   A model with some residual structure.
+#'
+#' @returns `gstat::variogram`
+#'   A \pkg{Gstat} variogram.
+#'
 #' @examplesIf requireNamespace("asreml", quietly = TRUE)
 #' library(asreml)
 #' model <- asreml(
@@ -25,6 +30,8 @@
 #'     geom_line() +
 #'     facet_grid(~dir.hor, scales = "free_x")
 #' }
+#'
+#' @export
 directional_variograms <- function(model) {
     data <- as.data.frame(model$mf)
 

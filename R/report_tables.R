@@ -2,16 +2,22 @@
 #'
 #' This function outputs the predictions for each factor for a single model.
 #' Each factor is put on a separate excel sheet.
-#' @param model an ASReml model. Can be a model object, or a string referencing
-#'     a model object.
-#' @param classify A string specifying the factors in the model to predict on.
-#' If multiple are specified separate with either \code{*} or \code{:}.
-#'     For example \code{Nitrogen:Variety} or \code{Nitrogen*Variety}.
 #'
-#' @returns A list of data frames. The first data frame is the anova for the
-#' model. The remaining data frames are the prediction tables from the classify
-#' object.
-#' @export
+#' @param model
+#'   The model to generate predictions for.
+#'
+#'   The value may be:
+#'   * `asreml`
+#'   * `glmmTBM` (not yet implemented)
+#' @param classify `character`
+#'   A string specifying the factors in the model to predict on. If multiple
+#'   are specified separate with either \code{*} or \code{:}. For example
+#'   \code{Nitrogen:Variety} or \code{Nitrogen*Variety}.
+#'
+#' @returns `list` of `data.frame`
+#'   A list of data frames. The first data frame is the ANOVA for the model.
+#'   The remaining data frames are the prediction tables from the classify
+#'   object.
 #'
 #' @examplesIf requireNamespace("asreml", quietly = TRUE)
 #' library(asreml)
@@ -35,9 +41,9 @@
 #' )
 #'
 #' writexl::write_xlsx(x = tables, path = "Prediction_Tables.xlsx")
-#'
 #' }
-
+#'
+#' @export
 report_tables <- function(model, classify) {
     if (!inherits(model, "asreml")) {
         stop("Model should be an asreml object")

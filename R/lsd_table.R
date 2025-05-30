@@ -2,13 +2,18 @@
 #'
 #' Generates a table of least significant differences (LSDs) for a given model.
 #'
-#' @param model An \pkg{ASReml-R} model.
-#' @param classify A string specifying which variables to predict and calculate
-#'     LSDs from.
-#' @param ... Arguments to pass to `predictPlus.asreml`
+#' @param model
+#'   The model object to calculate LSDs from.
+#'
+#'   The value may be:
+#'   * `asreml`
+#'   * `glmmTMB` (not yet implemented)
+#' @param classify `character`
+#'   A string specifying which variables to predict and calculate LSDs from.
+#' @param ...
+#'   Arguments to pass to `predictPlus.asreml`
 #'
 #' @returns A `data.frame` with the LSD values.
-#' @export
 #'
 #' @examplesIf requireNamespace("asreml", quietly = TRUE)
 #' library(asreml)
@@ -19,7 +24,8 @@
 #'     data = oats
 #' )
 #' lsd_table(model, classify = "Variety")
-
+#'
+#' @export
 lsd_table <- function(model, classify, ...) {
     ## Suppress all prints
     utils::capture.output(

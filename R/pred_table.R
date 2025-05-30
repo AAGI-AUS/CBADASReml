@@ -67,7 +67,6 @@
 #'     If `factor_combine` is `FALSE`, the factors specified in
 #'     `classify` remain as separate columns.
 #'
-#'
 #' @export
 pred_table <- function(
     mod,

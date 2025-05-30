@@ -2,12 +2,19 @@
 #'
 #' This function allows you to observe the anova table for multiple ASReml
 #' or glmmTMB models.
-#' @param ... `asreml`, any number of asreml models.
-#' @param n_digits `numeric`, number of digits to round results to.
 #'
-#' @returns a dataframe containing all anova tables. Can be used with xtable to
-#'     produce a LaTeX table.
-#' @export
+#' @param ...
+#'   The models to use in the ANOVA table comparison
+#'
+#'   Their values may be:
+#'   * `asreml`
+#'   * `glmmTMB` (not yet implemented)
+#' @param n_digits `numeric`
+#'   The number of digits to round results to.
+#'
+#' @returns `data.frame`
+#'   A dataframe containing all anova tables. Can be used with xtable to
+#'   produce a LaTeX table.
 #'
 #' @examplesIf requireNamespace("asreml", quietly = TRUE)
 #' library(CBADASReml)
@@ -27,6 +34,8 @@
 #'     data = test_data
 #' )
 #' anova_table(mod1, mod2)
+#'
+#' @export
 anova_table <- function(..., n_digits = 3) {
     if (!is.numeric(n_digits)) {
         stop(paste0("n_digits must be numeric: ", n_digits))

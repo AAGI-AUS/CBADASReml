@@ -2,13 +2,22 @@
 #'
 #' Generates a table of least significant differences (LSDs) for a given model.
 #'
-#' @param model, an ASReml model.
-#' @param classify A string specifying which variables to predict and calculate
-#'     LSDs from.
-#' @param ... Arguments to pass to `predictPlus.asreml`
+#' @param model
+#'   The model to generate LSDs from.
 #'
-#' @returns return a ggplot2 object.
-#' @export
+#'   The value may be:
+#'   * `asreml`
+#'   * `glmmTMB` (not yet implemented)
+#' @param classify `character` vector
+#'   A string specifying which variables to predict and calculate LSDs from.
+#'
+#'   For `asreml` models, it is passed to `classify` argument of
+#'   `predictPlus.asreml`.
+#' @param ...
+#'   Arguments to pass to `predictPlus.asreml`
+#'
+#' @returns `ggplot` object
+#'   Returns a ggplot2 plot of the LSDs.
 #'
 #' @examplesIf requireNamespace("asreml", quietly = TRUE)
 #' library(asreml)
@@ -19,7 +28,8 @@
 #'     data = oats
 #' )
 #' lsd_graph(model, classify = "Variety")
-
+#'
+#' @export
 lsd_graph <- function(model, classify, ...) {
     response <- model[["call"]][["fixed"]][[2]]
     response <- toString(response)

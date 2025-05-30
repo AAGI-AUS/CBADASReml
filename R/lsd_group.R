@@ -1,13 +1,19 @@
 #' Group treatments using results of paired t-test
 #'
-#' @param treatments character vector of the treatment names
-#' @param means numeric vector of the treatment means/fitted values
-#' @param alpha numeric significant difference threshold
-#' @param pvalues symmetric numeric matrix of pvalues calculated via pairwise
-#'     t-tests
+#' Intended as a replacement of the agricolae::orderPvalue function, but with
+#' (maybe) a better algorithm.
 #'
-#' @returns data.frame of treatments and their associated group
-#' @export
+#' @param treatments `character` vector
+#'   Character vector of the treatment names
+#' @param means `numeric`
+#'   Vector of the treatment means/fitted values
+#' @param alpha `numeric`
+#'   Significant difference threshold
+#' @param pvalues `matrix` of `numeric`
+#'   Matrix of pvalues calculated via pairwise t-tests
+#'
+#' @returns data.frame
+#'   Dataframe of each treatment and their associated LSD group
 #'
 #' @examplesIf "&"(requireNamespace("asreml", quietly = TRUE), requireNamespace("asremlPlus", quietly = TRUE))
 #' library(asreml)
@@ -29,14 +35,14 @@
 #' means <- pred$predictions$predicted.value
 #' alpha <- 0.05
 #'
-#' lsdmeantab <-
-#'     lsd_group(
-#'         treatments,
-#'         means,
-#'         alpha,
-#'         prob.matrix
-#'     )
-
+#' lsd_group(
+#'     treatments,
+#'     means,
+#'     alpha,
+#'     prob.matrix
+#' )
+#'
+#' @export
 lsd_group <- function(treatments, means, alpha, pvalues) {
     ## Order everything by descending mean
     ord <- order(means, decreasing = TRUE)

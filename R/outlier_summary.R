@@ -1,14 +1,26 @@
+#' Detect outliers for small-plot trial analysis
+#'
 #' Provides a summary of the outliers present in the asreml model.
 #' Gives context to the outliers by showing the responses for the same factor
 #' combinations as the outliers
 #'
-#' @param model an ASReml Model.
-#' @param cutoff the point beyond which points are considered as Outliers
-#' @keywords Outlier
-#' @returns prints to the console the number of outliers and two tables (one with just the outliers, one giving the context relevant to same factor combinations).
-#' @export
-#' @examples
+#' @param model
+#'   The model object to detect outliers in.
 #'
+#'   The value may be:
+#'   * `asreml`
+#'   * `glmmTMB` (not yet implemented)
+#' @param cutoff `numeric`
+#'   The magnitude of a point's residual to be considered an outlier.
+#'
+#' @returns `NULL`
+#'   Prints:
+#'   * The number of outliers.
+#'   * A table of the outliers, if any.
+#'   * A table of relevant context to some factor combinations, if there are
+#'     outliers.
+#'
+#' @examplesIf requireNamespace("asreml", quietly = TRUE)
 #' library(asreml)
 #' model <- asreml(
 #'     fixed = weight ~ littersize + Dose + Sex + Dose:Sex,
@@ -16,10 +28,9 @@
 #'     residual = ~units,
 #'     data = rats
 #' )
-#'
 #' outlier_summary(model)
 #'
-#' @autoglobal
+#' @export
 outlier_summary <- function(model, cutoff = 3.5) {
     data <- as.data.frame(model$mf)
 
