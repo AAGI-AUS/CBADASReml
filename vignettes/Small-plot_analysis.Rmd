@@ -130,7 +130,7 @@ oats <- oats[order(oats$Column),]
 
 mod_oats <- asreml(
     fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
-    random = ~ idv(Blocks) + idv(Blocks):idv(Wplots),
+    random = ~ idv(Blocks) + idv(Blocks):id(Wplots),
     residual = ~ ar1(Column):ar1(Row),
     data = oats,
     trace = FALSE
@@ -151,30 +151,99 @@ mod_rats <- update(mod_rats, aom = T)
 
 In the first model, `mod_oats`, we are using the `oats` data:
 
-- `yield` is our $y \in \mathbb{R}^n$ vector.
+##### Data
+- The `oats` data has 72 rows, 2 treatments (Nitrogen and Variety), and plots
+  (3 levels) within blocks (6 levels). Therefore:
+  + $n = 72$ (number of observations)
+  + $p = 3$ (number of fixed effects, including an interaction effect)
+  + $q = 2$ (number of random effects, blocks, and plots within blocks)
+
+##### $y$
+- `yield` is our $y \in \mathbb{R}^{72}$ ($72 \times 1$) vector.
+
+##### $X$
 - `Variety`, `Nitrogen` and their interaction `Variety:Nitrogen` are in the $X
-  \in \mathbb{R}^{n \times 3}$ matrix.
-- `Blocks` and `Blocks:Wplots` are in the $Z$ matrix. We specify the `idv`
-  variance model function, which is the homogeneous scaled identity variance
-  structure, i.e. $\sigma^2 I$. In other words, the term is IID:
-  + $u_b \in \mathbb{R}^b \sim N(0, \sigma_b^2 I_b)$
-  + $u_{bp} \in \mathbb{R}^{bp} \sim N(0, \sigma_{bp}^2 I_{bp})$
-  + $u \in \mathbb{R}^{b + bp} = [ \; u_b^\intercal \; u_{bp}^\intercal \;
-    ]^\intercal$
-  + $Z = [ \; Z_b \; Z_{bp} \; ]$ (the design matrices for `Blocks` and
-    `Blocks:Wplots`)
-  + Therefore, $G = \bigoplus_{i = 1}^2 G_i = \begin{bmatrix} \sigma_b^2 I_b &
-    0 \\ 0 & \sigma_{bp}^2 I_{bp} \end{bmatrix}$
-- `ar1(Column):ar1(Row)` is the residual variance structure. In this case we
-  refer to an autoregressive model of order 1 (AR(1)) on both `Row` and
+  \in \mathbb{R}^{72 \times 3}$ ($72 \times 3$) matrix.
+
+##### $b$
+- There are 3 fixed effects which are continuous, therefore our fixed effects
+  vector is given by $b \in \mathbb{R}^{3 \times 1}$
+
+##### $Z$
+- `Blocks` and `Blocks:Wplots` make up our $Z \in \mathbb{R}^{n \times q}$
+  matrix. Since these are factors, each level is treated as it's own dummy
+  variable. We end up with two $Z_i$ matrices which make up $Z = [ \; Z_2 \; Z_2
+  \; ]$ which are given as follows (if ordered by their respective variables):
+
+\begin{equation*}
+Z_{1}
+=
+\begin{bmatrix}
+1          & 0 & 0 & 0 & 0 & 0 \\
+\vdots \times \text{10} & 0 & 0 & 0 & 0 & 0 \\
+1          & 0 & 0 & 0 & 0 & 0 \\
+0          & 1 & 0 & 0 & 0 & 0 \\
+0          & \vdots \times \text{10} & 0 & 0 & 0 & 0 \\
+           &   & \vdots &   &   &
+\end{bmatrix}
+\in
+\mathbb{R}^{72 \times 6}
+\end{equation*}
+
+\begin{equation*}
+Z_{2}
+=
+\begin{bmatrix}
+1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\vdots \times \text{2} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & \vdots \times \text{2} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+&  &  &  &  &  &  &  & \vdots &  &  &  &  &  &  &  &  &
+\end{bmatrix}
+\in
+\mathbb{R}^{72 \times 18}
+\end{equation*}
+
+  Where each column in $Z_1$ represents the $6$ `Blocks`, and the columns in
+  $Z_2$ represent the $6 \times 3 = 18$ `Blocks` $\times$ `Wplots`.
+
+##### $u$
+- Since we have $2$ model terms (`idv(Blocks)` and `idv(Blocks):id(Wplots)`),
+  we have two $Z_i$ matrices, and also two $u_i$ vectors. Our random effects
+  vector is given by:
+  + $u = \begin{bmatrix} u_1 \\ u_2 \end{bmatrix}$
+  + $u_1 \sim N(0, G_1) \in \mathbb{R}^{6}$
+  + $u_2 \sim N(0, G_2) \in \mathbb{R}^{18}$.
+
+##### $G$
+- `idv(Blocks) + idv(Blocks):id(Wplots)` is the random effects variance
+  structure. Since we have two terms, we again have two $G_i$'s. We specify the
+  `idv` variance model function, which is the homogeneous scaled identity
+  variance structure, i.e. $\sigma^2 I$. The second term has a /direct product/
+  implied by the `:` operator, which in the case of matrices is a /Kronecker
+  product/, of `idv(Blocks)` and `id(Wplots)`. `id` variance model means it is
+  simply a correlation structure, i.e. $I$, and there is no estimation of a
+  variance parameter. Noting we have 2 random effects terms:
+  + $G_1 = \sigma_1^2 I_6$ ($I_6$ is the $6 \times 6$ identity matrix)
+  + $G_2 = (\sigma_2^2 I_6) \otimes I_3$
+  + $G = \bigoplus_{i = 1}^2 G_i = \begin{bmatrix} \sigma_1^2 I_6 & 0 \\ 0 &
+    (\sigma_2^2 I_6 \otimes I_3) \end{bmatrix}$
+
+##### $e$
+- The error vector is specified by the single model term
+  `ar1(Column):ar1(Row)`, therefore the error is given by:
+  + $e \sim N(0, R)$ where $R$ is the $R$ structure
+
+##### $R$
+- `ar1(Column):ar1(Row)` specifies the residual variance structure. In this
+  case we refer to an autoregressive model of order 1 (AR(1)) on both `Row` and
   `Column`, where the `:` operator implies a separable Kronecker product
   structure. The variance model `ar1` is of the form: $\Sigma_{ii} = 1,
   \Sigma_{ij} = \phi \Sigma_{i-1, j}, i > j+1, \lvert \phi \rvert < 1$.
-  + $e_c \in \mathbb{R}^c \sim N(0, \Sigma_c(\phi))$
-  + $e_r \in \mathbb{R}^r \sim N(0, \Sigma_r(\phi))$
-  + $e = [ \; e_c^\intercal \; e_r^\intercal \; ]^\intercal$
-  + Therefore, $R \in \mathbb{R}^{c \times r} = \bigotimes_{i=1}^2 R_i =
-    \Sigma_c(\phi) \otimes \Sigma_r(\phi)$
+  + $R = \Sigma_c(\phi_c) \otimes \Sigma_r(\phi_r)$
+  + Where $\phi$ refers to the correlation within the columns ($\phi_c$) or the
+    rows ($\phi_r$).
 
 In the second model, `mod_rats`, we are using the `rats` data:
 
@@ -183,14 +252,14 @@ In the second model, `mod_rats`, we are using the `rats` data:
 - `Dam` is in the $Z$ matrix. We specify the `idv` variance model function,
   which is the homogeneous scaled identity variance structure, i.e. $\sigma^2
   I$. In other words, the term is IID:
-  + $u \in \mathbb{R}^d \sim N(0, \sigma_d^2 I_d)$
+  + $u \in \mathbb{R}^d \sim N(0, G)$
   + $Z$ is the design matrix for `Dam`.
-  + Therefore, $G = \sigma_d^2 I_d$.
+  + $G = \sigma_d^2 I_d$.
 - `idv(units)` is the residual variance structure, in this case the residual
   term has the homogeneous covariance matrix: $\sigma^2 I$. This is basically
   saying all observations have the same error distribution (IID):
-  + $e \in \mathbb{R}^n \sim N(0, \sigma_e^2 I_n)$
-  + Therefore, $R = \sigma_e^2 I_n$, the simplest $R$ structure.
+  + $e \in \mathbb{R}^n \sim N(0, R)$
+  + $R = \sigma_e^2 I_n$
 
 Upon executing the above in R, the \pkg{ASReml-R} code will attempt to
 *estimate* the variance components $\sigma_d^2$ and $\sigma_e^2$, using the
