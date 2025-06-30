@@ -32,8 +32,8 @@ See our guide on [how to create a great issue](https://code-review.tidyverse.org
 
 ### Code style
 
-*   New code should follow the tidyverse [style guide](https://style.tidyverse.org). 
-    You can use the [styler](https://CRAN.R-project.org/package=styler) package to apply these styles, but please don't restyle code that has nothing to do with your PR.  
+*   We use [air](https://posit-dev.github.io/air/) for formatting our code style.
+New code should follow our formatting guidelines found in [air.toml](../air.toml).  
 
 *  We use [roxygen2](https://cran.r-project.org/package=roxygen2), with [Markdown syntax](https://cran.r-project.org/web/packages/roxygen2/vignettes/rd-formatting.html), for documentation.  
 
