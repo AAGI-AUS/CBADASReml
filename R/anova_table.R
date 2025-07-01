@@ -67,12 +67,13 @@ anova_table.asreml <- function(..., n_digits = 3) {
 
     sig_list <- lapply(
         wald_list,
-        \(x)
+        \(x) {
             data.frame(
                 Effect = rownames(x),
                 pvalue = as.numeric(x[, "Pr(Chisq)"]),
                 row.names = NULL
             )
+        }
     )
 
     ## lapply returns list of dfs, which is reduced by full outer joins
@@ -90,8 +91,7 @@ anova_table.asreml <- function(..., n_digits = 3) {
 
     ## Filter out intercept and residual pvalues
     pval_table <- pval_table[
-        !(pval_table[["Effect"]] %in%
-            c("(Intercept)", "residual (MS)")),
+        !(pval_table[["Effect"]] %in% c("(Intercept)", "residual (MS)")),
     ]
 
     ## Round pvals to n_digits
@@ -113,11 +113,12 @@ anova_table.glmmTMB <- function(..., n_digits = 3, zi = FALSE) {
 
     response_names <- sapply(
         models,
-        \(x)
+        \(x) {
             as.character(attr(
                 x$modelInfo$reTrms$cond$terms$fixed,
                 "variables"
             )[[2]])
+        }
     )
 
     anova_list <- lapply(
@@ -134,12 +135,13 @@ anova_table.glmmTMB <- function(..., n_digits = 3, zi = FALSE) {
 
     sig_list <- lapply(
         anova_list,
-        \(x)
+        \(x) {
             data.frame(
                 Effect = rownames(x),
                 pvalue = as.numeric(x[, "Pr(>Chisq)"]),
                 row.names = NULL
             )
+        }
     )
 
     ## lapply returns list of dfs, which is reduced by full outer joins
@@ -157,8 +159,7 @@ anova_table.glmmTMB <- function(..., n_digits = 3, zi = FALSE) {
 
     ## Filter out intercept and residual pvalues
     pval_table <- pval_table[
-        !(pval_table[["Effect"]] %in%
-            c("(Intercept)", "residual (MS)")),
+        !(pval_table[["Effect"]] %in% c("(Intercept)", "residual (MS)")),
     ]
 
     ## Round pvals to n_digits
