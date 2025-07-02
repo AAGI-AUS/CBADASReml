@@ -16,18 +16,9 @@ Description: This package provides helper functions for ASReml,
 License: GPL (>= 3)
 Imports:
     asremlPlus,
-    dplyr,
-    DT,
     ggplot2,
-    ggpubr,
     gstat,
-    htmltools,
-    magrittr,
-    rlang,
-    sf,
-    stringr,
-    tidyr,
-    xtable
+    sf
 Suggests:
     emmeans,
     glmmTMB,
