@@ -7,19 +7,23 @@
 exploratory_table(data, response, groupby)
 }
 \arguments{
-\item{data}{a data set to be summarised}
+\item{data}{\code{data.frame}
+A data set to be summarised}
 
-\item{response}{string variable name in the data of the response}
+\item{response}{\code{character}
+String variable name in the data of the response}
 
-\item{groupby}{vector of strings of the names of the grouping variables in
-the data}
+\item{groupby}{\code{character} vector
+Vector of strings of the names of the grouping variables in the data}
 }
 \value{
-data.frame
+\code{data.frame}
+Summary table
 }
 \description{
-This function outputs the summary statistics of the given data
+This function outputs the summary statistics of the given data.
 }
 \examples{
 exploratory_table(mtcars, response = "mpg", groupby = c("cyl", "gear"))
+
 }

@@ -7,12 +7,20 @@
 anova_table(..., n_digits = 3)
 }
 \arguments{
-\item{...}{\code{asreml}, any number of asreml models.}
+\item{...}{The models to use in the ANOVA table comparison
 
-\item{n_digits}{\code{numeric}, number of digits to round results to.}
+Their values may be:
+\itemize{
+\item \code{asreml}
+\item \code{glmmTMB}
+}}
+
+\item{n_digits}{\code{numeric}
+The number of digits to round results to.}
 }
 \value{
-a dataframe containing all anova tables. Can be used with xtable to
+\code{data.frame}
+A dataframe containing all anova tables. Can be used with xtable to
 produce a LaTeX table.
 }
 \description{
@@ -27,16 +35,33 @@ test_data <- oats
 test_data["yield2"] <- oats["yield"] * runif(nrow(oats["yield"]))
 mod1 <- asreml(
     fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
-    random = ~idv(Blocks) + idv(Blocks):idv(Wplots),
-    residual = ~idv(units),
+    random = ~ idv(Blocks) + idv(Blocks):idv(Wplots),
+    residual = ~ idv(units),
     data = test_data
 )
 mod2 <- asreml(
     fixed = yield2 ~ Variety + Nitrogen + Variety:Nitrogen,
-    random = ~idv(Blocks) + idv(Blocks):idv(Wplots),
-    residual = ~idv(units),
+    random = ~ idv(Blocks) + idv(Blocks):idv(Wplots),
+    residual = ~ idv(units),
     data = test_data
 )
 anova_table(mod1, mod2)
+
+## With glmmTMB models
+library(glmmTMB)
+Salamanders$count2 <- runif(nrow(Salamanders), 0, 10)
+mod3 <- glmmTMB( # Zero inflated model
+    count ~ spp * mined + (1 | site),
+    zi = ~ spp * mined,
+    data = Salamanders,
+    family = nbinom2
+)
+mod4 <- glmmTMB( # Hurdle model
+    count2 ~ spp * mined + (1 | site),
+    zi = ~ spp * mined,
+    data = Salamanders,
+    family = truncated_nbinom2
+)
+anova_table(mod3, mod4)
 \dontshow{\}) # examplesIf}
 }

@@ -2,19 +2,31 @@
 % Please edit documentation in R/outlier_summary.R
 \name{outlier_summary}
 \alias{outlier_summary}
-\title{Provides a summary of the outliers present in the asreml model.
-Gives context to the outliers by showing the responses for the same factor
-combinations as the outliers}
+\title{Detect outliers for small-plot trial analysis}
 \usage{
 outlier_summary(model, cutoff = 3.5)
 }
 \arguments{
-\item{model}{an ASReml Model.}
+\item{model}{The model object to detect outliers in.
 
-\item{cutoff}{the point beyond which points are considered as Outliers}
+The value may be:
+\itemize{
+\item \code{asreml}
+\item \code{glmmTMB} (not yet implemented)
+}}
+
+\item{cutoff}{\code{numeric}
+The magnitude of a point's residual to be considered an outlier.}
 }
 \value{
-prints to the console the number of outliers and two tables (one with just the outliers, one giving the context relevant to same factor combinations).
+\code{NULL}
+Prints:
+\itemize{
+\item The number of outliers.
+\item A table of the outliers, if any.
+\item A table of relevant context to some factor combinations, if there are
+outliers.
+}
 }
 \description{
 Provides a summary of the outliers present in the asreml model.
@@ -22,7 +34,7 @@ Gives context to the outliers by showing the responses for the same factor
 combinations as the outliers
 }
 \examples{
-
+\dontshow{if (requireNamespace("asreml", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(asreml)
 model <- asreml(
     fixed = weight ~ littersize + Dose + Sex + Dose:Sex,
@@ -30,8 +42,6 @@ model <- asreml(
     residual = ~units,
     data = rats
 )
-
 outlier_summary(model)
-
+\dontshow{\}) # examplesIf}
 }
-\keyword{Outlier}

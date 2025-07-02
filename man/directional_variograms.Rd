@@ -7,13 +7,16 @@
 directional_variograms(model)
 }
 \arguments{
-\item{model}{\code{asreml}, an ASReml model with some residual structure.}
+\item{model}{\code{asreml}
+A model with some residual structure.}
 }
 \value{
-A \code{gstat::variogram} object.
+\code{gstat::variogram}
+A \pkg{Gstat} variogram.
 }
 \description{
-This function allows you to observe directional variograms in the 0 (vertical) and 90 (horizontal) directions for gridded small-plot trial data.
+This function allows you to observe directional variograms in the 0
+(vertical) and 90 (horizontal) directions for gridded small-plot trial data.
 }
 \examples{
 \dontshow{if (requireNamespace("asreml", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}

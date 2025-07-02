@@ -7,16 +7,23 @@
 report_tables(model, classify)
 }
 \arguments{
-\item{model}{an ASReml model. Can be a model object, or a string referencing
-a model object.}
+\item{model}{The model to generate predictions for.
 
-\item{classify}{A string specifying the factors in the model to predict on.
-If multiple are specified separate with either \code{*} or \code{:}.
-For example \code{Nitrogen:Variety} or \code{Nitrogen*Variety}.}
+The value may be:
+\itemize{
+\item \code{asreml}
+\item \code{glmmTBM} (not yet implemented)
+}}
+
+\item{classify}{\code{character}
+A string specifying the factors in the model to predict on. If multiple
+are specified separate with either \code{*} or \code{:}. For example
+\code{Nitrogen:Variety} or \code{Nitrogen*Variety}.}
 }
 \value{
-A list of data frames. The first data frame is the anova for the
-model. The remaining data frames are the prediction tables from the classify
+\code{list} of \code{data.frame}
+A list of data frames. The first data frame is the ANOVA for the model.
+The remaining data frames are the prediction tables from the classify
 object.
 }
 \description{
@@ -46,7 +53,6 @@ tables <- excel_prediction_file(
 )
 
 writexl::write_xlsx(x = tables, path = "Prediction_Tables.xlsx")
-
 }
 \dontshow{\}) # examplesIf}
 }

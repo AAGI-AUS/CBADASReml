@@ -7,10 +7,16 @@
 lsd_table(model, classify, ...)
 }
 \arguments{
-\item{model}{An \pkg{ASReml-R} model.}
+\item{model}{The model object to calculate LSDs from.
 
-\item{classify}{A string specifying which variables to predict and calculate
-LSDs from.}
+The value may be:
+\itemize{
+\item \code{asreml}
+\item \code{glmmTMB} (not yet implemented)
+}}
+
+\item{classify}{\code{character}
+A string specifying which variables to predict and calculate LSDs from.}
 
 \item{...}{Arguments to pass to \code{predictPlus.asreml}}
 }

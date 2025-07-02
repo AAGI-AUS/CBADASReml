@@ -7,20 +7,25 @@
 lsd_group(treatments, means, alpha, pvalues)
 }
 \arguments{
-\item{treatments}{character vector of the treatment names}
+\item{treatments}{\code{character} vector
+Character vector of the treatment names}
 
-\item{means}{numeric vector of the treatment means/fitted values}
+\item{means}{\code{numeric}
+Vector of the treatment means/fitted values}
 
-\item{alpha}{numeric significant difference threshold}
+\item{alpha}{\code{numeric}
+Significant difference threshold}
 
-\item{pvalues}{symmetric numeric matrix of pvalues calculated via pairwise
-t-tests}
+\item{pvalues}{\code{matrix} of \code{numeric}
+Matrix of pvalues calculated via pairwise t-tests}
 }
 \value{
-data.frame of treatments and their associated group
+data.frame
+Dataframe of each treatment and their associated LSD group
 }
 \description{
-Group treatments using results of paired t-test
+Intended as a replacement of the agricolae::orderPvalue function, but with
+(maybe) a better algorithm.
 }
 \examples{
 \dontshow{if ("&"(requireNamespace("asreml", quietly = TRUE), requireNamespace("asremlPlus", quietly = TRUE))) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
@@ -43,12 +48,11 @@ treatments <- colnames(prob.matrix)
 means <- pred$predictions$predicted.value
 alpha <- 0.05
 
-lsdmeantab <-
-    lsd_group(
-        treatments,
-        means,
-        alpha,
-        prob.matrix
-    )
+lsd_group(
+    treatments,
+    means,
+    alpha,
+    prob.matrix
+)
 \dontshow{\}) # examplesIf}
 }

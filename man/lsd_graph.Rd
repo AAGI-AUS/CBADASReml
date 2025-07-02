@@ -7,15 +7,25 @@
 lsd_graph(model, classify, ...)
 }
 \arguments{
-\item{model, }{an ASReml model.}
+\item{model}{The model to generate LSDs from.
 
-\item{classify}{A string specifying which variables to predict and calculate
-LSDs from.}
+The value may be:
+\itemize{
+\item \code{asreml}
+\item \code{glmmTMB} (not yet implemented)
+}}
+
+\item{classify}{\code{character} vector
+A string specifying which variables to predict and calculate LSDs from.
+
+For \code{asreml} models, it is passed to \code{classify} argument of
+\code{predictPlus.asreml}.}
 
 \item{...}{Arguments to pass to \code{predictPlus.asreml}}
 }
 \value{
-return a ggplot2 object.
+\code{ggplot} object
+Returns a ggplot2 plot of the LSDs.
 }
 \description{
 Generates a table of least significant differences (LSDs) for a given model.

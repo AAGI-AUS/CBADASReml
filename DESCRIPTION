@@ -32,7 +32,6 @@ Suggests:
     emmeans,
     glmmTMB,
     car,
-    ASExtras4,
     asreml,
     roxyglobals,
     rstac,

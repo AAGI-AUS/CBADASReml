@@ -37,16 +37,16 @@ outlier_summary <- function(model, cutoff = 3.5) {
     # Add standardised residuals to the model (if not already in the model)
     if (is.null(model$aom)) {
         print("No aom = T, Updating Model")
-        model <- update.asreml(model, aom = TRUE)
+        model <- asreml::update.asreml(model, aom = TRUE)
     }
 
     # Finding the factors used in the model if not supplied by the user
     factors <- model$formulae$fixed
     factors <- as.character(attr(factors, "variables"))
     factors <- factors[3:length(factors)]
-    factors_sym <- rlang::syms(factors)
+    ## factors_sym <- rlang::syms(factors)
 
-    data$combined_trt = do.call(paste, c(data[, factors], sep = "_"))
+    data$combined_trt <- do.call(paste, c(data[, factors], sep = "_"))
 
     # identify which treatment combinations have an outlier
     data$residuals <- model$aom$R[, 2]
