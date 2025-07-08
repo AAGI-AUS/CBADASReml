@@ -19,13 +19,16 @@
 #' library(asreml)
 #' model <- asreml(
 #'     fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
-#'     random = ~idv(Blocks) + idv(Blocks):idv(Wplots),
-#'     residual = ~idv(units),
+#'     random = ~ idv(Blocks) + idv(Blocks):idv(Wplots),
+#'     residual = ~ idv(units),
 #'     data = oats
 #' )
 #' lsd_table(model, classify = "Variety")
 #'
 #' @export
+lsd_table <- function(model, classify, ...) {
+}
+
 lsd_table <- function(model, classify, ...) {
     ## Suppress all prints
     utils::capture.output(
@@ -41,8 +44,8 @@ lsd_table <- function(model, classify, ...) {
 
     lsd <- pred$LSD$assignedLSD
 
-    prob.matrix <- ifelse(is.na(pred$p.differences), 1, pred$p.differences)
-    treatments <- colnames(prob.matrix)
+    prob_matrix <- ifelse(is.na(pred$p.differences), 1, pred$p.differences)
+    treatments <- colnames(prob_matrix)
     means <- pred$predictions$predicted.value
     alpha <- 0.05
 
@@ -51,7 +54,7 @@ lsd_table <- function(model, classify, ...) {
             treatments,
             means,
             alpha,
-            prob.matrix
+            prob_matrix
         )
 
     lsdmeantab$lsd <- lsd

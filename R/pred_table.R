@@ -49,7 +49,6 @@
 #'     Whether or not to combine the factors in `classify` into a single
 #'     column in the output table. If `TRUE` (default), the factor levels
 #'     are concatenated and labelled using `trt_col_label`.
-#'
 #' @param trt_col_label `character` vector.
 #'     Specifies the label for the combined factor column when
 #'     `factor_combine` is `TRUE`. Defaults to `"Treatment"`
@@ -58,7 +57,8 @@
 #'     Contains the predicted means, standard errors, and confidence intervals
 #'     for the specified variables. Includes the following columns:
 #' \describe{
-#'   \item{Treatment}{The combined factor levels, if `factor_combine` is `TRUE`.}
+#'   \item{Treatment}{The combined factor levels, if `factor_combine` is
+#'                    `TRUE`.}
 #'   \item{Mean}{The predicted mean values.}
 #'   \item{Standard Error}{The standard errors of the predicted means.}
 #'   \item{Lower CL}{The lower confidence limits.}
@@ -66,6 +66,17 @@
 #' }
 #'     If `factor_combine` is `FALSE`, the factors specified in
 #'     `classify` remain as separate columns.
+#'
+#' @examplesIf requireNamespace("asreml", quietly = TRUE)
+#' library(CBADASReml)
+#' library(asreml)
+#' mod1 <- asreml(
+#'     fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
+#'     random = ~ idv(Blocks) + idv(Blocks):idv(Wplots),
+#'     residual = ~ idv(units),
+#'     data = oats
+#' )
+#' pred_table(mod1, classify = "Variety")
 #'
 #' @export
 pred_table <- function(
@@ -117,7 +128,7 @@ pred_table <- function(
             names(tab)[names(tab) == "backtransformed.predictions"] <-
                 "predicted.value"
         } else {
-            tab <- pred$predictions
+            tab <- as.data.frame(pred$predictions)
         }
         tab <- tab[, -ncol(tab)]
         names(tab)[
