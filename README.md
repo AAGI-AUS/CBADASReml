@@ -1,8 +1,28 @@
 # CBADASReml <img src="man/figures/logo.png" align="right" height="139" alt="" />
 ## A collection of helper functions for small-plot trial analysis using ASReml
 
-## Installation
+## Installation instructions
 
+{CBADASReml} is available through the [R-Universe](https://r-universe.dev/search) with pre-built binaries (this is the easy way).
+
+To get started:
+
+### Enable this universe
+
+```r
+options(repos = c(
+    aagi_aus = 'https://aagi-aus.r-universe.dev',
+    CRAN = 'https://cloud.r-project.org'))
+```
+
+
+### Install
+
+```r
+install.packages("AAGIPalettes")
+```
+
+### The hard(er) way
 You can install {CBADASReml} like so:
 
 ```r
