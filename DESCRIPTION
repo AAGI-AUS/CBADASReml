@@ -16,6 +16,7 @@ Authors@R: c(
 Description: This package provides helper functions for ASReml,
     particularly for use with small-plot trials.
 License: GPL (>= 3)
+URL: https://aagi-aus.github.io/CBADASReml/
 Imports:
     asremlPlus,
     ggplot2,
@@ -37,9 +38,9 @@ VignetteBuilder:
 Config/roxyglobals/filename: globals.R
 Config/roxyglobals/unique: FALSE
 Config/testthat/edition: 3
+Config/testthat/parallel: true
 Encoding: UTF-8
+Language: en-AU
 Roxygen: list(markdown = TRUE, roclets = c("collate", "namespace", "rd",
     "roxyglobals::global_roclet"))
 RoxygenNote: 7.3.2.9000
-URL: https://aagi-aus.github.io/CBADASReml/
-Language: en-AU
