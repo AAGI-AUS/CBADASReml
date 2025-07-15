@@ -29,7 +29,7 @@
     },
     {
       "@type": "Person",
-      "givenName": ["Adam H.", "adamhsparks@gmail.com"],
+      "givenName": ["Adam H.", "adam.sparks@curtin.edu.au"],
       "familyName": "Sparks",
       "@id": "https://orcid.org/0000-0002-0061-8359"
     }
@@ -37,7 +37,7 @@
   "copyrightHolder": [
     {
       "@type": "Organization",
-      "name": "Curtin University of Technology"
+      "name": "Curtin University"
     },
     {
       "@type": "Organization",
@@ -47,7 +47,7 @@
   "funder": [
     {
       "@type": "Organization",
-      "name": "Curtin University of Technology"
+      "name": "Curtin University"
     },
     {
       "@type": "Organization",
@@ -230,7 +230,7 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "269.324KB",
+  "fileSize": "269.305KB",
   "relatedLink": "https://aagi-aus.github.io/CBADASReml/",
   "readme": "https://github.com/AAGI-AUS/CBADASReml/blob/main/README.md"
 }
