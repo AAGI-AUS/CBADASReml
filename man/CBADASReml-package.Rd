@@ -10,6 +10,13 @@
 
 This package provides helper functions for ASReml, particularly for use with small-plot trials.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://aagi-aus.github.io/CBADASReml/}
+}
+
+}
 \author{
 \strong{Maintainer}: Kai Bagley \email{kai.bagley@curtin.edu.au} (\href{https://orcid.org/0009-0004-6579-6959}{ORCID})
 

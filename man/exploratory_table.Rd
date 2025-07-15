@@ -25,5 +25,4 @@ This function outputs the summary statistics of the given data.
 }
 \examples{
 exploratory_table(mtcars, response = "mpg", groupby = c("cyl", "gear"))
-
 }

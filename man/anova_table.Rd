@@ -20,12 +20,12 @@ The number of digits to round results to.}
 }
 \value{
 \code{data.frame}
-A dataframe containing all anova tables. Can be used with xtable to
+A dataframe containing all ANOVA tables. Can be used with xtable to
 produce a LaTeX table.
 }
 \description{
-This function allows you to observe the anova table for multiple ASReml
-or glmmTMB models.
+This function allows you to observe the ANOVA table for multiple \pkg{ASReml}
+or \CRANpkg{glmmTMB} models.
 }
 \examples{
 \dontshow{if (requireNamespace("asreml", quietly = TRUE)) withAutoprint(\{ # examplesIf}
