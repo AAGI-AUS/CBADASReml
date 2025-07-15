@@ -77,7 +77,7 @@
 #'     data = oats
 #' )
 #' pred_table(mod1, classify = "Variety")
-#'
+#' @autoglobal
 #' @export
 pred_table <- function(
     mod,

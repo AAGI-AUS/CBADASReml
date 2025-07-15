@@ -28,7 +28,7 @@
 #'     data = oats
 #' )
 #' lsd_graph(model, classify = "Variety")
-#'
+#' @autoglobal
 #' @export
 lsd_graph <- function(model, classify, ...) {
     response <- model[["call"]][["fixed"]][[2]]

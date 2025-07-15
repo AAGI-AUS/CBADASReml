@@ -1,7 +1,7 @@
 #' An ANOVA table Function
 #'
-#' This function allows you to observe the anova table for multiple ASReml
-#' or glmmTMB models.
+#' This function allows you to observe the ANOVA table for multiple \pkg{ASReml}
+#' or \CRANpkg{glmmTMB} models.
 #'
 #' @param ...
 #'   The models to use in the ANOVA table comparison
@@ -13,7 +13,7 @@
 #'   The number of digits to round results to.
 #'
 #' @returns `data.frame`
-#'   A dataframe containing all anova tables. Can be used with xtable to
+#'   A dataframe containing all ANOVA tables. Can be used with xtable to
 #'   produce a LaTeX table.
 #'
 #' @examplesIf requireNamespace("asreml", quietly = TRUE)
@@ -51,7 +51,7 @@
 #'     family = truncated_nbinom2
 #' )
 #' anova_table(mod3, mod4)
-#'
+#' @autoglobal
 #' @export
 anova_table <- function(..., n_digits = 3) {
     if (!is.numeric(n_digits)) {

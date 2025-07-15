@@ -14,7 +14,7 @@
 #'
 #' @examples
 #' exploratory_table(mtcars, response = "mpg", groupby = c("cyl", "gear"))
-#'
+#' @autoglobal
 #' @export
 exploratory_table <- function(data, response, groupby) {
     if (!response %in% names(data)) {

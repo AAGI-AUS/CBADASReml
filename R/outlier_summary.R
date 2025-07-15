@@ -1,8 +1,8 @@
 #' Detect outliers for small-plot trial analysis
 #'
-#' Provides a summary of the outliers present in the asreml model.
-#' Gives context to the outliers by showing the responses for the same factor
-#' combinations as the outliers
+#' Provides a summary of the outliers present in the \link[asreml]{asreml}
+#' model. Gives context to the outliers by showing the responses for the same
+#' factor combinations as the outliers
 #'
 #' @param model
 #'   The model object to detect outliers in.
@@ -29,7 +29,7 @@
 #'     data = rats
 #' )
 #' outlier_summary(model)
-#'
+#' @autoglobal
 #' @export
 outlier_summary <- function(model, cutoff = 3.5) {
     data <- as.data.frame(model$mf)

@@ -30,7 +30,7 @@
 #'     geom_line() +
 #'     facet_grid(~dir.hor, scales = "free_x")
 #' }
-#'
+#' @autoglobal
 #' @export
 directional_variograms <- function(model) {
     data <- as.data.frame(model$mf)

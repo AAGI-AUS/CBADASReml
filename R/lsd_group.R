@@ -41,7 +41,7 @@
 #'     alpha,
 #'     prob.matrix
 #' )
-#'
+#' @autoglobal
 #' @export
 lsd_group <- function(treatments, means, alpha, pvalues) {
     ## Order everything by descending mean
@@ -67,7 +67,9 @@ lsd_group <- function(treatments, means, alpha, pvalues) {
             } else {
                 ## Stop checking and assign labels
                 ## If trt_j has no label, we need to iterate the label
-                if (grp[trt_j - 1] == "") ltr <- ltr + 1
+                if (grp[trt_j - 1] == "") {
+                    ltr <- ltr + 1
+                }
                 ## All trts from trt_i to trt_j-1 are in one group
                 grp_idx <- trt_i:(trt_j - 1)
                 letter <- letters[ltr]
