@@ -3,7 +3,7 @@ pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   small_plot_analysis: small_plot_analysis.html
-last_built: 2025-07-15T06:16Z
+last_built: 2025-07-15T06:18Z
 urls:
   reference: https://aagi-aus.github.io/CBADASReml/reference
   article: https://aagi-aus.github.io/CBADASReml/articles
