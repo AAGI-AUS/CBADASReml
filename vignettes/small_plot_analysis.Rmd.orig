@@ -1,8 +1,8 @@
 ---
-title: "Small-plot_analysis"
+title: "Small-plot analysis"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Small-plot_analysis}
+  %\VignetteIndexEntry{Small-plot analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
