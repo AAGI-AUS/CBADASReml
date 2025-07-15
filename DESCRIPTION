@@ -6,10 +6,12 @@ Authors@R: c(
            comment = c(ORCID = "0009-0004-6579-6959")),
     person(c("Jordan", "jordan.brown@curtin.edu.au"), "Brown", role = "aut",
            comment = c(ORCID = "0009-0008-5014-0593")),
-    person("Adam H.", "Sparks", , "adam.sparks@curtin.edu.au", role = "aut"),
-    person("Curtin University", role = "cph"),
+    person(c("Adam H.", "adamhsparks@gmail.com"), "Sparks", role = "aut",
+           comment = c(ORCID = "0000-0002-0061-8359")),
+    person("Curtin University of Technology", role = c("fnd", "cph"),
+           comment = c("http://www.curtin.edu.au/", ROR = "02n415q13")),
     person("Grains Research and Development Corporation", role = c("fnd", "cph"),
-           comment = "GRDC Project CUR2210-005OPX (AAGI-CU)")
+           comment = c(Project = "GRDC Project CUR2210-005OPX (AAGI-CU)", ROR = "02xwr1996"))
   )
 Description: This package provides helper functions for ASReml,
     particularly for use with small-plot trials.
@@ -20,21 +22,22 @@ Imports:
     gstat,
     sf
 Suggests:
+    asreml,
+    car,
     emmeans,
     glmmTMB,
-    car,
-    asreml,
+    knitr,
+    rmarkdown,
     roxyglobals,
     rstac,
     testthat (>= 3.0.0),
-    vdiffr,
-    knitr,
-    rmarkdown
+    vdiffr
+VignetteBuilder: 
+    knitr
 Config/roxyglobals/filename: globals.R
 Config/roxyglobals/unique: FALSE
 Config/testthat/edition: 3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE, roclets = c("collate", "namespace", "rd",
     "roxyglobals::global_roclet"))
-RoxygenNote: 7.3.2
-VignetteBuilder: knitr
+RoxygenNote: 7.3.2.9000
