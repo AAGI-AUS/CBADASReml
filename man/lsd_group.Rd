@@ -28,7 +28,7 @@ Intended as a replacement of the agricolae::orderPvalue function, but with
 (maybe) a better algorithm.
 }
 \examples{
-\dontshow{if ("&"(requireNamespace("asreml", quietly = TRUE), requireNamespace("asremlPlus", quietly = TRUE))) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if ("&"(requireNamespace("asreml", quietly = TRUE), requireNamespace("asremlPlus", quietly = TRUE))) withAutoprint(\{ # examplesIf}
 library(asreml)
 model <- asreml(
     fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,

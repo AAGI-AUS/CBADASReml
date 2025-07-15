@@ -28,7 +28,7 @@ This function allows you to observe the anova table for multiple ASReml
 or glmmTMB models.
 }
 \examples{
-\dontshow{if (requireNamespace("asreml", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (requireNamespace("asreml", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 library(CBADASReml)
 library(asreml)
 test_data <- oats

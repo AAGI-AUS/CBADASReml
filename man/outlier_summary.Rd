@@ -34,7 +34,7 @@ Gives context to the outliers by showing the responses for the same factor
 combinations as the outliers
 }
 \examples{
-\dontshow{if (requireNamespace("asreml", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (requireNamespace("asreml", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 library(asreml)
 model <- asreml(
     fixed = weight ~ littersize + Dose + Sex + Dose:Sex,

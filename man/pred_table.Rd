@@ -78,7 +78,8 @@ Specifies the label for the combined factor column when
 Contains the predicted means, standard errors, and confidence intervals
 for the specified variables. Includes the following columns:
 \describe{
-\item{Treatment}{The combined factor levels, if \code{factor_combine} is \code{TRUE}.}
+\item{Treatment}{The combined factor levels, if \code{factor_combine} is
+\code{TRUE}.}
 \item{Mean}{The predicted mean values.}
 \item{Standard Error}{The standard errors of the predicted means.}
 \item{Lower CL}{The lower confidence limits.}
@@ -92,4 +93,17 @@ Generate a table of predicted values and CIs from an
 \link[asreml]{asreml} or \link[glmmTMB]{glmmTMB} model, for
 the specified variables \code{asreml} or \code{glmmTMB} object. Created by Matthew
 Nguyen.
+}
+\examples{
+\dontshow{if (requireNamespace("asreml", quietly = TRUE)) withAutoprint(\{ # examplesIf}
+library(CBADASReml)
+library(asreml)
+mod1 <- asreml(
+    fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
+    random = ~ idv(Blocks) + idv(Blocks):idv(Wplots),
+    residual = ~ idv(units),
+    data = oats
+)
+pred_table(mod1, classify = "Variety")
+\dontshow{\}) # examplesIf}
 }

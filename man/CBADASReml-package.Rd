@@ -16,13 +16,13 @@ This package provides helper functions for ASReml, particularly for use with sma
 Authors:
 \itemize{
   \item Jordan jordan.brown@curtin.edu.au Brown (\href{https://orcid.org/0009-0008-5014-0593}{ORCID})
-  \item Adam H. Sparks \email{adam.sparks@curtin.edu.au}
+  \item Adam H. adamhsparks@gmail.com Sparks (\href{https://orcid.org/0000-0002-0061-8359}{ORCID})
 }
 
 Other contributors:
 \itemize{
-  \item Curtin University [copyright holder]
-  \item Grains Research and Development Corporation (GRDC Project CUR2210-005OPX (AAGI-CU)) [funder, copyright holder]
+  \item Curtin University of Technology (\href{https://ror.org/02n415q13}{ROR}) (http://www.curtin.edu.au/) [funder, copyright holder]
+  \item Grains Research and Development Corporation (\href{https://ror.org/02xwr1996}{ROR}) (GRDC Project CUR2210-005OPX (AAGI-CU)) [funder, copyright holder]
 }
 
 }
