@@ -12,7 +12,7 @@
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.3.3 (2024-02-29)",
+  "runtimePlatform": "R version 4.5.1 (2025-06-13)",
   "author": [
     {
       "@type": "Person",
@@ -232,7 +232,7 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "269.803KB",
+  "fileSize": "270.051KB",
   "relatedLink": "https://aagi-aus.github.io/CBADASReml/",
   "readme": "https://github.com/AAGI-AUS/CBADASReml/blob/main/README.md"
 }
