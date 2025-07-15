@@ -84,8 +84,8 @@ mixed-effects models (LMMs), using <code>ASReml</code> or
 <code>glmmTMB</code>, and this package contains helper functions for
 this type of modelling.</p>
 <p>Note that the trial design is not handled at all by this package, and
-we recommend the use of <code>FielDHub</code> for creating small plot
-trial designs.</p>
+we recommend the use of <a href="https://didiermurillof.github.io/FielDHub/index.html" class="external-link">{FielDHub}</a>
+for creating small plot trial designs.</p>
 </div>
 <div class="section level3">
 <h3 id="mathematical-background">Mathematical Background<a class="anchor" aria-label="anchor" href="#mathematical-background"></a>
@@ -536,7 +536,7 @@ using the REML algorithm.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod_oats</span><span class="op">)</span></span></code></pre></div>
 <div class="float">
-<img src="figure/unnamed-chunk-4-1.png" alt="plot of chunk unnamed-chunk-4"><div class="figcaption">plot of chunk unnamed-chunk-4</div>
+<img src="plot_mod_oats-1.png" alt="plot of chunk plot_mod_oats"><div class="figcaption">plot of chunk plot_mod_oats</div>
 </div>
 </div>
 <div class="section level5">
@@ -546,7 +546,7 @@ using the REML algorithm.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/asreml/man/varioGram.html" class="external-link">varioGram</a></span><span class="op">(</span><span class="va">mod_oats</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="float">
-<img src="figure/unnamed-chunk-5-1.png" alt="plot of chunk unnamed-chunk-5"><div class="figcaption">plot of chunk unnamed-chunk-5</div>
+<img src="variogram_mod_oats-1.png" alt="plot of chunk variogram_mod_oats"><div class="figcaption">plot of chunk variogram_mod_oats</div>
 </div>
 </div>
 </div>
@@ -594,7 +594,8 @@ in both directions, rather than the traditional approach with
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../reference/directional_variograms.html">directional_variograms</a></span><span class="op">(</span><span class="va">mod_oats</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="float">
-<img src="figure/unnamed-chunk-7-1.png" alt="plot of chunk unnamed-chunk-7"><div class="figcaption">plot of chunk unnamed-chunk-7</div>
+<img src="directional_variograms_mod_oats-1.png" alt="plot of chunk directional_variograms_mod_oats"><div class="figcaption">plot of chunk
+directional_variograms_mod_oats</div>
 </div>
 </div>
 </div>
@@ -680,9 +681,9 @@ effect against each response.</p>
 <span></span>
 <span><span class="fu"><a href="../reference/anova_table.html">anova_table</a></span><span class="op">(</span><span class="va">mod_rats</span>, <span class="va">mod_rats2</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       Effect weight newresp</span></span>
-<span><span class="co">#&gt; 1 littersize      0   0.187</span></span>
-<span><span class="co">#&gt; 2        Sex      0   0.752</span></span>
-<span><span class="co">#&gt; 3       Dose      0   0.715</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 littersize      0   0.134</span></span>
+<span><span class="co">#&gt; 2        Sex      0   0.209</span></span>
+<span><span class="co">#&gt; 3       Dose      0   0.869</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="pred_table">
@@ -726,7 +727,7 @@ error, and confidence intervals.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/lsd_graph.html">lsd_graph</a></span><span class="op">(</span><span class="va">mod_rats</span>, classify <span class="op">=</span> <span class="st">"Dose"</span><span class="op">)</span></span></code></pre></div>
 <div class="float">
-<img src="figure/unnamed-chunk-13-1.png" alt="plot of chunk unnamed-chunk-13"><div class="figcaption">plot of chunk unnamed-chunk-13</div>
+<img src="lsd_graph_mod_rats-1.png" alt="plot of chunk lsd_graph_mod_rats"><div class="figcaption">plot of chunk lsd_graph_mod_rats</div>
 </div>
 </div>
 </div>
