@@ -22,8 +22,8 @@ Useful links:
 
 Authors:
 \itemize{
-  \item Jordan jordan.brown@curtin.edu.au Brown (\href{https://orcid.org/0009-0008-5014-0593}{ORCID})
-  \item Adam H. adam.sparks@curtin.edu.au Sparks (\href{https://orcid.org/0000-0002-0061-8359}{ORCID})
+  \item Jordan Brown \email{jordan.brown@curtin.edu.au} (\href{https://orcid.org/0009-0008-5014-0593}{ORCID})
+  \item Adam H. Sparks \email{adam.sparks@curtin.edu.au} (\href{https://orcid.org/0000-0002-0061-8359}{ORCID})
 }
 
 Other contributors:

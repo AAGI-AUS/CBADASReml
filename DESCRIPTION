@@ -4,9 +4,9 @@ Version: 0.1.0
 Authors@R: c(
     person("Kai", "Bagley", , "kai.bagley@curtin.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0004-6579-6959")),
-    person(c("Jordan", "jordan.brown@curtin.edu.au"), "Brown", role = "aut",
+    person("Jordan", "Brown", , "jordan.brown@curtin.edu.au", role = "aut",
            comment = c(ORCID = "0009-0008-5014-0593")),
-    person(c("Adam H.", "adam.sparks@curtin.edu.au"), "Sparks", role = "aut",
+    person("Adam H.", "Sparks", , "adam.sparks@curtin.edu.au", role = "aut",
            comment = c(ORCID = "0000-0002-0061-8359")),
     person("Curtin University", role = c("fnd", "cph"),
            comment = c("http://www.curtin.edu.au/", ROR = "02n415q13")),
