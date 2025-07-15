@@ -4,6 +4,7 @@
   "identifier": "CBADASReml",
   "description": "This package provides helper functions for ASReml, particularly for use with small-plot trials.",
   "name": "CBADASReml: Provides helper functions for ASReml",
+  "codeRepository": "https://github.com/AAGI-AUS/CBADASReml",
   "license": "https://spdx.org/licenses/GPL-3.0",
   "version": "0.1.0",
   "programmingLanguage": {
@@ -229,7 +230,7 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "123.809KB",
-  "codeRepository": "https://github.com/AAGI-AUS/CBADASReml",
+  "fileSize": "122.418KB",
+  "relatedLink": "https://aagi-aus.github.io/CBADASReml/",
   "readme": "https://github.com/AAGI-AUS/CBADASReml/blob/main/README.md"
 }

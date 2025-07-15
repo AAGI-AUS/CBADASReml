@@ -2,3 +2,6 @@
 ^\.github$
 ^air.toml
 ^codemeta\.json$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

@@ -41,3 +41,4 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE, roclets = c("collate", "namespace", "rd",
     "roxyglobals::global_roclet"))
 RoxygenNote: 7.3.2.9000
+URL: https://aagi-aus.github.io/CBADASReml/
