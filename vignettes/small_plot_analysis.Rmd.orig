@@ -5,6 +5,7 @@ vignette: >
   %\VignetteIndexEntry{Small-plot analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{asreml}
 ---
 
 ```{r, include = FALSE}
@@ -31,7 +32,8 @@ using `ASReml` or `glmmTMB`, and this package contains helper functions for
 this type of modelling.
 
 Note that the trial design is not handled at all by this package, and we
-recommend the use of `FielDHub` for creating small plot trial designs.
+recommend the use of [{FielDHub}](https://didiermurillof.github.io/FielDHub/index.html)
+for creating small plot trial designs.
 
 ## Mathematical Background
 
@@ -277,12 +279,12 @@ REML algorithm.
 ### Traditional Diagnostics (`ASReml-R`)
 
 #### `plot.asreml`
-```{r}
+```{r plot_mod_oats}
 plot(mod_oats)
 ```
 
 #### `plot(varioGram(mod))`
-```{r}
+```{r variogram_mod_oats}
 plot(varioGram(mod_oats))
 ```
 
@@ -307,7 +309,7 @@ outlier_summary(mod_rats)
 The purpose of this function is to view the autocorrelation structure in both
 directions, rather than the traditional approach with `ASReml-R`.
 
-```{r}
+```{r directional_variograms_mod_oats}
 plot(directional_variograms(mod_oats))
 ```
 
@@ -392,6 +394,7 @@ lsd_table(mod_rats, classify = "Dose")
 
 Show an LSD graph of the same data:
 
-```{r}
+```{r lsd_graph_mod_rats}
 lsd_graph(mod_rats, classify = "Dose")
 ```
+

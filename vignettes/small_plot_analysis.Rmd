@@ -5,6 +5,7 @@ vignette: >
   %\VignetteIndexEntry{Small-plot analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{asreml}
 ---
 
 
@@ -27,7 +28,8 @@ using `ASReml` or `glmmTMB`, and this package contains helper functions for
 this type of modelling.
 
 Note that the trial design is not handled at all by this package, and we
-recommend the use of `FielDHub` for creating small plot trial designs.
+recommend the use of [{FielDHub}](https://didiermurillof.github.io/FielDHub/index.html)
+for creating small plot trial designs.
 
 ## Mathematical Background
 
@@ -308,7 +310,7 @@ REML algorithm.
 plot(mod_oats)
 ```
 
-![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
+![plot of chunk plot_mod_oats](plot_mod_oats-1.png)
 
 #### `plot(varioGram(mod))`
 
@@ -316,7 +318,7 @@ plot(mod_oats)
 plot(varioGram(mod_oats))
 ```
 
-![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
+![plot of chunk variogram_mod_oats](variogram_mod_oats-1.png)
 
 :::
 
@@ -365,7 +367,7 @@ directions, rather than the traditional approach with `ASReml-R`.
 plot(directional_variograms(mod_oats))
 ```
 
-![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png)
+![plot of chunk directional_variograms_mod_oats](directional_variograms_mod_oats-1.png)
 
 :::
 
@@ -454,9 +456,9 @@ mod_rats2 <- update(mod_rats2, aom = TRUE)
 
 anova_table(mod_rats, mod_rats2)
 #>       Effect weight newresp
-#> 1 littersize      0   0.187
-#> 2        Sex      0   0.752
-#> 3       Dose      0   0.715
+#> 1 littersize      0   0.134
+#> 2        Sex      0   0.209
+#> 3       Dose      0   0.869
 ```
 
 ### `pred_table`
@@ -504,4 +506,5 @@ Show an LSD graph of the same data:
 lsd_graph(mod_rats, classify = "Dose")
 ```
 
-![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-1.png)
+![plot of chunk lsd_graph_mod_rats](lsd_graph_mod_rats-1.png)
+
