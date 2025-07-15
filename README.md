@@ -40,7 +40,7 @@ options(o) # reset options
 
 ## Usage
 
-For a detailed understanding of how the package can be used, here is a fully worked example of a small-plot trial analysis: [Small-Plot Case Study](vignettes/Small-plot_analysis.Rmd).
+For a detailed understanding of how the package can be used, here is a fully worked example of a small-plot trial analysis: [Small-Plot Case Study](https://aagi-aus.github.io/CBADASReml/articles/small_plot_analysis.html)
 This analysis tries to showcase each function in a useful capacity.  
 
 ## Contributions 

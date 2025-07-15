@@ -23,14 +23,16 @@
     },
     {
       "@type": "Person",
-      "givenName": ["Jordan", "jordan.brown@curtin.edu.au"],
+      "givenName": "Jordan",
       "familyName": "Brown",
+      "email": "jordan.brown@curtin.edu.au",
       "@id": "https://orcid.org/0009-0008-5014-0593"
     },
     {
       "@type": "Person",
-      "givenName": ["Adam H.", "adam.sparks@curtin.edu.au"],
+      "givenName": "Adam H.",
       "familyName": "Sparks",
+      "email": "adam.sparks@curtin.edu.au",
       "@id": "https://orcid.org/0000-0002-0061-8359"
     }
   ],
@@ -230,7 +232,7 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "269.752KB",
+  "fileSize": "269.803KB",
   "relatedLink": "https://aagi-aus.github.io/CBADASReml/",
   "readme": "https://github.com/AAGI-AUS/CBADASReml/blob/main/README.md"
 }
