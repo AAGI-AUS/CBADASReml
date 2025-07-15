@@ -1,3 +1,4 @@
+skip_on_cran()
 set.seed(123)
 library(asreml)
 test_data <- oats

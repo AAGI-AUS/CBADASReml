@@ -1,3 +1,4 @@
+skip_on_cran()
 library(asreml)
 model <- asreml::asreml(
     fixed = yield ~ Variety,
