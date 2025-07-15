@@ -19,11 +19,12 @@ options(repos = c(
 ### Install
 
 ```r
-install.packages("AAGIPalettes")
+install.packages("CBADASReml")
 ```
 
 ### The hard(er) way
-You can install {CBADASReml} like so:
+
+You can install {CBADASReml} directly from the repository with {pak} like so:
 
 ```r
 o <- options() # store default options
