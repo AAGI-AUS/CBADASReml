@@ -232,7 +232,10 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "270.051KB",
+  "applicationCategory": "Tools",
+  "isPartOf": "https://grdc.com.au/research/partnerships-and-initiatives/strategic-partnerships/aagi",
+  "keywords": ["AgriculturalResearch", "ExperimentalAnalysis"],
+  "fileSize": "270.273KB",
   "relatedLink": "https://aagi-aus.github.io/CBADASReml/",
   "readme": "https://github.com/AAGI-AUS/CBADASReml/blob/main/README.md"
 }
