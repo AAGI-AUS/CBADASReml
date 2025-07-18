@@ -73,6 +73,8 @@ produce a LaTeX table.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://aagi-aus.github.io/CBADASReml/">CBADASReml</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">asreml</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: Matrix</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading ASReml-R version 4.2</span>
 <span class="r-in"><span><span class="va">test_data</span> <span class="op">&lt;-</span> <span class="va">oats</span></span></span>
 <span class="r-in"><span><span class="va">test_data</span><span class="op">[</span><span class="st">"yield2"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">oats</span><span class="op">[</span><span class="st">"yield"</span><span class="op">]</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">oats</span><span class="op">[</span><span class="st">"yield"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">mod1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/asreml/man/asreml.html" class="external-link">asreml</a></span><span class="op">(</span></span></span>
@@ -89,9 +91,9 @@ produce a LaTeX table.</p>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">anova_table</span><span class="op">(</span><span class="va">mod1</span>, <span class="va">mod2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Effect yield yield2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1          Variety 0.226  0.387</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2         Nitrogen 0.000  0.054</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 Variety:Nitrogen 0.936  0.681</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1          Variety 0.226  0.015</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2         Nitrogen 0.000  0.134</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 Variety:Nitrogen 0.936  0.149</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## With glmmTMB models</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/glmmTMB/glmmTMB" class="external-link">glmmTMB</a></span><span class="op">)</span></span></span>
@@ -123,7 +125,7 @@ produce a LaTeX table.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Kai Bagley, Jordan Brown, Adam H. Sparks, Curtin University, Grains Research and Development Corporation.</p>
+  <p>Developed by Kai Bagley, Jordan Brown, Matthew Nguyen, Adam H. Sparks, Curtin University, Grains Research and Development Corporation.</p>
 </div>
 
 <div class="pkgdown-footer-right">
