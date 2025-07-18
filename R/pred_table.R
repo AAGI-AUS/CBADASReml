@@ -2,8 +2,7 @@
 #'
 #' Generate a table of predicted values and CIs from an
 #' \link[asreml]{asreml} or \link[glmmTMB]{glmmTMB} model, for
-#' the specified variables `asreml` or `glmmTMB` object. Created by Matthew
-#' Nguyen.
+#' the specified variables `asreml` or `glmmTMB` object.
 #'
 #' @param mod
 #'   The model object to get predictions from.
@@ -14,13 +13,13 @@
 #' @param classify `character` vector.
 #'   Variable for which predictions will be made.
 #'
-#'   For `asreml` models, it is passed to `classify` argument of
-#'   `predictPlus.asreml`.
-#'   For `glmmTMB` models it is used in the `specs` argument of
-#'   \link[emmeans]{emmeans}
+#'   For [asreml::asreml()] models, it is passed to `classify` argument of
+#'   [asremlPlus::predictPlus.asreml()].
+#'   For \CRANpkg{glmmTMB} models it is used in the `specs` argument of
+#'   [emmeans::emmeans()]
 #' @param link_fun `character` vector.
 #'   Specifies the transformation function to apply over the predictions.
-#'   Only applies for `asreml` objects.
+#'   Only applies for [asreml::asreml()] objects.
 #'
 #'   The value may be:
 #'
@@ -32,7 +31,7 @@
 #'   * `"probit"`
 #'   * `"cloglog"`
 #' @param tmb_component `character` vector.
-#'   Specifies the component of the `glmmTMB` model from which to get
+#'   Specifies the component of the \CRANpkg{glmmTMB} model from which to get
 #'   predictions.
 #'
 #'   The value may be:
@@ -42,7 +41,7 @@
 #'   * `"cmean"`
 #'   * `"response"`
 #' @param tmb_type `character` vector.
-#'   Specifies  the prediction type for `glmmTMB` models.
+#'   Specifies  the prediction type for \CRANpkg{glmmTMB} models.
 #'
 #'   * Only `"response"` is supported at the moment.
 #' @param factor_combine Logical
@@ -78,6 +77,7 @@
 #' )
 #' pred_table(mod1, classify = "Variety")
 #' @autoglobal
+#' @author Matthew Nguyen, \email{matthew.nguyen@@curtin.edu.au}
 #' @export
 pred_table <- function(
     mod,

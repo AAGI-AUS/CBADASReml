@@ -23,6 +23,7 @@ Useful links:
 Authors:
 \itemize{
   \item Jordan Brown \email{jordan.brown@curtin.edu.au} (\href{https://orcid.org/0009-0008-5014-0593}{ORCID})
+  \item Matthew Nguyen \email{matthew.nguyen@curtin.edu.au} (\href{https://orcid.org/0009-0006-6773-8263}{ORCID})
   \item Adam H. Sparks \email{adam.sparks@curtin.edu.au} (\href{https://orcid.org/0000-0002-0061-8359}{ORCID})
 }
 

@@ -6,6 +6,8 @@ Authors@R: c(
            comment = c(ORCID = "0009-0004-6579-6959")),
     person("Jordan", "Brown", , "jordan.brown@curtin.edu.au", role = "aut",
            comment = c(ORCID = "0009-0008-5014-0593")),
+    person("Matthew", "Nguyen", , "matthew.nguyen@curtin.edu.au", role = "aut",
+           comment = c(ORCID = "0009-0006-6773-8263")),
     person("Adam H.", "Sparks", , "adam.sparks@curtin.edu.au", role = "aut",
            comment = c(ORCID = "0000-0002-0061-8359")),
     person("Curtin University", role = c("fnd", "cph"),

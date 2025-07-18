@@ -26,14 +26,14 @@ The value may be:
 \item{classify}{\code{character} vector.
 Variable for which predictions will be made.
 
-For \code{asreml} models, it is passed to \code{classify} argument of
-\code{predictPlus.asreml}.
-For \code{glmmTMB} models it is used in the \code{specs} argument of
-\link[emmeans]{emmeans}}
+For \code{\link[asreml:asreml]{asreml::asreml()}} models, it is passed to \code{classify} argument of
+\code{\link[asremlPlus:predictPlus.asreml]{asremlPlus::predictPlus.asreml()}}.
+For \CRANpkg{glmmTMB} models it is used in the \code{specs} argument of
+\code{\link[emmeans:emmeans]{emmeans::emmeans()}}}
 
 \item{link_fun}{\code{character} vector.
 Specifies the transformation function to apply over the predictions.
-Only applies for \code{asreml} objects.
+Only applies for \code{\link[asreml:asreml]{asreml::asreml()}} objects.
 
 The value may be:
 \itemize{
@@ -47,7 +47,7 @@ The value may be:
 }}
 
 \item{tmb_component}{\code{character} vector.
-Specifies the component of the \code{glmmTMB} model from which to get
+Specifies the component of the \CRANpkg{glmmTMB} model from which to get
 predictions.
 
 The value may be:
@@ -59,7 +59,7 @@ The value may be:
 }}
 
 \item{tmb_type}{\code{character} vector.
-Specifies  the prediction type for \code{glmmTMB} models.
+Specifies  the prediction type for \CRANpkg{glmmTMB} models.
 \itemize{
 \item Only \code{"response"} is supported at the moment.
 }}
@@ -91,8 +91,7 @@ If \code{factor_combine} is \code{FALSE}, the factors specified in
 \description{
 Generate a table of predicted values and CIs from an
 \link[asreml]{asreml} or \link[glmmTMB]{glmmTMB} model, for
-the specified variables \code{asreml} or \code{glmmTMB} object. Created by Matthew
-Nguyen.
+the specified variables \code{asreml} or \code{glmmTMB} object.
 }
 \examples{
 \dontshow{if (requireNamespace("asreml", quietly = TRUE)) withAutoprint(\{ # examplesIf}
@@ -106,4 +105,7 @@ mod1 <- asreml(
 )
 pred_table(mod1, classify = "Variety")
 \dontshow{\}) # examplesIf}
+}
+\author{
+Matthew Nguyen, \email{matthew.nguyen@curtin.edu.au}
 }

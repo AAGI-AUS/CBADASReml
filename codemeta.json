@@ -12,7 +12,7 @@
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.5.1 (2025-06-13)",
+  "runtimePlatform": "R version 4.3.3 (2024-02-29)",
   "author": [
     {
       "@type": "Person",
@@ -27,6 +27,13 @@
       "familyName": "Brown",
       "email": "jordan.brown@curtin.edu.au",
       "@id": "https://orcid.org/0009-0008-5014-0593"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Matthew",
+      "familyName": "Nguyen",
+      "email": "matthew.nguyen@curtin.edu.au",
+      "@id": "https://orcid.org/0009-0006-6773-8263"
     },
     {
       "@type": "Person",
@@ -235,7 +242,7 @@
   "applicationCategory": "Tools",
   "isPartOf": "https://grdc.com.au/research/partnerships-and-initiatives/strategic-partnerships/aagi",
   "keywords": ["AgriculturalResearch", "ExperimentalAnalysis"],
-  "fileSize": "270.273KB",
+  "fileSize": "270.801KB",
   "relatedLink": "https://aagi-aus.github.io/CBADASReml/",
   "readme": "https://github.com/AAGI-AUS/CBADASReml/blob/main/README.md"
 }
