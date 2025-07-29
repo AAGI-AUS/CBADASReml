@@ -50,11 +50,11 @@ test_that("appropriate errors are given for incorrect parameters given", {
 })
 
 test_that("one model works", {
-    expect_equal(anova_table(mod1), out)
+    expect_identical(anova_table(mod1), out)
 })
 test_that("two models work", {
     out2 <- cbind(out, yield2 = c(0.059, 0.004, 0.562))
-    expect_equal(anova_table(mod1, mod2), out2)
+    expect_identical(anova_table(mod1, mod2), out2)
 })
 test_that("two+ models work", {
     out3 <- cbind(
@@ -62,7 +62,7 @@ test_that("two+ models work", {
         yield2 = c(0.059, 0.004, 0.562),
         yield3 = c(0.978, 0.000, 0.171)
     )
-    expect_equal(anova_table(mod1), out)
+    expect_identical(anova_table(mod1), out)
 })
 
 test_that("n_digits returns correct digits", {

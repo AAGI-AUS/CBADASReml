@@ -57,7 +57,7 @@ lsd_table <- function(model, classify, ...) {
         )
 
     lsdmeantab$lsd <- lsd
-    lsdmeantab$means <- means[order(means, decreasing = TRUE)]
+    lsdmeantab$means <- sort(means, decreasing = TRUE, na.last = TRUE)
 
     return(lsdmeantab)
 }

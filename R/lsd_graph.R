@@ -51,7 +51,7 @@ lsd_graph <- function(model, classify, ...) {
         ) +
         ggplot2::geom_bar(
             color = "black",
-            position = ggplot2::position_dodge(.9),
+            position = ggplot2::position_dodge(0.9),
             stat = "identity",
             fill = "lightblue"
         ) +
@@ -64,7 +64,7 @@ lsd_graph <- function(model, classify, ...) {
         ) +
         ggplot2::geom_errorbar(
             ggplot2::aes(ymin = means - lsd, ymax = means + lsd),
-            width = .1
+            width = 0.1
         ) +
         ggplot2::theme_bw() +
         ggplot2::theme(

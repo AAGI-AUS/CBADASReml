@@ -56,7 +56,7 @@ report_tables <- function(model, classify) {
     # Find all classify treatments levels to use
     factors <- strsplit(classify, ":|\\*")[[1]]
     classify_vector <- unlist(
-        lapply(1:length(factors), function(i) {
+        lapply(seq_along(factors), function(i) {
             utils::combn(factors, i, paste, collapse = ":")
         })
     )

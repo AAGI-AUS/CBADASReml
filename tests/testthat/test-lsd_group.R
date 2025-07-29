@@ -62,5 +62,5 @@ test_that("groups are same as agricolae::orderPvalue", {
             prob.matrix
         )
 
-    expect_equal(lsdmeantab$group, agricolae_groups)
+    expect_identical(lsdmeantab$group, agricolae_groups)
 })

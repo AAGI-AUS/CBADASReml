@@ -55,7 +55,7 @@
 #' @export
 anova_table <- function(..., n_digits = 3) {
     if (!is.numeric(n_digits)) {
-        stop(paste0("n_digits must be numeric: ", n_digits))
+        stop("n_digits must be numeric: ", n_digits)
     }
     UseMethod("anova_table")
 }

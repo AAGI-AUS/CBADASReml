@@ -13,15 +13,9 @@ table <- report_tables(
 )
 
 test_that("expected names", {
-    expect_equal(
-        names(table),
-        c("Anova", "Nitrogen", "Variety", "Nitrogen:Variety")
-    )
+    expect_named(table, c("Anova", "Nitrogen", "Variety", "Nitrogen:Variety"))
 })
 
 test_that("expected table", {
-    expect_equal(
-        table[["Nitrogen"]],
-        lsd_table(model, classify = "Nitrogen")
-    )
+    expect_identical(table[["Nitrogen"]], lsd_table(model, classify = "Nitrogen"))
 })
