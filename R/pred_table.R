@@ -178,7 +178,7 @@ pred_table <- function(
     }
 
     ## Format pred table
-    if (factor_combine == TRUE) {
+    if (factor_combine) {
         ## Last four columns are always present - combine first ncol - 4 names
         if (ncol(tab) - 4 > 1) {
             tab[[trt_col_label]] <-

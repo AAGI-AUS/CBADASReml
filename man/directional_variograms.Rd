@@ -2,7 +2,7 @@
 % Please edit documentation in R/directional_variograms.R
 \name{directional_variograms}
 \alias{directional_variograms}
-\title{A spatial variogram function for Single Site Data}
+\title{A Spatial Variogram Function for Single Site Data}
 \usage{
 directional_variograms(model)
 }

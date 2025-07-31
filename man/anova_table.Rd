@@ -2,7 +2,7 @@
 % Please edit documentation in R/anova_table.R
 \name{anova_table}
 \alias{anova_table}
-\title{An ANOVA table Function}
+\title{An ANOVA Table Function}
 \usage{
 anova_table(..., n_digits = 3)
 }

@@ -1,4 +1,4 @@
-#' A spatial variogram function for Single Site Data
+#' A Spatial Variogram Function for Single Site Data
 #'
 #' This function allows you to observe directional variograms in the 0
 #' (vertical) and 90 (horizontal) directions for gridded small-plot trial data.

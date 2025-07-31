@@ -2,7 +2,7 @@
 % Please edit documentation in R/report_tables.R
 \name{report_tables}
 \alias{report_tables}
-\title{A prediction function for models with more than one variable to predict on.}
+\title{A prediction function for models with more than one variable to predict on}
 \usage{
 report_tables(model, classify)
 }
@@ -28,7 +28,7 @@ object.
 }
 \description{
 This function outputs the predictions for each factor for a single model.
-Each factor is put on a separate excel sheet.
+Each factor is put on a separate Excel sheet.
 }
 \examples{
 \dontshow{if (requireNamespace("asreml", quietly = TRUE)) withAutoprint(\{ # examplesIf}

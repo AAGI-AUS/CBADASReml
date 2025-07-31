@@ -24,8 +24,8 @@ data.frame
 Dataframe of each treatment and their associated LSD group
 }
 \description{
-Intended as a replacement of the agricolae::orderPvalue function, but with
-(maybe) a better algorithm.
+Intended as a replacement of the \code{\link[agricolae:orderPvalue]{agricolae::orderPvalue()}} function, but
+with (maybe) a better algorithm.
 }
 \examples{
 \dontshow{if ("&"(requireNamespace("asreml", quietly = TRUE), requireNamespace("asremlPlus", quietly = TRUE))) withAutoprint(\{ # examplesIf}

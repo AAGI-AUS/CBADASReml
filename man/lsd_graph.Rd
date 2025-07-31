@@ -2,7 +2,7 @@
 % Please edit documentation in R/lsd_graph.R
 \name{lsd_graph}
 \alias{lsd_graph}
-\title{Create an LSD plot from an ASReml model}
+\title{Create an LSD graph from an ASReml model}
 \usage{
 lsd_graph(model, classify, ...)
 }

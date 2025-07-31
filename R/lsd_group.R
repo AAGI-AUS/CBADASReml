@@ -1,7 +1,7 @@
 #' Group treatments using results of paired t-test
 #'
-#' Intended as a replacement of the agricolae::orderPvalue function, but with
-#' (maybe) a better algorithm.
+#' Intended as a replacement of the [agricolae::orderPvalue()] function, but
+#' with (maybe) a better algorithm.
 #'
 #' @param treatments `character` vector
 #'   Character vector of the treatment names

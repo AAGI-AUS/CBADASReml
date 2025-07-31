@@ -1,4 +1,4 @@
-#' Produces a summary table for the data with Mean, Median, SD, CV and Range.
+#' Produces a summary table for the data with Mean, Median, SD, CV and Range
 #'
 #' This function outputs the summary statistics of the given data.
 #'

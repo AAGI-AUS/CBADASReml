@@ -2,7 +2,7 @@
 % Please edit documentation in R/exploratory_table.R
 \name{exploratory_table}
 \alias{exploratory_table}
-\title{Produces a summary table for the data with Mean, Median, SD, CV and Range.}
+\title{Produces a summary table for the data with Mean, Median, SD, CV and Range}
 \usage{
 exploratory_table(data, response, groupby)
 }

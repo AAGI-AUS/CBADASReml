@@ -1,7 +1,7 @@
-#' A prediction function for models with more than one variable to predict on.
+#' A prediction function for models with more than one variable to predict on
 #'
 #' This function outputs the predictions for each factor for a single model.
-#' Each factor is put on a separate excel sheet.
+#' Each factor is put on a separate Excel sheet.
 #'
 #' @param model
 #'   The model to generate predictions for.
@@ -64,11 +64,12 @@ report_tables <- function(model, classify) {
     # Create the tables for each
     pred_list <- lapply(
         classify_vector,
-        \(x)
+        \(x) {
             lsd_table(
                 model,
                 classify = x
             )
+        }
     )
 
     names(pred_list) <- classify_vector

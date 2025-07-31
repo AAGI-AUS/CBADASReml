@@ -67,4 +67,5 @@ outlier_summary <- function(model, cutoff = 3.5) {
     } else {
         print("No outliers detected")
     }
+    return(invisible(NULL))
 }

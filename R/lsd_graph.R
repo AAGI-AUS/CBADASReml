@@ -1,4 +1,4 @@
-#' Create an LSD plot from an ASReml model
+#' Create an LSD graph from an ASReml model
 #'
 #' Generates a table of least significant differences (LSDs) for a given model.
 #'
