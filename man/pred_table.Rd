@@ -2,7 +2,7 @@
 % Please edit documentation in R/pred_table.R
 \name{pred_table}
 \alias{pred_table}
-\title{Generate Prediction Table from Model}
+\title{Generate prediction table from model}
 \usage{
 pred_table(
   mod,

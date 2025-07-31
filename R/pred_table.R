@@ -1,4 +1,4 @@
-#' Generate Prediction Table from Model
+#' Generate prediction table from model
 #'
 #' Generate a table of predicted values and CIs from an
 #' \link[asreml]{asreml} or \link[glmmTMB]{glmmTMB} model, for

@@ -1,4 +1,4 @@
-#' An ANOVA Table Function
+#' An ANOVA table function
 #'
 #' This function allows you to observe the ANOVA table for multiple \pkg{ASReml}
 #' or \CRANpkg{glmmTMB} models.
