@@ -34,8 +34,9 @@ Suggests:
     roxyglobals,
     rstac,
     testthat (>= 3.0.0),
-    vdiffr
-VignetteBuilder: 
+    vdiffr,
+    cli
+VignetteBuilder:
     knitr
 Config/roxyglobals/filename: globals.R
 Config/roxyglobals/unique: FALSE
@@ -47,6 +48,6 @@ Roxygen: list(markdown = TRUE, roclets = c("collate", "namespace", "rd",
     "roxyglobals::global_roclet"))
 RoxygenNote: 7.3.2.9000
 X-schema.org-applicationCategory: Tools
-X-schema.org-isPartOf: 
+X-schema.org-isPartOf:
     https://grdc.com.au/research/partnerships-and-initiatives/strategic-partnerships/aagi
 X-schema.org-keywords: Agricultural Research, Experimental Analysis
