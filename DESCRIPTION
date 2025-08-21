@@ -1,6 +1,6 @@
 Package: CBADASReml
 Title: Provides helper functions for ASReml
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
     person("Kai", "Bagley", , "kai.bagley@curtin.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0004-6579-6959")),
@@ -19,7 +19,8 @@ Description: This package provides helper functions for ASReml,
     particularly for use with small-plot trials.
 License: GPL (>= 3)
 URL: https://aagi-aus.github.io/CBADASReml/
-Imports:
+Depends:
+    R (>= 4.1.0),
     asremlPlus,
     ggplot2,
     gstat,
