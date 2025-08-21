@@ -46,11 +46,17 @@
 #' @export
 report_tables <- function(model, classify) {
     if (!inherits(model, "asreml")) {
-        stop("Model should be an asreml object")
+        cli::cli_abort(
+            "Model should be an asreml object",
+            call = rlang::caller_env()
+        )
     }
 
     if (!is.character(classify)) {
-        stop("classify should be a string")
+        cli::cli_abort(
+            "classify should be a string",
+            call = rlang::caller_env()
+        )
     }
 
     # Find all classify treatments levels to use

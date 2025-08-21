@@ -55,7 +55,10 @@
 #' @export
 anova_table <- function(..., n_digits = 3) {
     if (!is.numeric(n_digits)) {
-        stop("n_digits must be numeric: ", n_digits)
+        cli::cli_abort(
+            "n_digits must be numeric: {n_digits}",
+            call = rlang::caller_env()
+        )
     }
     UseMethod("anova_table")
 }
@@ -71,10 +74,10 @@ anova_table.asreml <- function(..., n_digits = 3) {
     )
 
     if (length(unique(response_names)) != length(models)) {
-        stop(paste(
-            "Models should have different response names:",
-            response_names
-        ))
+        cli::cli_abort(
+            "Models should have different response names: {response_names}",
+            call = rlang::caller_env()
+        )
     }
 
     wald_list <- lapply(

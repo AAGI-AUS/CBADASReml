@@ -36,7 +36,7 @@ outlier_summary <- function(model, cutoff = 3.5) {
 
     # Add standardised residuals to the model (if not already in the model)
     if (is.null(model$aom)) {
-        print("No aom = T, Updating Model")
+        cli::cli_alert_info("No aom = T, Updating Model")
         model <- asreml::update.asreml(model, aom = TRUE)
     }
 
@@ -65,7 +65,7 @@ outlier_summary <- function(model, cutoff = 3.5) {
         print(outlier_table, 3)
         print(ordered_table, 3)
     } else {
-        print("No outliers detected")
+        cli::cli_alert_info("No outliers detected")
     }
     return(invisible(NULL))
 }

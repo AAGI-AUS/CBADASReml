@@ -18,10 +18,16 @@
 #' @export
 exploratory_table <- function(data, response, groupby) {
     if (!response %in% names(data)) {
-        stop("response must be a column in the data")
+        cli::cli_abort(
+            "response must be a column in the data",
+            call = rlang::caller_env()
+        )
     }
     if (!all(groupby %in% names(data))) {
-        stop("grouping variables must be columns in the data")
+        cli::cli_abort(
+            "grouping variables must be columns in the data",
+            call = rlang::caller_env()
+        )
     }
 
     compute_stats <- function(x) {

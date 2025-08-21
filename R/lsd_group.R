@@ -88,5 +88,5 @@ lsd_group <- function(treatments, means, alpha, pvalues) {
             }
         }
     }
-    stop("Something bad happened...")
+    cli::cli_abort("Something bad happened...")
 }

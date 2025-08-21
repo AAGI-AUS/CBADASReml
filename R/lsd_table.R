@@ -26,8 +26,6 @@
 #' lsd_table(model, classify = "Variety")
 #' @autoglobal
 #' @export
-lsd_table <- function(model, classify, ...) {}
-
 lsd_table <- function(model, classify, ...) {
     ## Suppress all prints
     utils::capture.output(

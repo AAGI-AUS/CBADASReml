@@ -98,12 +98,22 @@ pred_table <- function(
 ) {
     modtype <- class(mod)
 
-    stopifnot(
-        "Model must be of class asreml or glmmTMB" = modtype == "asreml" |
-            modtype == "glmmTMB",
-        "classify must be type character" = is.character(classify),
-        'link_fun must be one of "identity", "log", "inverse", "sqrt",
-        "logit", "probit", "cloglog"' = link_fun %in%
+    if (!(modtype == "asreml" | modtype == "glmmTMB")) {
+        cli::cli_abort(
+            "Model must be of class asreml or glmmTMB",
+            call = rlang::caller_env()
+        )
+    }
+
+    if (is.character(classify)) {
+        cli::cli_abort(
+            "Classify must be type character",
+            call = rlang::caller_env()
+        )
+    }
+
+    if (
+        !(link_fun %in%
             c(
                 "identity",
                 "log",
@@ -112,14 +122,44 @@ pred_table <- function(
                 "logit",
                 "probit",
                 "cloglog"
-            ),
-        'tmb_component must be one of "cond", "cmean", "zi", "response"' = tmb_component %in%
-            c("cond", "cmean", "zi", "response"),
-        'tmb_type must be one of "response"' = tmb_type %in% c("response"),
-        "factor_combine must be type logical" = is.logical(factor_combine),
-        "trt_col_label must be type character" = is.character(trt_col_label)
-        ## Check/extend conditions
-    )
+            ))
+    ) {
+        cli::cli_abort(
+            'link_fun must be one of "identity", "log", "inverse", "sqrt", "logit", "probit", "cloglog"',
+            call = rlang::caller_env()
+        )
+    }
+
+    if (
+        tmb_component %in%
+            c("cond", "cmean", "zi", "response")
+    ) {
+        cli::cli_abort(
+            'tmb_component must be one of "cond", "cmean", "zi", "response"',
+            call = rlang::caller_env()
+        )
+    }
+
+    if (tmb_type %in% c("response")) {
+        cli::cli_abort(
+            'tmb_type must be one of "response"',
+            call = rlang::caller_env()
+        )
+    }
+
+    if (is.logical(factor_combine)) {
+        cli::cli_abort(
+            "factor_combine must be type logical",
+            call = rlang::caller_env()
+        )
+    }
+
+    if (is.character(trt_col_label)) {
+        cli::cli_abort(
+            "trt_col_label must be type character",
+            call = rlang::caller_env()
+        )
+    }
 
     if (modtype == "asreml") {
         utils::capture.output(
