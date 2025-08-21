@@ -94,14 +94,22 @@ Generate a table of predicted values and CIs from an
 the specified variables \code{asreml} or \code{glmmTMB} object.
 }
 \examples{
-\dontshow{if (requireNamespace("asreml", quietly = TRUE)) withAutoprint(\{ # examplesIf}
+\dontshow{if (requireNamespace("asreml", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(CBADASReml)
 library(asreml)
+library(glmmTMB)
 mod1 <- asreml(
     fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
     random = ~ idv(Blocks) + idv(Blocks):idv(Wplots),
     residual = ~ idv(units),
     data = oats
+)
+# Zero inflated model
+mod2 <- glmmTMB(
+    count ~ spp * mined + (1|site),
+    zi = ~ spp * mined,
+    data = Salamanders,
+    family = nbinom2
 )
 pred_table(mod1, classify = "Variety")
 \dontshow{\}) # examplesIf}

@@ -11,9 +11,9 @@ Authors@R: c(
     person("Adam H.", "Sparks", , "adam.sparks@curtin.edu.au", role = "aut",
            comment = c(ORCID = "0000-0002-0061-8359")),
     person("Curtin University", role = c("fnd", "cph"),
-           comment = c("http://www.curtin.edu.au/", ROR = "02n415q13")),
+           comment = "http://www.curtin.edu.au/, ROR: 02n415q13"),
     person("Grains Research and Development Corporation", role = c("fnd", "cph"),
-           comment = c(Project = "GRDC Project CUR2210-005OPX (AAGI-CU)", ROR = "02xwr1996"))
+           comment = "Project: GRDC Project CUR2210-005OPX (AAGI-CU), ROR: 02xwr1996")
   )
 Description: This package provides helper functions for ASReml,
     particularly for use with small-plot trials.
@@ -47,7 +47,7 @@ Encoding: UTF-8
 Language: en-AU
 Roxygen: list(markdown = TRUE, roclets = c("collate", "namespace", "rd",
     "roxyglobals::global_roclet"))
-RoxygenNote: 7.3.2.9000
+RoxygenNote: 7.3.2
 X-schema.org-applicationCategory: Tools
 X-schema.org-isPartOf:
     https://grdc.com.au/research/partnerships-and-initiatives/strategic-partnerships/aagi
