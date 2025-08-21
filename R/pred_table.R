@@ -130,31 +130,28 @@ pred_table <- function(
         )
     }
 
-    if (
-        tmb_component %in%
-            c("cond", "cmean", "zi", "response")
-    ) {
+    if (!(tmb_component %in% c("cond", "cmean", "zi", "response"))) {
         cli::cli_abort(
             'tmb_component must be one of "cond", "cmean", "zi", "response"',
             call = rlang::caller_env()
         )
     }
 
-    if (tmb_type %in% c("response")) {
+    if (!(tmb_type %in% c("response"))) {
         cli::cli_abort(
             'tmb_type must be one of "response"',
             call = rlang::caller_env()
         )
     }
 
-    if (is.logical(factor_combine)) {
+    if (!(is.logical(factor_combine))) {
         cli::cli_abort(
             "factor_combine must be type logical",
             call = rlang::caller_env()
         )
     }
 
-    if (is.character(trt_col_label)) {
+    if (!(is.character(trt_col_label))) {
         cli::cli_abort(
             "trt_col_label must be type character",
             call = rlang::caller_env()

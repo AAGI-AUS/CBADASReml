@@ -21,14 +21,14 @@
 #'     outliers.
 #'
 #' @examplesIf requireNamespace("asreml", quietly = TRUE)
-#' library(asreml)
-#' model <- asreml(
-#'     fixed = weight ~ littersize + Dose + Sex + Dose:Sex,
-#'     random = ~idv(Dam),
-#'     residual = ~units,
-#'     data = rats
-#' )
-#' outlier_summary(model)
+library(asreml)
+model <- asreml(
+    fixed = weight ~ littersize + Dose + Sex + Dose:Sex,
+    random = ~ idv(Dam),
+    residual = ~units,
+    data = rats
+)
+outlier_summary(model)
 #' @autoglobal
 #' @export
 outlier_summary <- function(model, cutoff = 3.5) {
@@ -36,8 +36,8 @@ outlier_summary <- function(model, cutoff = 3.5) {
 
     # Add standardised residuals to the model (if not already in the model)
     if (is.null(model$aom)) {
-        cli::cli_alert_info("No aom = T, Updating Model")
-        model <- asreml::update.asreml(model, aom = TRUE)
+        cli::cli_alert_warning("No aom = T, updating model")
+        model <- asreml::update.asreml(model, aom = TRUE, trace = FALSE)
     }
 
     # Finding the factors used in the model if not supplied by the user
@@ -61,8 +61,9 @@ outlier_summary <- function(model, cutoff = 3.5) {
 
     # Results to help the user identify outliers and their context
     if (sum(abs(data$residuals) > cutoff) > 0) {
-        print(paste("Outliers detected:", sum(abs(data$residuals) > cutoff)))
+        cli::cli_h1("Outliers detected: {sum(abs(data$residuals) > cutoff)}")
         print(outlier_table, 3)
+        cli::cli_h2("Data table")
         print(ordered_table, 3)
     } else {
         cli::cli_alert_info("No outliers detected")
