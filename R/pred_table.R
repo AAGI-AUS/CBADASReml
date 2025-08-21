@@ -69,11 +69,19 @@
 #' @examplesIf requireNamespace("asreml", quietly = TRUE)
 #' library(CBADASReml)
 #' library(asreml)
+#' library(glmmTMB)
 #' mod1 <- asreml(
 #'     fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
 #'     random = ~ idv(Blocks) + idv(Blocks):idv(Wplots),
 #'     residual = ~ idv(units),
 #'     data = oats
+#' )
+#' # Zero inflated model
+#' mod2 <- glmmTMB(
+#'     count ~ spp * mined + (1|site),
+#'     zi = ~ spp * mined,
+#'     data = Salamanders,
+#'     family = nbinom2
 #' )
 #' pred_table(mod1, classify = "Variety")
 #' @autoglobal
@@ -118,7 +126,9 @@ pred_table <- function(
             pred <- asremlPlus::predictPlus.asreml(
                 mod,
                 classify = classify,
-                wald.tab = as.data.frame(asreml::wald(mod)),
+                wald.tab = as.data.frame(
+                    asreml::wald(mod, denDF = "algebraic")$Wald
+                ),
                 pairwise = TRUE,
                 transform.function = link_fun
             )
