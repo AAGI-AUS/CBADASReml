@@ -6,7 +6,7 @@
   "name": "CBADASReml: Provides helper functions for ASReml",
   "codeRepository": "https://github.com/AAGI-AUS/CBADASReml",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -186,10 +186,28 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=vdiffr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "cli",
+      "name": "cli",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=cli"
     }
   ],
   "softwareRequirements": {
     "1": {
+      "@type": "SoftwareApplication",
+      "identifier": "R",
+      "name": "R",
+      "version": ">= 4.1.0"
+    },
+    "2": {
       "@type": "SoftwareApplication",
       "identifier": "asremlPlus",
       "name": "asremlPlus",
@@ -201,7 +219,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=asremlPlus"
     },
-    "2": {
+    "3": {
       "@type": "SoftwareApplication",
       "identifier": "ggplot2",
       "name": "ggplot2",
@@ -213,7 +231,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=ggplot2"
     },
-    "3": {
+    "4": {
       "@type": "SoftwareApplication",
       "identifier": "gstat",
       "name": "gstat",
@@ -225,7 +243,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=gstat"
     },
-    "4": {
+    "5": {
       "@type": "SoftwareApplication",
       "identifier": "sf",
       "name": "sf",
@@ -242,7 +260,7 @@
   "applicationCategory": "Tools",
   "isPartOf": "https://grdc.com.au/research/partnerships-and-initiatives/strategic-partnerships/aagi",
   "keywords": ["AgriculturalResearch", "ExperimentalAnalysis"],
-  "fileSize": "270.828KB",
+  "fileSize": "274.077KB",
   "relatedLink": "https://aagi-aus.github.io/CBADASReml/",
   "readme": "https://github.com/AAGI-AUS/CBADASReml/blob/main/README.md"
 }
