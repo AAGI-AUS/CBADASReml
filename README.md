@@ -1,9 +1,10 @@
 # CBADASReml <img src="man/figures/logo.png" align="right" height="139" alt="" />
+
 ## A collection of helper functions for small-plot trial analysis using ASReml
 
 ## Installation instructions
 
-{CBADASReml} is available through the [R-Universe](https://r-universe.dev/search) with pre-built binaries (this is the easy way).
+{CBADASReml} is available through the [R-Universe](https://aagi-aus.r-universe.dev/packages) with pre-built binaries (this is the easy way).
 
 To get started:
 
@@ -14,7 +15,6 @@ options(repos = c(
     aagi_aus = 'https://aagi-aus.r-universe.dev',
     CRAN = 'https://cloud.r-project.org'))
 ```
-
 
 ### Install
 
@@ -41,8 +41,8 @@ options(o) # reset options
 ## Usage
 
 For a detailed understanding of how the package can be used, here is a fully worked example of a small-plot trial analysis: [Small-Plot Case Study](https://aagi-aus.github.io/CBADASReml/articles/small_plot_analysis.html)
-This analysis tries to showcase each function in a useful capacity.  
+This analysis tries to showcase each function in a useful capacity.
 
-## Contributions 
+## Contributions
 
-All contributions are appreciated, but please make sure to follow the [Contribution Guidelines](.github/CONTRIBUTING.md). 
+All contributions are appreciated, but please make sure to follow the [Contribution Guidelines](.github/CONTRIBUTING.md).
