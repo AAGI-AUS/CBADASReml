@@ -8,16 +8,23 @@ vignette: >
   %\VignetteDepends{asreml}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-    collapse = TRUE,
-    comment = "#>"
-)
-```
 
-``` {r setup}
+
+
+``` r
 library(CBADASReml)
+#> Loading required package: asremlPlus
+#> ASReml-R needs to be loaded if the mixed-model functions are to be used.
+#> 
+#> ASReml-R is available from VSNi. Please visit http://www.vsni.co.uk/ for more information.
+#> Loading required package: ggplot2
+#> Loading required package: gstat
+#> Loading required package: sf
+#> Linking to GEOS 3.13.0, GDAL 3.8.5, PROJ 9.5.1; sf_use_s2() is TRUE
 library(asreml)
+#> Loading required package: Matrix
+#> Online License checked out Fri Aug 22 12:51:01 2025
+#> Loading ASReml-R version 4.2
 ```
 
 # CBADASReml
@@ -28,12 +35,13 @@ A typical type of experimental analysis that this package will assist with is
 the small plot trial. Here we will show the general workflow for performing a
 small-plot analysis and how each function from the package can be used.
 Analysis of small plot trials is done using linear mixed-effects models (LMMs),
-using `ASReml` or `glmmTMB`, and this package contains helper functions for
-this type of modelling.
+using {ASReml} or [{glmmTMB}](https://glmmtmb.github.io/glmmTMB/), and this
+package contains helper functions for this type of modelling.
 
 Note that the trial design is not handled at all by this package, and we
-recommend the use of [{FielDHub}](https://didiermurillof.github.io/FielDHub/index.html)
-for creating small plot trial designs.
+recommend the use of [{speed}](https://biometryhub.github.io/speed/) or
+[{FielDHub}](https://didiermurillof.github.io/FielDHub/index.html) for creating
+small plot trial designs.
 
 ## Mathematical Background
 
@@ -300,7 +308,11 @@ Upon executing the above in R, the `ASReml-R` code will attempt to
 *estimate* the variance components $\sigma_d^2$ and $\sigma_e^2$, using the
 REML algorithm.
 
-## Function examples {.tabset}
+## Function examples
+
+::::{style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px"}
+
+:::{}
 
 ### Traditional Diagnostics (`ASReml-R`)
 
@@ -320,6 +332,10 @@ plot(varioGram(mod_oats))
 
 ![plot of chunk variogram_mod_oats](variogram_mod_oats-1.png)
 
+:::
+
+:::{}
+
 ### CBADASReml Diagnostics
 
 #### `outlier_summary`
@@ -331,10 +347,14 @@ rats dataset that is included within `ASReml-R`.
 
 ``` r
 outlier_summary(mod_rats)
-#> [1] "Outliers detected: 2"
+#> 
+#> ── Outliers detected: 2 ────────────────────────────────────────────────────────
 #>    Dose Sex littersize Dam weight units combined_trt residuals
 #> 56    C   F         13   5   5.02    56       13_F_C -4.090506
 #> 66    C   F          9   6   3.68    66        9_F_C -7.941340
+#> 
+#> ── Data table ──
+#> 
 #>     Dose Sex littersize Dam weight units combined_trt  residuals
 #> 56     C   F         13   5   5.02    56       13_F_C -4.0905065
 #> 57     C   F         13   5   6.04    57       13_F_C -1.4769901
@@ -365,7 +385,16 @@ plot(directional_variograms(mod_oats))
 
 ![plot of chunk directional_variograms_mod_oats](directional_variograms_mod_oats-1.png)
 
-## Model Outputs {.tabset}
+:::
+
+::::
+
+
+## Model Outputs
+
+::::{style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px"}
+
+:::{}
 
 ### Traditional Outputs (`ASReml-R`)
 
@@ -373,28 +402,30 @@ plot(directional_variograms(mod_oats))
 
 For getting the significance of each variable in the model
 
+
 ``` r
 wald(mod_rats)
 #> [0;34mWald tests for fixed effects.[0m
 #> [0;34mResponse: weight[0m
 #> [0;34mTerms added sequentially; adjusted for those above.[0m
-#>
-#>               Df Sum of Sq Wald statistic             Pr(Chisq)
-#> (Intercept)    1   1477.67         8981.5 < 0.00000000000000022 ***
-#> littersize     1      4.58           27.8   0.00000013118965070 ***
-#> Sex            1      9.80           59.5   0.00000000000001199 ***
-#> Dose           2      3.76           22.8   0.00001099619080491 ***
-#> residual (MS)         0.16
+#> 
+#>               Df Sum of Sq Wald statistic Pr(Chisq)    
+#> (Intercept)    1   1477.67         8981.5 < 2.2e-16 ***
+#> littersize     1      4.58           27.8 1.312e-07 ***
+#> Sex            1      9.80           59.5 1.199e-14 ***
+#> Dose           2      3.76           22.8 1.100e-05 ***
+#> residual (MS)         0.16                             
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 #### `predict`
 
+
 ``` r
 predict.asreml(mod_oats, classify = "Nitrogen")
 #> $pvals
-#>
+#> 
 #> Notes:
 #> [0;34m- The predictions are obtained by averaging across the hypertable
 #>   calculated from model terms constructed solely from factors in
@@ -408,11 +439,15 @@ predict.asreml(mod_oats, classify = "Nitrogen")
 #> 2  0.2_cwt       100.15097  6.896569 Estimable
 #> 3  0.4_cwt       114.41044  6.887489 Estimable
 #> 4  0.6_cwt       123.22901  6.912904 Estimable
-#>
+#> 
 #> $avsed
-#>  overall
+#>  overall 
 #> 3.748427
 ```
+
+:::
+
+:::{}
 
 ### CBADASReml Outputs
 
@@ -420,6 +455,7 @@ predict.asreml(mod_oats, classify = "Nitrogen")
 
 Show an ANOVA table for multiple models, with p-values for each effect against
 each response.
+
 
 ``` r
 rats[["newresp"]] <- rats[["weight"]] * runif(nrow(rats))
@@ -436,9 +472,9 @@ mod_rats2 <- update(mod_rats2, aom = TRUE)
 
 anova_table(mod_rats, mod_rats2)
 #>       Effect weight newresp
-#> 1 littersize      0   0.134
-#> 2        Sex      0   0.209
-#> 3       Dose      0   0.869
+#> 1 littersize      0   0.804
+#> 2        Sex      0   0.208
+#> 3       Dose      0   0.008
 ```
 
 ### `pred_table`
@@ -446,22 +482,23 @@ anova_table(mod_rats, mod_rats2)
 Get the mean for each level of a fixed effect, as well as standard error, and
 confidence intervals.
 
+
 ``` r
 pred_table(mod_rats, classify = "Dose")
-#> Warning in asremlPlus::predictPlus.asreml(mod, classify = classify, wald.tab =
-#> as.data.frame(asreml::wald(mod)), : Denominator degrees of freedom obtained
-#> using dDF.na method residual
-#>   Treatment     Mean Standard Error Lower CL Upper CL
-#> 1         C 6.410370      0.1060763 6.201667 6.619072
-#> 2      High 5.554064      0.1482309 5.262423 5.845704
-#> 3       Low 5.989315      0.1071587 5.778483 6.200147
+#> Error:
+#> ! Classify must be type character
 ```
+
+:::
+
+::::
 
 ## Least significant difference
 
 #### `lsd_table`
 
 Show a least significant difference table:
+
 
 ``` r
 lsd_table(mod_rats, classify = "Dose")
@@ -475,8 +512,10 @@ lsd_table(mod_rats, classify = "Dose")
 
 Show an LSD graph of the same data:
 
+
 ``` r
 lsd_graph(mod_rats, classify = "Dose")
 ```
 
 ![plot of chunk lsd_graph_mod_rats](lsd_graph_mod_rats-1.png)
+

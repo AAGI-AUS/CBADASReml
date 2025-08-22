@@ -28,12 +28,13 @@ A typical type of experimental analysis that this package will assist with is
 the small plot trial. Here we will show the general workflow for performing a
 small-plot analysis and how each function from the package can be used.
 Analysis of small plot trials is done using linear mixed-effects models (LMMs),
-using `ASReml` or `glmmTMB`, and this package contains helper functions for
-this type of modelling.
+using {ASReml} or [{glmmTMB}](https://glmmtmb.github.io/glmmTMB/), and this
+package contains helper functions for this type of modelling.
 
 Note that the trial design is not handled at all by this package, and we
-recommend the use of [{FielDHub}](https://didiermurillof.github.io/FielDHub/index.html)
-for creating small plot trial designs.
+recommend the use of [{speed}](https://biometryhub.github.io/speed/) or
+[{FielDHub}](https://didiermurillof.github.io/FielDHub/index.html) for creating
+small plot trial designs.
 
 ## Mathematical Background
 
