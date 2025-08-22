@@ -8,10 +8,14 @@ vignette: >
   %\VignetteDepends{asreml}
 ---
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
 
-
-
-``` r
+``` {r setup}
 library(CBADASReml)
 library(asreml)
 ```
@@ -296,11 +300,7 @@ Upon executing the above in R, the `ASReml-R` code will attempt to
 *estimate* the variance components $\sigma_d^2$ and $\sigma_e^2$, using the
 REML algorithm.
 
-## Function examples
-
-::::{style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px"}
-
-:::{}
+## Function examples {.tabset}
 
 ### Traditional Diagnostics (`ASReml-R`)
 
@@ -319,10 +319,6 @@ plot(varioGram(mod_oats))
 ```
 
 ![plot of chunk variogram_mod_oats](variogram_mod_oats-1.png)
-
-:::
-
-:::{}
 
 ### CBADASReml Diagnostics
 
@@ -369,16 +365,7 @@ plot(directional_variograms(mod_oats))
 
 ![plot of chunk directional_variograms_mod_oats](directional_variograms_mod_oats-1.png)
 
-:::
-
-::::
-
-
-## Model Outputs
-
-::::{style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px"}
-
-:::{}
+## Model Outputs {.tabset}
 
 ### Traditional Outputs (`ASReml-R`)
 
@@ -386,30 +373,28 @@ plot(directional_variograms(mod_oats))
 
 For getting the significance of each variable in the model
 
-
 ``` r
 wald(mod_rats)
 #> [0;34mWald tests for fixed effects.[0m
 #> [0;34mResponse: weight[0m
 #> [0;34mTerms added sequentially; adjusted for those above.[0m
-#> 
-#>               Df Sum of Sq Wald statistic             Pr(Chisq)    
+#>
+#>               Df Sum of Sq Wald statistic             Pr(Chisq)
 #> (Intercept)    1   1477.67         8981.5 < 0.00000000000000022 ***
 #> littersize     1      4.58           27.8   0.00000013118965070 ***
 #> Sex            1      9.80           59.5   0.00000000000001199 ***
 #> Dose           2      3.76           22.8   0.00001099619080491 ***
-#> residual (MS)         0.16                                         
+#> residual (MS)         0.16
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 #### `predict`
 
-
 ``` r
 predict.asreml(mod_oats, classify = "Nitrogen")
 #> $pvals
-#> 
+#>
 #> Notes:
 #> [0;34m- The predictions are obtained by averaging across the hypertable
 #>   calculated from model terms constructed solely from factors in
@@ -423,15 +408,11 @@ predict.asreml(mod_oats, classify = "Nitrogen")
 #> 2  0.2_cwt       100.15097  6.896569 Estimable
 #> 3  0.4_cwt       114.41044  6.887489 Estimable
 #> 4  0.6_cwt       123.22901  6.912904 Estimable
-#> 
+#>
 #> $avsed
-#>  overall 
+#>  overall
 #> 3.748427
 ```
-
-:::
-
-:::{}
 
 ### CBADASReml Outputs
 
@@ -439,7 +420,6 @@ predict.asreml(mod_oats, classify = "Nitrogen")
 
 Show an ANOVA table for multiple models, with p-values for each effect against
 each response.
-
 
 ``` r
 rats[["newresp"]] <- rats[["weight"]] * runif(nrow(rats))
@@ -466,7 +446,6 @@ anova_table(mod_rats, mod_rats2)
 Get the mean for each level of a fixed effect, as well as standard error, and
 confidence intervals.
 
-
 ``` r
 pred_table(mod_rats, classify = "Dose")
 #> Warning in asremlPlus::predictPlus.asreml(mod, classify = classify, wald.tab =
@@ -478,16 +457,11 @@ pred_table(mod_rats, classify = "Dose")
 #> 3       Low 5.989315      0.1071587 5.778483 6.200147
 ```
 
-:::
-
-::::
-
 ## Least significant difference
 
 #### `lsd_table`
 
 Show a least significant difference table:
-
 
 ``` r
 lsd_table(mod_rats, classify = "Dose")
@@ -501,10 +475,8 @@ lsd_table(mod_rats, classify = "Dose")
 
 Show an LSD graph of the same data:
 
-
 ``` r
 lsd_graph(mod_rats, classify = "Dose")
 ```
 
 ![plot of chunk lsd_graph_mod_rats](lsd_graph_mod_rats-1.png)
-

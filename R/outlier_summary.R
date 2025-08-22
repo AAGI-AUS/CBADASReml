@@ -21,14 +21,14 @@
 #'     outliers.
 #'
 #' @examplesIf requireNamespace("asreml", quietly = TRUE)
-library(asreml)
-model <- asreml(
-    fixed = weight ~ littersize + Dose + Sex + Dose:Sex,
-    random = ~ idv(Dam),
-    residual = ~units,
-    data = rats
-)
-outlier_summary(model)
+#' library(asreml)
+#' model <- asreml(
+#'     fixed = weight ~ littersize + Dose + Sex + Dose:Sex,
+#'     random = ~ idv(Dam),
+#'     residual = ~units,
+#'     data = rats
+#' )
+#' outlier_summary(model)
 #' @autoglobal
 #' @export
 outlier_summary <- function(model, cutoff = 3.5) {
