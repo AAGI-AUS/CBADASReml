@@ -271,11 +271,7 @@ Upon executing the above in R, the `ASReml-R` code will attempt to
 *estimate* the variance components $\sigma_d^2$ and $\sigma_e^2$, using the
 REML algorithm.
 
-## Function examples
-
-::::{style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px"}
-
-:::{}
+## Function examples {.tabset}
 
 ### Traditional Diagnostics (`ASReml-R`)
 
@@ -288,10 +284,6 @@ plot(mod_oats)
 ```{r variogram_mod_oats}
 plot(varioGram(mod_oats))
 ```
-
-:::
-
-:::{}
 
 ### CBADASReml Diagnostics
 
@@ -314,16 +306,7 @@ directions, rather than the traditional approach with `ASReml-R`.
 plot(directional_variograms(mod_oats))
 ```
 
-:::
-
-::::
-
-
-## Model Outputs
-
-::::{style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px"}
-
-:::{}
+## Model Outputs {.tabset}
 
 ### Traditional Outputs (`ASReml-R`)
 
@@ -340,10 +323,6 @@ wald(mod_rats)
 ```{r}
 predict.asreml(mod_oats, classify = "Nitrogen")
 ```
-
-:::
-
-:::{}
 
 ### CBADASReml Outputs
 
@@ -377,10 +356,6 @@ confidence intervals.
 pred_table(mod_rats, classify = "Dose")
 ```
 
-:::
-
-::::
-
 ## Least significant difference
 
 #### `lsd_table`
@@ -398,4 +373,3 @@ Show an LSD graph of the same data:
 ```{r lsd_graph_mod_rats}
 lsd_graph(mod_rats, classify = "Dose")
 ```
-

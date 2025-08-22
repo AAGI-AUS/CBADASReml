@@ -20,10 +20,10 @@ library(CBADASReml)
 #> Loading required package: ggplot2
 #> Loading required package: gstat
 #> Loading required package: sf
-#> Linking to GEOS 3.13.0, GDAL 3.8.5, PROJ 9.5.1; sf_use_s2() is TRUE
+#> Linking to GEOS 3.12.1, GDAL 3.8.4, PROJ 9.3.1; sf_use_s2() is TRUE
 library(asreml)
 #> Loading required package: Matrix
-#> Online License checked out Fri Aug 22 12:51:01 2025
+#> Online License checked out Fri Aug 22 14:18:11 2025
 #> Loading ASReml-R version 4.2
 ```
 
@@ -130,32 +130,19 @@ CBADASReml::exploratory_table(
     response = "yield",
     groupby = c("Variety", "Nitrogen")
 )
-#>        Variety Nitrogen             mean median               sd
-#> 1  Golden_rain    0_cwt               80     75 21.0047613649858
-#> 2  Golden_rain  0.2_cwt             98.5  102.5 13.4721935853075
-#> 3  Golden_rain  0.4_cwt 114.666666666667    110 29.9443929086343
-#> 4  Golden_rain  0.6_cwt 124.833333333333  129.5 20.8750249500849
-#> 5   Marvellous    0_cwt 86.6666666666667   92.5 16.5730705262081
-#> 6   Marvellous  0.2_cwt            108.5  111.5 26.8533051969399
-#> 7   Marvellous  0.4_cwt 117.166666666667  118.5 9.78604448521805
-#> 8   Marvellous  0.6_cwt 126.833333333333  122.5 20.2920345620311
-#> 9      Victory    0_cwt             71.5     65   20.59854363784
-#> 10     Victory  0.2_cwt 89.6666666666667   89.5 22.5092573548455
-#> 11     Victory  0.4_cwt 110.833333333333    106 26.0108951531213
-#> 12     Victory  0.6_cwt            118.5  114.5 30.0915270466622
-#>                  cv reps min max     range
-#> 1  26.2559517062322    6  60 117  60 - 117
-#> 2  13.6773538937132    6  82 114  82 - 114
-#> 3  26.1142961412508    6  86 161  86 - 161
-#> 4  16.7223163819105    6  96 149  96 - 149
-#> 5  19.1227736840862    6  63 105  63 - 105
-#> 6  24.7495900432626    6  70 140  70 - 140
-#> 7  8.35224280388454    6 104 132 104 - 132
-#> 8  15.9989760016014    6  99 156  99 - 156
-#> 9   28.809151941035    6  53 111  53 - 111
-#> 10  25.103260990534    6  64 130  64 - 130
-#> 11 23.4684768298838    6  81 157  81 - 157
-#> 12 25.3936937102634    6  86 174  86 - 174
+#>        Variety Nitrogen             mean median               sd               cv reps min max     range
+#> 1  Golden_rain    0_cwt               80     75 21.0047613649858 26.2559517062322    6  60 117  60 - 117
+#> 2  Golden_rain  0.2_cwt             98.5  102.5 13.4721935853075 13.6773538937132    6  82 114  82 - 114
+#> 3  Golden_rain  0.4_cwt 114.666666666667    110 29.9443929086343 26.1142961412508    6  86 161  86 - 161
+#> 4  Golden_rain  0.6_cwt 124.833333333333  129.5 20.8750249500849 16.7223163819105    6  96 149  96 - 149
+#> 5   Marvellous    0_cwt 86.6666666666667   92.5 16.5730705262081 19.1227736840862    6  63 105  63 - 105
+#> 6   Marvellous  0.2_cwt            108.5  111.5 26.8533051969399 24.7495900432626    6  70 140  70 - 140
+#> 7   Marvellous  0.4_cwt 117.166666666667  118.5 9.78604448521805 8.35224280388454    6 104 132 104 - 132
+#> 8   Marvellous  0.6_cwt 126.833333333333  122.5 20.2920345620311 15.9989760016014    6  99 156  99 - 156
+#> 9      Victory    0_cwt             71.5     65   20.59854363784  28.809151941035    6  53 111  53 - 111
+#> 10     Victory  0.2_cwt 89.6666666666667   89.5 22.5092573548455  25.103260990534    6  64 130  64 - 130
+#> 11     Victory  0.4_cwt 110.833333333333    106 26.0108951531213 23.4684768298838    6  81 157  81 - 157
+#> 12     Victory  0.6_cwt            118.5  114.5 30.0915270466622 25.3936937102634    6  86 174  86 - 174
 ```
 
 ### Model Fitting and Validation
@@ -176,8 +163,8 @@ mod_oats <- asreml(
     data = oats,
     trace = FALSE
 )
-#> Warning in asreml(fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen, : Some
-#> components changed by more than 1% on the last iteration
+#> Warning in asreml(fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen, : Some components changed by more than 1% on
+#> the last iteration
 
 mod_oats <- update(mod_oats, aom = TRUE)
 
@@ -308,11 +295,7 @@ Upon executing the above in R, the `ASReml-R` code will attempt to
 *estimate* the variance components $\sigma_d^2$ and $\sigma_e^2$, using the
 REML algorithm.
 
-## Function examples
-
-::::{style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px"}
-
-:::{}
+## Function examples {.tabset}
 
 ### Traditional Diagnostics (`ASReml-R`)
 
@@ -332,10 +315,6 @@ plot(varioGram(mod_oats))
 
 ![plot of chunk variogram_mod_oats](variogram_mod_oats-1.png)
 
-:::
-
-:::{}
-
 ### CBADASReml Diagnostics
 
 #### `outlier_summary`
@@ -348,7 +327,7 @@ rats dataset that is included within `ASReml-R`.
 ``` r
 outlier_summary(mod_rats)
 #> 
-#> ── Outliers detected: 2 ────────────────────────────────────────────────────────
+#> ── Outliers detected: 2 ───────────────────────────────────────────────────────────────────────────────────────────
 #>    Dose Sex littersize Dam weight units combined_trt residuals
 #> 56    C   F         13   5   5.02    56       13_F_C -4.090506
 #> 66    C   F          9   6   3.68    66        9_F_C -7.941340
@@ -385,16 +364,7 @@ plot(directional_variograms(mod_oats))
 
 ![plot of chunk directional_variograms_mod_oats](directional_variograms_mod_oats-1.png)
 
-:::
-
-::::
-
-
-## Model Outputs
-
-::::{style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px"}
-
-:::{}
+## Model Outputs {.tabset}
 
 ### Traditional Outputs (`ASReml-R`)
 
@@ -405,9 +375,9 @@ For getting the significance of each variable in the model
 
 ``` r
 wald(mod_rats)
-#> [0;34mWald tests for fixed effects.[0m
-#> [0;34mResponse: weight[0m
-#> [0;34mTerms added sequentially; adjusted for those above.[0m
+#> Wald tests for fixed effects.
+#> Response: weight
+#> Terms added sequentially; adjusted for those above.
 #> 
 #>               Df Sum of Sq Wald statistic Pr(Chisq)    
 #> (Intercept)    1   1477.67         8981.5 < 2.2e-16 ***
@@ -427,13 +397,13 @@ predict.asreml(mod_oats, classify = "Nitrogen")
 #> $pvals
 #> 
 #> Notes:
-#> [0;34m- The predictions are obtained by averaging across the hypertable
+#> - The predictions are obtained by averaging across the hypertable
 #>   calculated from model terms constructed solely from factors in
 #>   the averaging and classify sets.
 #> - Use 'average' to move ignored factors into the averaging set.
 #> - The simple averaging set: Variety
 #> - The ignored set: Blocks,Wplots
-#> [0m
+#> 
 #>   Nitrogen predicted.value std.error    status
 #> 1    0_cwt        77.76388  6.929776 Estimable
 #> 2  0.2_cwt       100.15097  6.896569 Estimable
@@ -444,10 +414,6 @@ predict.asreml(mod_oats, classify = "Nitrogen")
 #>  overall 
 #> 3.748427
 ```
-
-:::
-
-:::{}
 
 ### CBADASReml Outputs
 
@@ -472,9 +438,9 @@ mod_rats2 <- update(mod_rats2, aom = TRUE)
 
 anova_table(mod_rats, mod_rats2)
 #>       Effect weight newresp
-#> 1 littersize      0   0.804
-#> 2        Sex      0   0.208
-#> 3       Dose      0   0.008
+#> 1 littersize      0   0.626
+#> 2        Sex      0   0.011
+#> 3       Dose      0   0.058
 ```
 
 ### `pred_table`
@@ -488,10 +454,6 @@ pred_table(mod_rats, classify = "Dose")
 #> Error:
 #> ! Classify must be type character
 ```
-
-:::
-
-::::
 
 ## Least significant difference
 
@@ -518,4 +480,3 @@ lsd_graph(mod_rats, classify = "Dose")
 ```
 
 ![plot of chunk lsd_graph_mod_rats](lsd_graph_mod_rats-1.png)
-
