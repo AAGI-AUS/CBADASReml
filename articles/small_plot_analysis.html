@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">CBADASReml</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,7 +69,18 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://aagi-aus.github.io/CBADASReml/">CBADASReml</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">asreml</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">#&gt; Loading required package: asremlPlus</span></span>
+<span><span class="co">#&gt; ASReml-R needs to be loaded if the mixed-model functions are to be used.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ASReml-R is available from VSNi. Please visit http://www.vsni.co.uk/ for more information.</span></span>
+<span><span class="co">#&gt; Loading required package: ggplot2</span></span>
+<span><span class="co">#&gt; Loading required package: gstat</span></span>
+<span><span class="co">#&gt; Loading required package: sf</span></span>
+<span><span class="co">#&gt; Linking to GEOS 3.13.0, GDAL 3.8.5, PROJ 9.5.1; sf_use_s2() is TRUE</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">asreml</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required package: Matrix</span></span>
+<span><span class="co">#&gt; Online License checked out Fri Aug 22 12:51:01 2025</span></span>
+<span><span class="co">#&gt; Loading ASReml-R version 4.2</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="cbadasreml">CBADASReml<a class="anchor" aria-label="anchor" href="#cbadasreml"></a>
 </h2>
@@ -80,11 +91,10 @@
 with is the small plot trial. Here we will show the general workflow for
 performing a small-plot analysis and how each function from the package
 can be used. Analysis of small plot trials is done using linear
-mixed-effects models (LMMs), using <code>ASReml</code> or
-<code>glmmTMB</code>, and this package contains helper functions for
-this type of modelling.</p>
+mixed-effects models (LMMs), using {ASReml} or <a href="https://glmmtmb.github.io/glmmTMB/" class="external-link">{glmmTMB}</a>, and this
+package contains helper functions for this type of modelling.</p>
 <p>Note that the trial design is not handled at all by this package, and
-we recommend the use of <a href="https://didiermurillof.github.io/FielDHub/index.html" class="external-link">{FielDHub}</a>
+we recommend the use of <a href="https://biometryhub.github.io/speed/" class="external-link">{speed}</a> or <a href="https://didiermurillof.github.io/FielDHub/index.html" class="external-link">{FielDHub}</a>
 for creating small plot trial designs.</p>
 </div>
 <div class="section level3">
@@ -563,10 +573,14 @@ provider. Below is an example for the rats dataset that is included
 within <code>ASReml-R</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/outlier_summary.html">outlier_summary</a></span><span class="op">(</span><span class="va">mod_rats</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Outliers detected: 2"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Outliers detected: 2 ────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt;    Dose Sex littersize Dam weight units combined_trt residuals</span></span>
 <span><span class="co">#&gt; 56    C   F         13   5   5.02    56       13_F_C -4.090506</span></span>
 <span><span class="co">#&gt; 66    C   F          9   6   3.68    66        9_F_C -7.941340</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Data table ──</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     Dose Sex littersize Dam weight units combined_trt  residuals</span></span>
 <span><span class="co">#&gt; 56     C   F         13   5   5.02    56       13_F_C -4.0905065</span></span>
 <span><span class="co">#&gt; 57     C   F         13   5   6.04    57       13_F_C -1.4769901</span></span>
@@ -619,12 +633,12 @@ directional_variograms_mod_oats</div>
 <span><span class="co">#&gt; <span style="color: #0000BB;">Response: weight</span></span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">Terms added sequentially; adjusted for those above.</span></span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;               Df Sum of Sq Wald statistic             Pr(Chisq)    </span></span>
-<span><span class="co">#&gt; (Intercept)    1   1477.67         8981.5 &lt; 0.00000000000000022 ***</span></span>
-<span><span class="co">#&gt; littersize     1      4.58           27.8   0.00000013118965070 ***</span></span>
-<span><span class="co">#&gt; Sex            1      9.80           59.5   0.00000000000001199 ***</span></span>
-<span><span class="co">#&gt; Dose           2      3.76           22.8   0.00001099619080491 ***</span></span>
-<span><span class="co">#&gt; residual (MS)         0.16                                         </span></span>
+<span><span class="co">#&gt;               Df Sum of Sq Wald statistic Pr(Chisq)    </span></span>
+<span><span class="co">#&gt; (Intercept)    1   1477.67         8981.5 &lt; 2.2e-16 ***</span></span>
+<span><span class="co">#&gt; littersize     1      4.58           27.8 1.312e-07 ***</span></span>
+<span><span class="co">#&gt; Sex            1      9.80           59.5 1.199e-14 ***</span></span>
+<span><span class="co">#&gt; Dose           2      3.76           22.8 1.100e-05 ***</span></span>
+<span><span class="co">#&gt; residual (MS)         0.16                             </span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 </div>
@@ -681,9 +695,9 @@ effect against each response.</p>
 <span></span>
 <span><span class="fu"><a href="../reference/anova_table.html">anova_table</a></span><span class="op">(</span><span class="va">mod_rats</span>, <span class="va">mod_rats2</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       Effect weight newresp</span></span>
-<span><span class="co">#&gt; 1 littersize      0   0.134</span></span>
-<span><span class="co">#&gt; 2        Sex      0   0.209</span></span>
-<span><span class="co">#&gt; 3       Dose      0   0.869</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 littersize      0   0.804</span></span>
+<span><span class="co">#&gt; 2        Sex      0   0.208</span></span>
+<span><span class="co">#&gt; 3       Dose      0   0.008</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="pred_table">
@@ -693,13 +707,8 @@ effect against each response.</p>
 error, and confidence intervals.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pred_table.html">pred_table</a></span><span class="op">(</span><span class="va">mod_rats</span>, classify <span class="op">=</span> <span class="st">"Dose"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in asremlPlus::predictPlus.asreml(mod, classify = classify, wald.tab =</span></span>
-<span><span class="co">#&gt; as.data.frame(asreml::wald(mod)), : Denominator degrees of freedom obtained</span></span>
-<span><span class="co">#&gt; using dDF.na method residual</span></span>
-<span><span class="co">#&gt;   Treatment     Mean Standard Error Lower CL Upper CL</span></span>
-<span><span class="co">#&gt; 1         C 6.410370      0.1060763 6.201667 6.619072</span></span>
-<span><span class="co">#&gt; 2      High 5.554064      0.1482309 5.262423 5.845704</span></span>
-<span><span class="co">#&gt; 3       Low 5.989315      0.1071587 5.778483 6.200147</span></span></code></pre></div>
+<span><span class="co">#&gt; Error:</span></span>
+<span><span class="co">#&gt; ! Classify must be type character</span></span></code></pre></div>
 </div>
 </div>
 </div>

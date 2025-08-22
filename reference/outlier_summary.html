@@ -11,7 +11,7 @@ factor combinations as the outliers"><meta property="og:image" content="https://
 
     <a class="navbar-brand me-2" href="../index.html">CBADASReml</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,11 +84,15 @@ outliers.</p></li>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">rats</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">outlier_summary</span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "No aom = T, Updating Model"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Outliers detected: 2"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> No aom = T, updating model</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Outliers detected: 2</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Dose Sex littersize Dam weight units combined_trt residuals</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 56    C   F         13   5   5.02    56       13_C_F -4.020632</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 66    C   F          9   6   3.68    66        9_C_F -7.877422</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Data table</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     Dose Sex littersize Dam weight units combined_trt  residuals</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 56     C   F         13   5   5.02    56       13_C_F -4.0206317</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 53     C   F         13   5   7.16    53       13_C_F  1.4705108</span>
