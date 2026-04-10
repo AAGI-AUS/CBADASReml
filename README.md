@@ -11,9 +11,12 @@ To get started:
 ### Enable this universe
 
 ```r
-options(repos = c(
-    aagi_aus = 'https://aagi-aus.r-universe.dev',
-    CRAN = 'https://cloud.r-project.org'))
+options(
+    repos = c(
+        AAGI = 'https://aagi-aus.r-universe.dev',
+        CRAN = 'https://cloud.r-project.org'
+    )
+)
 ```
 
 ### Install
@@ -31,8 +34,9 @@ o <- options() # store default options
 
 options(pkg.build_vignettes = TRUE)
 
-if (!require("pak"))
-  install.packages("pak")
+if (!require("pak")) {
+    install.packages("pak")
+}
 pak::pak("AAGI-AUS/CBADASReml")
 
 options(o) # reset options
