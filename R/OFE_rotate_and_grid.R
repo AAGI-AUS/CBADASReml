@@ -252,7 +252,7 @@ ofe_grid_data <- function(data_in, rotation_angle, nrow, npe, ncol, trim_ends=TR
       temp_filter = paste(Row, Col)
     )
   
-  point.reference.frame <- data.frame(
+  point_reference_frame <- data.frame(
     Row = as.factor(rep(1:nrow, ncol)),
     Col = as.factor(rep(1:ncol, each = nrow))
   ) |> 
@@ -278,11 +278,11 @@ ofe_grid_data <- function(data_in, rotation_angle, nrow, npe, ncol, trim_ends=TR
   structure(
     class = "gridded.ofe",
     list(
-      gridded_data = point.reference.frame |> 
+      gridded_data = point_reference_frame |> 
         dplyr::left_join(data_out_summary) |>
         dplyr::select(-temp_filter) |> 
         dplyr::mutate(
-          Pe.Row = as.factor(1 + floor(npe*as.numeric(Row)/(nrow+1e-6)))
+          Pe = as.factor(1 + floor(npe*as.numeric(Row)/(nrow+1e-6)))
         ) |>
         dplyr::arrange(Rep, Col, Row),
       original_data = data_out
