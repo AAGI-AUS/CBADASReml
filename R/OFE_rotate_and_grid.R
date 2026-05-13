@@ -34,24 +34,39 @@
 #'  st_as_sf(coords = c("long", "lat"), crs = 4326) |>
 #'  st_transform(3395)
 #'  
-#' OFE_rotate_data(data, -60)
+#' ofe_rotate_data(data, -60)
 #' @autoglobal
 #' @author Braden Thorne, \email{braden.thorne@@curtin.edu.au}
 #' @export
-OFE_rotate_data <- function(data, angle){
-  original_coordinates = sf::st_coordinates(data)
-  rotated_coordinates = spdep::Rotation(
-    original_coordinates,
-    pi*angle/180
-  )
+ofe_rotate_data <- function(data, angle){
+  rotation_angle <- angle*pi/180
+  rotation_matrix <- matrix(c(
+    cos(rotation_angle),
+    sin(rotation_angle),
+    -sin(rotation_angle),
+    cos(rotation_angle)
+  ), nrow=2, ncol=2)
+  
+  original_coordinates <- sf::st_coordinates(data)
+  translation_matrix <- apply(st_coordinates(data), 2, mean)
+  
+  rotated_coordinates <- (
+    rotation_matrix %*% (
+      original_coordinates |> 
+        as.matrix() |> 
+        t() - 
+        translation_matrix
+    )
+  ) + translation_matrix
+  
   return(
     data |> 
       sf::st_drop_geometry() |> 
       dplyr::mutate(
         x_original = as.numeric(original_coordinates[,1]),
         y_original = as.numeric(original_coordinates[,2]),
-        x = rotated_coordinates[,1],
-        y = rotated_coordinates[,2]
+        x = rotated_coordinates[1,],
+        y = rotated_coordinates[2,]
       ) |> 
       sf::st_as_sf(
         coords = c("x", "y"),
@@ -65,7 +80,7 @@ OFE_rotate_data <- function(data, angle){
 #'
 #' Optimally rotate and grid a georeferenced dataframe
 #'
-#' @param data `data.frame`.
+#' @param data_in `data.frame`.
 #'   The dataframe to be rotated. 
 #'   This should be goereferenced per the `sf` pacakge.
 #'   
@@ -77,36 +92,36 @@ OFE_rotate_data <- function(data, angle){
 #'   \item{Rep}{The blocking structure to be preserved}
 #' }
 #'   
-#' @param angle `numeric`.
+#' @param rotation_angle `numeric`.
 #'   Clockwise angle in degrees to rotate the dataframe.
 #'   
-#' @param N.rows `numeric`.
+#' @param nrow `numeric`.
 #'   The number of rows in the final grid.
 #'   This should be as large as possible without introducing spurious NA values.
 #'   
-#' @param N.pe `numeric`.
+#' @param npe `numeric`.
 #'   Number of pseudo-environments to be generated along the strips.
 #'   PEs will be evenly spaced, so may not be appropriate in all cases.
 #'   Always assess PEs visually before use.
 #'   
-#' @param N.cols `numeric`.
+#' @param ncol `numeric`.
 #'   The actual number of strips in the data.
 #'   This should be counted/confirmed before hand.
 #'   If there is a gap between strips, count the number of strips 
 #'   in this gap when determining this number.
 #'   
-#' @param trim.ends `bool`.
+#' @param trim_ends `bool`.
 #'   Boolean determining whether the gridded data should be trimmed
 #'   to remove NAs occuring at the ends of columns.
 #'   Defaults to FALSE.
 #'
-#' @returns `Gridded.OFE`.
+#' @returns `gridded.ofe`.
 #'     `list` containing the following items:
 #' \describe{
-#'   \item{gridded.data `data.frame`}{
+#'   \item{gridded_data `data.frame`}{
 #'     The georeferenced gridded data.
 #'   }
-#'   \item{data.original `data.frame`}{
+#'   \item{data_original `data.frame`}{
 #'     The input data with additional columns for visualising the
 #'     rotation process.
 #'   }
@@ -129,14 +144,14 @@ OFE_rotate_data <- function(data, angle){
 #'  st_as_sf(coords = c("long", "lat"), crs = 4326) |>
 #'  st_transform(3395)
 #'  
-#' OFE_grid_data(data, -60, 80, 5, 18, trim.ends=FALSE)
+#' ofe_grid_data(data, -60, 80, 5, 18, trim_ends=FALSE)
 #' @autoglobal
 #' @author Braden Thorne, \email{braden.thorne@@curtin.edu.au}
 #' @export
-OFE_grid_data <- function(data.in, rotation.angle, N.rows, N.pe, N.cols, trim.ends=TRUE){
+ofe_grid_data <- function(data_in, rotation_angle, nrow, npe, ncol, trim_ends=TRUE){
   
   ### Start with the rough angle rotation to determine strip labels
-  data.pre.angle <- OFE_rotate_data(data.in, rotation.angle) |> 
+  data_pre_angle <- ofe_rotate_data(data_in, rotation_angle) |> 
     dplyr::mutate(
       x = as.numeric(sf::st_coordinates(geometry)[, "X"]),
       y = as.numeric(sf::st_coordinates(geometry)[, "Y"]),
@@ -144,56 +159,56 @@ OFE_grid_data <- function(data.in, rotation.angle, N.rows, N.pe, N.cols, trim.en
       Col = 0
     )
   
-  x_gap <- (max(data.pre.angle$x)-min(data.pre.angle$x))/(N.cols-1)
-  col.breaks <- seq(
-    min(data.pre.angle$x)-x_gap/2,
-    max(data.pre.angle$x)+x_gap/2,
-    length=(N.cols+1)
+  x_gap <- (max(data_pre_angle$x)-min(data_pre_angle$x))/(ncol-1)
+  col_breaks <- seq(
+    min(data_pre_angle$x)-x_gap/2,
+    max(data_pre_angle$x)+x_gap/2,
+    length=(ncol+1)
   )
-  col.mid.points <- col.breaks[1:N.cols] + diff(col.breaks)
-  for (i in 1:N.cols){
-    data.pre.angle$Col <- data.pre.angle$Col + (data.pre.angle$x>col.breaks[i])
+  col_mid_points <- col_breaks[1:ncol] + diff(col_breaks)
+  for (i in 1:ncol){
+    data_pre_angle$Col <- data_pre_angle$Col + (data_pre_angle$x>col_breaks[i])
   }
   
   ### Based on the labels, determine the actual rotation angle and rotate data.
   true_angle <- (180/pi)*atan(
     1/stats::lm(
       y_original~x_original,
-      data=dplyr::filter(data.pre.angle, Col==1)
+      data=dplyr::filter(data_pre_angle, Col==1)
     )$coefficients[[2]]
   )
   
-  data <- OFE_rotate_data(data.in, true_angle)
+  data <- ofe_rotate_data(data_in, true_angle)
   
   ### Prepare output data.
-  data.out <- data |>
+  data_out <- data |>
     dplyr::mutate(
       Yield = as.numeric(Yield),
       Treatment = as.factor(Treatment),
       Rep = as.factor(Rep),
       x = as.numeric(sf::st_coordinates(geometry)[, "X"]),
       y = as.numeric(sf::st_coordinates(geometry)[, "Y"]),
-      x_rough_rotation = data.pre.angle$x,
-      y_rough_rotation = data.pre.angle$y,
+      x_rough_rotation = data_pre_angle$x,
+      y_rough_rotation = data_pre_angle$y,
       Row = 0,
       Col = 0
     )
   
   ### Assign strip labels
-  x_gap <- (max(data.out$x)-min(data.out$x))/(N.cols-1)
-  col.breaks <- seq(
-    min(data.out$x)-x_gap/2,
-    max(data.out$x)+x_gap/2,
-    length=(N.cols+1)
+  x_gap <- (max(data_out$x)-min(data_out$x))/(ncol-1)
+  col_breaks <- seq(
+    min(data_out$x)-x_gap/2,
+    max(data_out$x)+x_gap/2,
+    length=(ncol+1)
   )
-  col.mid.points <- col.breaks[1:N.cols] + diff(col.breaks)
-  for (i in 1:N.cols){
-    data.out$Col <- data.out$Col + (data.out$x>col.breaks[i])
+  col_mid_points <- col_breaks[1:ncol] + diff(col_breaks)
+  for (i in 1:ncol){
+    data_out$Col <- data_out$Col + (data_out$x>col_breaks[i])
   }
   
   ### Can trim ends to not contain NAs if required.
-  if (trim.ends) {
-    y_extrema <- data.out |>
+  if (trim_ends) {
+    y_extrema <- data_out |>
       sf::st_drop_geometry() |>
       dplyr::mutate(Col=as.factor(Col)) |>
       dplyr::group_by(Col) |>
@@ -201,7 +216,7 @@ OFE_grid_data <- function(data.in, rotation.angle, N.rows, N.pe, N.cols, trim.en
         min(y),
         max(y)
       )
-    data.out <- data.out |>
+    data_out <- data_out |>
       dplyr::filter(
         y>=max(y_extrema[["min(y)"]]),
         y<=min(y_extrema[["max(y)"]])
@@ -209,14 +224,14 @@ OFE_grid_data <- function(data.in, rotation.angle, N.rows, N.pe, N.cols, trim.en
   }
   
   ### Assign specified number of rows.
-  row.breaks <- seq(min(data.out$y)-1e-6, max(data.out$y)+1e-6, length=(N.rows+1))
-  row.mid.points <- row.breaks[1:N.rows] + diff(row.breaks)
-  for (i in 1:N.rows){
-    data.out$Row <- data.out$Row + (data.out$y>row.breaks[i])
+  row_breaks <- seq(min(data_out$y)-1e-6, max(data_out$y)+1e-6, length=(nrow+1))
+  row_mid_points <- row_breaks[1:nrow] + diff(row_breaks)
+  for (i in 1:nrow){
+    data_out$Row <- data_out$Row + (data_out$y>row_breaks[i])
   }
   
   ### Summarise and reference to the gridded coordinates.
-  data.out.summary <- data.out |>
+  data_out_summary <- data_out |>
     sf::st_drop_geometry() |>
     dplyr::mutate(
       Col=as.factor(Col),
@@ -230,33 +245,33 @@ OFE_grid_data <- function(data.in, rotation.angle, N.rows, N.pe, N.cols, trim.en
     ) |>
     as.data.frame() |>
     dplyr::mutate(
-      temp.filter = paste(Row, Col)
+      temp_filter = paste(Row, Col)
     ) |>
     dplyr::arrange(Rep, Col, Row)
   
   point.reference.frame <- data.frame(
-    Row = as.factor(rep(1:N.rows, N.cols)),
-    Col = as.factor(rep(1:N.cols, each = N.rows))
+    Row = as.factor(rep(1:nrow, ncol)),
+    Col = as.factor(rep(1:ncol, each = nrow))
   ) |> 
     dplyr::mutate(
-      x = col.mid.points[Col],
-      y = row.mid.points[Row],
-      x_rotated = col.mid.points[Col]-col.mid.points[1],
-      y_rotated = row.mid.points[Row]-row.mid.points[1]
+      x = col_mid_points[Col],
+      y = row_mid_points[Row],
+      x_rotated = col_mid_points[Col]-col_mid_points[1],
+      y_rotated = row_mid_points[Row]-row_mid_points[1]
     ) |> 
     sf::st_as_sf(coords = c("x", "y"), crs = sf::st_crs(data)) |> 
-    OFE_rotate_data(-true_angle)
+    ofe_rotate_data(-true_angle)
   
   structure(
-    class = "Gridded.OFE",
+    class = "gridded.ofe",
     list(
-      gridded.data = point.reference.frame |> 
-        dplyr::left_join(data.out.summary) |>
-        dplyr::select(-temp.filter) |> 
+      gridded_data = point.reference.frame |> 
+        dplyr::left_join(data_out_summary) |>
+        dplyr::select(-temp_filter) |> 
         dplyr::mutate(
-          Pe.Row = as.factor(1 + floor(N.pe*as.numeric(Row)/(N.rows+1e-6)))
+          Pe.Row = as.factor(1 + floor(npe*as.numeric(Row)/(nrow+1e-6)))
         ),
-      original.data = data.out
+      original_data = data_out
     )
   )
 }
@@ -298,13 +313,13 @@ OFE_grid_data <- function(data.in, rotation.angle, N.rows, N.pe, N.cols, trim.en
 #'   }
 #' }
 #'
-#' @param data `Gridded.OFE`.
-#'     `list` generated by `OFE_grid_data` containing the following items:
+#' @param data `gridded.ofe`.
+#'     `list` generated by `ofe_grid_data` containing the following items:
 #' \describe{
-#'   \item{gridded.data `data.frame`}{
+#'   \item{gridded_data `data.frame`}{
 #'     The georeferenced gridded data.
 #'   }
-#'   \item{data.original `data.frame`}{
+#'   \item{data_original `data.frame`}{
 #'     The input data with additional columns for visualising the
 #'     rotation process.
 #'   }
@@ -327,18 +342,19 @@ OFE_grid_data <- function(data.in, rotation.angle, N.rows, N.pe, N.cols, trim.en
 #'  st_as_sf(coords = c("long", "lat"), crs = 4326) |>
 #'  st_transform(3395)
 #'  
-#' OFE_rotate_data(data, -60)
+#' gridded_data <- ofe_grid_data(data, -60, 80, 5, 18, trim_ends=FALSE)
+#' plot.gridded.ofe(gridded_data)
 #' @autoglobal
 #' @author Braden Thorne, \email{braden.thorne@@curtin.edu.au}
 #' @export
-plot.Gridded.OFE <- function(gridded.ofe){
-  p1 <- gridded.ofe$original.data |> 
+plot.gridded.ofe <- function(gridded_ofe){
+  p1 <- gridded_ofe$original_data |> 
     ggplot2::ggplot(
       ggplot2::aes(x=x_original, y=y_original, colour=Yield)
     ) + 
     ggplot2::geom_point() + 
     ggplot2::labs(x="Projected Longitude", y="Projected Latitude")
-  p2 <- gridded.ofe$original.data |>
+  p2 <- gridded_ofe$original_data |>
     dplyr::mutate(`Odd Strip`= as.factor(dplyr::if_else(Col%%2==0, "No", "Yes"))) |>
     ggplot2::ggplot(
       ggplot2::aes(x=x_rough_rotation, y=y_rough_rotation, colour=`Odd Strip`)
@@ -346,7 +362,7 @@ plot.Gridded.OFE <- function(gridded.ofe){
     ggplot2::geom_point() +
     ggplot2::labs(x="Roughly Rotated X", y="Roughly Rotated Y")
 
-  p3 <- gridded.ofe$gridded.data |>
+  p3 <- gridded_ofe$gridded_data |>
     ggplot2::ggplot(
       ggplot2::aes(x=x_rotated, y=y_rotated, colour=Yield)
     ) +
@@ -354,7 +370,7 @@ plot.Gridded.OFE <- function(gridded.ofe){
     ggplot2::scale_colour_continuous(na.value="red") +
     ggplot2::labs(x="Gridded X", y="Gridded Y")
 
-  p4 <- gridded.ofe$gridded.data |>
+  p4 <- gridded_ofe$gridded_data |>
     ggplot2::ggplot(
       ggplot2::aes(
         x=sf::st_coordinates(geometry)[, "X"],
