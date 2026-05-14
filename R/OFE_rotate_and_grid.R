@@ -167,7 +167,6 @@ ofe_grid_data <- function(data_in, rotation_angle, nrow, npe, ncol, trim_ends=TR
     max(data_pre_angle$x)+x_gap/2,
     length=(ncol+1)
   )
-  col_mid_points <- col_breaks[1:ncol] + diff(col_breaks)
   for (i in 1:ncol){
     data_pre_angle$Col <- data_pre_angle$Col + (data_pre_angle$x>col_breaks[i])
   }
