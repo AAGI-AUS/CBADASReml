@@ -47,7 +47,11 @@ ofe_rotate_data <- function(data, angle){
   ), nrow=2, ncol=2)
   
   original_coordinates <- sf::st_coordinates(data)
-  translation_matrix <- apply(st_coordinates(data), 2, mean)
+  translation_matrix <- apply(
+    original_coordinates,
+    2,
+    function(x){(max(x)+min(x))/2}
+  )
   
   rotated_coordinates <- (
     rotation_matrix %*% (
@@ -163,7 +167,6 @@ ofe_grid_data <- function(data_in, rotation_angle, nrow, npe, ncol, trim_ends=TR
     max(data_pre_angle$x)+x_gap/2,
     length=(ncol+1)
   )
-  col_mid_points <- col_breaks[1:ncol] + diff(col_breaks)
   for (i in 1:ncol){
     data_pre_angle$Col <- data_pre_angle$Col + (data_pre_angle$x>col_breaks[i])
   }
@@ -241,17 +244,14 @@ ofe_grid_data <- function(data_in, rotation_angle, nrow, npe, ncol, trim_ends=TR
     ) |>
     dplyr::group_by(Col, Row) |>
     dplyr::summarise(
-      Yield = mean(Yield),
-      Treatment = dplyr::first(Treatment),
-      Rep = dplyr::first(Rep)
+      Yield = mean(Yield)
     ) |>
     as.data.frame() |>
     dplyr::mutate(
       temp_filter = paste(Row, Col)
-    ) |>
-    dplyr::arrange(Rep, Col, Row)
+    )
   
-  point.reference.frame <- data.frame(
+  point_reference_frame <- data.frame(
     Row = as.factor(rep(1:nrow, ncol)),
     Col = as.factor(rep(1:ncol, each = nrow))
   ) |> 
@@ -261,18 +261,29 @@ ofe_grid_data <- function(data_in, rotation_angle, nrow, npe, ncol, trim_ends=TR
       x_rotated = col_mid_points[Col]-col_mid_points[1],
       y_rotated = row_mid_points[Row]-row_mid_points[1]
     ) |> 
+    left_join(
+      data_out |> 
+        sf::st_drop_geometry() |> 
+        dplyr::mutate(Col = as.factor(Col)) |> 
+        dplyr::group_by(Col) |> 
+        dplyr::summarise(
+          Treatment = dplyr::first(Treatment),
+          Rep = dplyr::first(Rep)
+        )
+    ) |> 
     sf::st_as_sf(coords = c("x", "y"), crs = sf::st_crs(data)) |> 
     ofe_rotate_data(-true_angle)
   
   structure(
     class = "gridded.ofe",
     list(
-      gridded_data = point.reference.frame |> 
+      gridded_data = point_reference_frame |> 
         dplyr::left_join(data_out_summary) |>
         dplyr::select(-temp_filter) |> 
         dplyr::mutate(
-          Pe.Row = as.factor(1 + floor(npe*as.numeric(Row)/(nrow+1e-6)))
-        ),
+          Pe = as.factor(1 + floor(npe*as.numeric(Row)/(nrow+1e-6)))
+        ) |>
+        dplyr::arrange(Rep, Col, Row),
       original_data = data_out
     )
   )
