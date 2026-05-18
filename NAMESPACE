@@ -3,6 +3,8 @@
 S3method(anova_table,asreml)
 S3method(anova_table,glmmTMB)
 export(anova_table)
+export(design_efficiency)
+export(design_power)
 export(directional_variograms)
 export(exploratory_table)
 export(lsd_graph)

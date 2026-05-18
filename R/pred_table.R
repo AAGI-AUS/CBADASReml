@@ -105,7 +105,7 @@ pred_table <- function(
         )
     }
 
-    if (is.character(classify)) {
+    if (!is.character(classify)) {
         cli::cli_abort(
             "Classify must be type character",
             call = rlang::caller_env()

@@ -19,7 +19,7 @@ This function allows you to observe directional variograms in the 0
 (vertical) and 90 (horizontal) directions for gridded small-plot trial data.
 }
 \examples{
-\dontshow{if (requireNamespace("asreml", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (requireNamespace("asreml", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 library(asreml)
 model <- asreml(
     fixed = yield ~ weed,

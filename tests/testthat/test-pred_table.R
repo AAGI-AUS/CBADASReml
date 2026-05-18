@@ -28,25 +28,18 @@ test_that("we get expected pred table for simple data with ASReml", {
 
 test_that("we get expected pred table for simple data with glmmTMB", {
     mod2 <- glmmTMB(
-        count ~ spp * mined + (1 | site),
-        zi = ~ spp * mined,
+        count ~ spp,
         data = Salamanders,
         family = nbinom2
     )
     p_tab <- data.frame(
         Treatment = c("GP", "PR", "DM", "EC-A", "EC-L", "DES-L", "DF"),
-        Mean = c(1.1604, 0.7013, 1.6350, 0.7079, 1.0028, 2.1342, 1.3426),
+        Mean = c(1.1739, 0.2935, 1.4783, 0.5435, 2.1848, 2.3152, 1.2717),
         `Standard Error` = c(
-            0.8044,
-            0.3745,
-            0.4390,
-            0.4248,
-            0.2000,
-            0.5614,
-            0.3418
+            0.2240, 0.0744, 0.2746, 0.1180, 0.3917, 0.4132, 0.2403
         ),
-        `Lower CL` = c(0.2982, 0.2463, 0.9660, 0.2184, 0.6783, 1.2744, 0.8151),
-        `Upper CL` = c(4.5151, 1.9972, 2.7673, 2.2951, 1.4824, 3.5740, 2.2115)
+        `Lower CL` = c(0.8076, 0.1786, 1.0271, 0.3551, 1.5375, 1.6318, 0.8781),
+        `Upper CL` = c(1.7064, 0.4822, 2.1276, 0.8319, 3.1046, 3.2849, 1.8418)
     )
     pt <- pred_table(mod2, classify = "spp")
     pt[, 2] <- round(pt[, 2], 4)

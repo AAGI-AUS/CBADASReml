@@ -94,7 +94,7 @@ Generate a table of predicted values and CIs from an
 the specified variables \code{asreml} or \code{glmmTMB} object.
 }
 \examples{
-\dontshow{if (requireNamespace("asreml", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (requireNamespace("asreml", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 library(CBADASReml)
 library(asreml)
 library(glmmTMB)
