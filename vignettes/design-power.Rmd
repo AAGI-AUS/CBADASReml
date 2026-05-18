@@ -1,0 +1,552 @@
+---
+title: "Experimental design power"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Experimental design power}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{asreml}
+---
+
+# Introduction
+
+This document will hopefully explain exactly the theory behind the
+\"statistical power\" value returned by the function `design_power`.
+
+Experimental designs are not necessarily all made equal. There **is** (usually)
+a \"gooder\" and a \"badder\" way to produce experimental designs, depending on
+many different factors that I will try to go over in this document.
+
+The function `design_power` will try to give a \"safe\" estimate of an
+experimental design\'s \"statistical power\", which is interpreted as a
+probability that a hypothesis test performed on the design will give a **true
+positive** result. A design/test with a power of 0.8, has an 0.8 probability of
+rejecting the null hypothesis when the true treatment difference is $\delta$,
+assuming the model and covariance assumptions are correct.
+
+# Design of Experiments
+
+We all know what an experimental design is. Formally, we try and stick to a few
+very important principles, outlined by Ronald Fisher, when creating an
+experiment:
+
+Randomisation
+
+: Placement of experimental units within a block must be random. This means
+that each element of the population being modelled has an equal chance of being
+part of the experiment. This is a huge one, it mitigates the influence of
+**confounding** due to variables that aren\'t part of the experiment.
+
+Replication
+
+: The experiment should be repeated multiple times to get variance estimates.
+This helps identify the sources of variation in the observations, and where to
+attribute this. Typically, the term \"blocking\" is used interchangeably with
+replication, but I believe this is incorrect. Replication is repetition of the
+experiment, blocking is a form of **local control**.
+
+Local control
+
+: Non-random arrangement of experimental units into groups. This reduces how
+much existing \"nuisance\" effects from leaking into our treatment effect
+estimates. The difference between blocking vs. randomisation is: \"Block
+whatever you can, randomise what you can\'t\".
+
+Consideration of all of these will result in at least a \"decent\" experiment.
+But sometimes it is not obvious how to fully avoid breaking these rules!!
+
+# Spatial Statistics Pitfalls
+
+Of particular note in our field of spatial statistics, is the presence of
+**spatial dependence**. This is the terminology used to refer to the fact that
+observations that are physically near to one another are **not independent**,
+and this **dependence** drops off as distance increases. If we make a simple
+experiment without considering this fact, we are breaking the **local control**
+rule in a bit of a nuanced way.
+
+Blocking allows us to recognise that a nuisance effect is present, and use a
+*blocking factor* to absorb this nuisance variation, leaving the variation of
+interest to be explained by the treatment effect.
+
+But! When we look at a small plot trial, it is clear that some things are going
+to influence the observations in ways that are difficult to block or randomise:
+
+- Nearby observations are more dependent than distant observations.
+
+- Observations in the same column or row may be more related due to the nature
+  of how the experiment was placed or observed.
+
+- There may be variation in treatment effects simply due to the location of a
+  given experimental unit.
+
+These are nuisance effects that will pollute our treatment effects!!! We have
+to block them, and if we can\'t we have to randomise within them!
+
+But we can\'t, how can we block if we don\'t know the nature of the soil? Or
+how the row/column effects came to be?
+
+# Local control
+
+We can\'t simply block away our problems here. But we **know** that there are
+arrangements that are better than others:
+
+There are positions in the trial area that are more favourable, and placing one
+treatment there will lead to confounding. If we get lucky and the randomisation
+is equally favourable to all treatments, then this is good. But how can we
+purposefully do this?
+
+Let\'s try a naive design summary. For 3 treatments:
+
+- `T1` has 5 replicates
+- `T2` has 5 replicates
+- `T3` has 5 replicates
+
+But is `T1` clumped in one corner? Has `T2` been placed along a gradient in
+soil fertility?
+
+Let\'s try a more principled approach. We are using mathematics to analyse the
+experiment, so let\'s use some mathematics to try and solve this problem.
+
+# Fisher information normally
+
+Ronald Fisher was a piece of shit, but he seemed pretty smart. He came up with
+this idea of **Fisher information**, how much information an observable random
+variable $Z$ carries about an unknown parameter $\theta$ of a distribution that
+describes $Z$.
+
+We can use this concept here. Let\'s start by modelling our observations as a
+linear function of the input variables:
+
+`\begin{equation}
+y = X \beta + \varepsilon
+\end{equation}`{=latex}
+
+$y$ is a vector of our $n$ observations, $X$ is a *design matrix*, $\beta$ is
+the vector of regression coefficients and $\varepsilon$ is the vector of
+residual errors.
+
+The design matrix describes the structure of the experiment, recording which
+treatment was assigned to which experimental unit, which block the EU belongs
+to, and any other model terms that are present.
+
+The residual errors (mean zero, covariance $\Sigma$):
+
+`\begin{equation}
+\varepsilon \sim \mathcal{N}(0, \Sigma)
+\end{equation}`{=latex}
+
+And thus:
+
+`\begin{equation}
+y \sim \mathcal{N}(X \beta, \Sigma)
+\end{equation}`{=latex}
+
+To calculate the Fisher information, we must consider our design matrix as
+fixed, as its the proposed experiment layout we are evaluating. Our random
+object is $y$, the vector of future observations that will be realised if the
+experiment were run. The likelihood therefore describes the probability density
+of observing $y$, given the design $X$, the model parameters $\beta$ and the
+covariance matrix $\Sigma$. We need a probability density function: the
+Gaussian PDF, which is a function $f(y ; \beta, \Sigma, X)$ relating the random
+variable to a parameter. It is the probability density of observing $y$, given
+the fixed $X$, the parameter $\beta$ and the covariance $\Sigma$.
+
+But this is backwards. We have a known $X$, and we want the $\beta$ that makes
+the observed $y$ the most plausible.
+
+If $f$ has a sharp \"peak\" in its value with a change in $\beta$, then we can
+say with confidence what the \"correct\" value is. If $f$ has a maximum, but
+it\'s not sharp, then it\'s harder to say where the true value is. This would
+imply that there is a kind of variance to consider here: Low variance = sharp
+peak, and more certainty on where $\hat{\beta}$ is. High variance = smooth, low
+certainty on where $\hat{\beta}$ is.
+
+This idea of how $f$ changes with respect to changes in $\beta$ is known as the
+score, and can be formulated as the partial derivative of the log-likelihood,
+with respect to $\beta$, evaluated at the true value of $\beta$:
+
+`\begin{equation}
+\frac{\partial}{\partial \beta} \log f(y ; \beta, \Sigma, X)
+\end{equation}`{=latex}
+
+At the *true* parameter value $\beta_0$, the expected value of the score is
+zero:
+
+`\begin{equation}
+\E \left[
+\frac{\partial}{\partial \beta} \log f(y ; \beta, \Sigma, X)
+\bigg|
+\beta_0
+\right]
+=
+0
+\end{equation}`{=latex}
+
+The **Fisher information** is the expected value of the variance of the score,
+at the true parameter $\beta_0$:
+
+`\begin{equation}
+\mathcal{I}(\beta)
+=
+\E \left[
+\left(
+\frac{\partial}{\partial \beta} \log f(y ; \beta, \Sigma, X)
+\right)^2
+\bigg|
+\beta_0
+\right]
+\end{equation}`{=latex}
+
+This quantity $\mathcal{I}(\beta)$ quantifies how variable the likelihood\'s
+gradient is under repeated samples, and how sharply the log-likelihood changes
+around the true parameter.
+
+Let\'s solve it for our linear model with normal errors, the likelihood
+function is:
+
+`\begin{equation}
+f(y ; \beta, \Sigma, X)
+=
+(2 \pi)^{-\frac{n}{2}}
+\left| \Sigma \right|^{-\frac{1}{2}}
+\exp \left(
+-\frac{1}{2}
+\left( y - X \beta \right)\T \Sigma^{-1} \left( y - X \beta \right)
+\right)
+\end{equation}`{=latex}
+
+And log-likelihood:
+
+`\begin{equation}
+\log f(y ; \beta, \Sigma, X)
+=
+-\frac{k}{2} \log(2 \pi)
+-\frac{1}{2} \log \left| \Sigma \right|
+-\frac{1}{2}
+\left( y - X \beta \right)\T \Sigma^{-1} \left( y - X \beta \right)
+\end{equation}`{=latex}
+
+Then we take the derivative with respect to the parameter of interest $\beta$:
+
+`\begin{equation}
+\begin{aligned}
+\frac{\partial}{\partial \beta} \log f(y ; \beta, \Sigma, X)
+&=
+\frac{\partial}{\partial \beta}
+\left(
+-\frac{1}{2}
+\left( y - X \beta \right)\T \Sigma^{-1} \left( y - X \beta \right)
+\right)
+\\
+&=
+-\frac{1}{2}
+\left(
+-X\T \Sigma^{-1} \left( y - X \beta \right)
+-
+X\T \Sigma^{-1} \left( y - X \beta \right)
+\right)
+\\
+&=
+X\T \Sigma^{-1} \left( y - X \beta \right)
+\end{aligned}
+\end{equation}`{=latex}
+
+This is the score. Now we square it:
+
+`\begin{equation}
+\begin{aligned}
+\left( \frac{\partial}{\partial \beta} \log f(y ; \beta, \Sigma, X) \right)^2
+&=
+X\T \Sigma^{-1} \left( y - X \beta \right)
+\left( X\T \Sigma^{-1} \left( y - X \beta \right) \right)\T
+\\
+&=
+X\T \Sigma^{-1} \left( y - X \beta \right)
+\left( y - X \beta \right)\T \Sigma^{-1} X
+\end{aligned}
+\end{equation}`{=latex}
+
+And take it\'s expected value at the true parameter $\beta_0$:
+
+`\begin{equation}
+\begin{aligned}
+\E \left[
+\left( \frac{\partial}{\partial \beta} \log f(y ; \beta, \Sigma, X) \right)^2
+\bigg|
+\beta_0
+\right]
+&=
+\E \left[
+X\T \Sigma^{-1} \left( y - X \beta_0 \right)
+\left( y - X \beta_0 \right)\T \Sigma^{-1} X
+\right]
+\\
+&=
+X\T \Sigma^{-1}
+\E \left[
+\left( y - X \beta_0 \right)
+\left( y - X \beta_0 \right)\T
+\right]
+\Sigma^{-1} X\T
+\\
+&=
+X\T \Sigma^{-1}
+\E \left[
+\varepsilon \varepsilon\T
+\right]
+\Sigma^{-1} X
+\\
+&=
+X\T \Sigma^{-1}
+\Var [ \varepsilon ]
+\Sigma^{-1} X
+\\
+&=
+X\T \Sigma^{-1}
+\Sigma
+\Sigma^{-1} X
+\\
+&=
+X\T \Sigma^{-1} X
+\end{aligned}
+\end{equation}`{=latex}
+
+Which is the inner product of the design matrix in the geometry induced by the
+covariance of the residuals.
+
+# What does this even mean?
+
+We\'ve finally got some equations for the Fisher information. But I\'ve
+purposely left the covariance of the linear regression open as $\Sigma$.
+Usually, this covariance would be \"IID\": independent, and identically
+distributed, meaning $\Sigma = \sigma^2 I$. This would mean the Fisher
+information is:
+
+`\begin{equation}
+\begin{aligned}
+\mathcal{I}(\beta ; X)
+&=
+X\T \Sigma^{-1} X
+\\
+&=
+X\T \left( \sigma^2 I \right)^{-1} X
+\\
+&=
+\frac{1}{\sigma^2} X\T X
+\end{aligned}
+\end{equation}`{=latex}
+
+However, remember our initial problem? We are suffering because we can\'t block
+and randomise our problems away! We need another technique for local control!
+This is our chance!!!
+
+# Ah yes, local control!
+
+Great, let\'s say that instead of the residuals being IID, we can allow them to
+be a little bit correlated. We can say the residuals have an $\text{AR}(1)
+\otimes \text{AR}(1)$ correlation structure, meaning the rows and the columns
+of the design are correlated such that neighbouring EUs have $\rho$
+correlation, then for each step further they have $\rho^2$ then $\rho^3$, etc.
+This means we want a covariance of:
+
+`\begin{equation}
+\Sigma = \sigma^2 R
+\end{equation}`{=latex}
+
+Where $R$ contains the $\text{AR}(1) \otimes \text{AR}(1)$ structure, and
+$\sigma^2$ is the variance parameter. The Fisher information is now:
+
+`\begin{equation}
+\mathcal{I}(\beta ; X) = \frac{1}{\sigma^2} X\T R^{-1} X
+\end{equation}`{=latex}
+
+Meaning we are calculating the Fisher information in **a geometry induced by
+the spatial covariance structure of the design**.
+
+This means that nearby observations are partially redundant, and distant
+observations contribute more independent information to the model. Treatment
+arrangements where comparisons are spread across the paddock tend to contain
+more information about the parameter of interest.
+
+# Noncentrality Parameter
+
+Now that we have this Fisher information, we can use it to calculate the
+uncertainty of any treatment comparison. For a given treatment contrast $c\T
+\beta$, the variance of the estimated contrast is $\Var [c\T \hat{\beta}] = c\T
+\mathcal{I}(\beta)^{-1} c$, and thus it has standard error $\mathrm{SE}[c\T
+\hat{\beta}] = \sqrt{c\T \mathcal{I}(\beta)^{-1} c}$.
+
+We care about the standard error: a smaller SE means the design has more
+resolving power for that treatment contrast. To estimate the power, we specify
+the treatment difference worth detecting, $\delta$, and say that the
+signal-to-noise ratio is:
+
+`\begin{equation}
+\lambda
+=
+\frac{\delta}{\mathrm{SE}[c\T \hat{\beta}]}
+\end{equation}`{=latex}
+
+This is called the *noncentrality parameter*. It is **the distance between the
+null hypothesis and the alternate hypothesis, in standard-error units**. When
+we know this distance, the power is simply the probability that the test
+statistic falls in the rejection region. If $\lambda = 2$, the true treatment
+difference is two SEs away from zero, if $\lambda = 4$ it\'s four SEs away.
+
+# Statistical Power
+
+## Known Covariance
+
+Say we are still interested in the contrast $c\T \beta$. This could be the mean
+of treatment `T1` minus the mean of `T2`. The null and alternate hypothesis for
+this is:
+
+`\begin{equation}
+\begin{aligned}
+H_0 &: c\T \beta = 0 \\
+H_1 &: c\T \beta = \delta
+\end{aligned}
+\end{equation}`{=latex}
+
+If the covariance matrix $\Sigma$ is known, then:
+
+`\begin{equation}
+c\T \hat{\beta}
+\sim
+\mathcal{N} \left( c\T \beta, c\T \mathcal{I}(\beta)^{-1} c \right)
+\end{equation}`{=latex}
+
+So the test statistic is a $Z$-test:
+
+`\begin{equation}
+Z = \frac{c\T \hat{\beta}}{\mathrm{SE}[c\T \hat{\beta}]}
+\end{equation}`{=latex}
+
+And under the null and alternative hypotheses:
+
+`\begin{equation}
+\begin{aligned}
+H_0 & \Longrightarrow Z \sim \mathcal{N} (0, 1) \\
+H_1 & \Longrightarrow Z \sim \mathcal{N} (\lambda, 1)
+\end{aligned}
+\end{equation}`{=latex}
+
+For a two-sided test with significance threshold $\alpha$, reject the null
+when:
+
+`\begin{equation}
+\left| Z \right| > z_{1-\alpha/2}
+\end{equation}`{=latex}
+
+And therefore! The power is:
+
+`\begin{equation}
+\text{Power}
+=
+P \left( \left| Z \right| > z_{1-\alpha/2} | Z \sim \mathcal{N}(\lambda, 1) \right)
+\end{equation}`{=latex}
+
+:::: important
+::: title
+Important
+:::
+
+That is, the power is the **probability** that $Z$ is is more extreme than a
+threshold $z$ value from a normal distribution centred at $\lambda$.
+
+Or in other words:
+
+The power is the probability that the experiment **would** detect the treatment
+difference, assuming the real effect is large enough to shift the test
+statistic $\lambda$ standard errors away from the null.
+::::
+
+## Unknown Covariance
+
+If the covariance is unknown and must be estimated from the data, we use a
+$t$-test instead. This is due to the fact that our denominator becomes a random
+parameter that must be estimated:
+
+`\begin{equation}
+T = \frac{c\T \hat{\beta}}{\hat{\mathrm{SE}}[c\T \hat{\beta}]}
+\end{equation}`{=latex}
+
+And under the null and alternate hypotheses, this is $t$-distributed with $\nu$
+degrees of freedom:
+
+`\begin{equation}
+\begin{aligned}
+H_0 & \Longrightarrow T \sim t_{\nu} \\
+H_1 & \Longrightarrow T \sim t_{\nu}(\lambda)
+\end{aligned}
+\end{equation}`{=latex}
+
+Something to note:
+
+- $t_{\nu}$ is the $t$-distribution with $\nu$ DoFs. The $t$-distribution
+  describes how a test statistic $T$ is distributed when the null hypothesis is
+  **true**.
+
+- $t_{\nu}(\lambda)$ is the *noncentral* $t$-distribution with $\nu$ DoFs. The
+  noncentral $t$-distribution describes how a test statistic $T$ is distributed
+  when the null hypothesis is **false**.
+
+Great. Now, for a two-sided test, we reject the null when
+
+`\begin{equation}
+\left| T \right| > t_{1-\alpha/2, \nu}
+\end{equation}`{=latex}
+
+Therefore the power is:
+
+`\begin{equation}
+\text{Power}
+=
+P \left( \left| T \right| > t_{1-\alpha/2, \nu} | T \sim t_{\nu}(\lambda) \right)
+\end{equation}`{=latex}
+
+## Omnibus Test
+
+If we want to compare multiple treatments as an omnibus test, letting $C \beta$
+be the vector of all treatment contrasts to compare:
+
+`\begin{equation}
+\begin{aligned}
+H_0 &: C \beta = 0 \\
+H_1 &: C \beta \ne 0
+\end{aligned}
+\end{equation}`{=latex}
+
+We use the Wald test:
+
+`\begin{equation}
+W
+=
+( C \hat{\beta} )\T
+\left( C \mathcal{I}(\beta)^{-1} C\T \right)^{-1}
+( C \hat{\beta} )
+\end{equation}`{=latex}
+
+Under the null and alternative hypotheses:
+
+`\begin{equation}
+\begin{aligned}
+H_0 & \Longrightarrow W \sim \chi_q^2 \\
+H_1 & \Longrightarrow W \sim \chi_q^2(\Lambda)
+\end{aligned}
+\end{equation}`{=latex}
+
+Where $\chi_q^2$ is the chi-squared distribution with $q$ DoFs, and
+$\chi_q^2(\Lambda)$ is the noncentral chi-squared distribution, with $q$ DoFs
+and $\Lambda$ noncentrality parameter.
+
+So, for one contrast the noncentrality parameter was $\lambda = \delta /
+\mathrm{SE}$. For multiple contrasts, it is just the Wald statistic:
+
+`\begin{equation}
+\Lambda
+=
+( C \beta )\T
+\left( C \mathcal{I}(\beta)^{-1} C\T \right)^{-1}
+( C \beta )
+\end{equation}`{=latex}
