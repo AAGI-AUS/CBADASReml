@@ -12,6 +12,7 @@ design_efficiency(
   block_col = NULL,
   rho_row = 0.1,
   rho_col = 0.1,
+  alpha = 0.05,
   tolerance = 1e-10
 )
 }

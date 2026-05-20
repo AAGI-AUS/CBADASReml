@@ -27,6 +27,7 @@ Depends:
     sf
 Suggests:
     asreml,
+    agridat,
     car,
     emmeans,
     glmmTMB,

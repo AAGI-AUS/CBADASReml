@@ -34,7 +34,7 @@
 #' \deqn{
 #'   \lambda
 #'   =
-#'   \frac{\delta}{\operatorname{SE}(c^\top \hat{\tau})},
+#'   \frac{\delta}{\operatorname{SE}(c^\intercal \hat{\tau})},
 #' }
 #' and power is calculated using a two-sided known-covariance Z-test
 #' approximation.
@@ -196,6 +196,7 @@ design_power <- function(
         block_col = block_col,
         rho_row = rho_row,
         rho_col = rho_col,
+        alpha = alpha,
         tolerance = tolerance
     )
 
@@ -401,6 +402,7 @@ design_efficiency <- function(
     block_col = NULL,
     rho_row = 0.1,
     rho_col = 0.1,
+    alpha = 0.05,
     tolerance = 1e-10
 ) {
     ti <- compute_treatment_info(
@@ -411,6 +413,7 @@ design_efficiency <- function(
         block_col = block_col,
         rho_row = rho_row,
         rho_col = rho_col,
+        alpha = alpha,
         tolerance = tolerance
     )
 
@@ -499,7 +502,7 @@ mpinv <- function(mat, tol = 1e-10) {
 }
 
 ## ar1 x ar1 correlation structure
-cor_ar1_ar1 <- function(row, column, rho_row, rho_col) {
+cor_ar1_ar1 <- function(row, column, rho_row, rho_col, alpha) {
     if (alpha <= 0 || alpha >= 1) stop("alpha must be between 0 and 1.")
     if (rho_row < 0 || rho_row >= 1) stop("rho_row must be in [0, 1).")
     if (rho_col < 0 || rho_col >= 1) stop("rho_col must be in [0, 1).")
@@ -551,6 +554,7 @@ compute_treatment_info <- function(
     block_col = NULL,
     rho_row = 0.1,
     rho_col = 0.1,
+    alpha = alpha,
     tolerance = 1e-10
 ) {
     ## combine multiple treatment columns into a treatment-combo factor
@@ -568,7 +572,8 @@ compute_treatment_info <- function(
         row = design[[row_col]],
         column = design[[column_col]],
         rho_row = rho_row,
-        rho_col = rho_col
+        rho_col = rho_col,
+        alpha = alpha
     )
     r_inv <- solve(r)
     r_inv_x2 <- r_inv %*% x2
