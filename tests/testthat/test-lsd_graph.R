@@ -1,22 +1,15 @@
-skip_on_cran()
-library(asreml)
-model <- asreml(
-    fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
-    random = ~ idv(Blocks) + idv(Blocks):idv(Wplots),
-    residual = ~ idv(units),
-    data = oats,
-    trace = FALSE
-)
-
-test_that("lsd_graph creates expected outputs", {
-    oats_lsd_graph_variety <- lsd_graph(model, "Variety")
+test_that("lsd_graph creates expected output for Variety", {
+    skip_if_no_asreml()
     vdiffr::expect_doppelganger(
         "oats_lsd_graph_variety",
-        oats_lsd_graph_variety
+        lsd_graph(get_oats_model(), "Variety")
     )
-    oats_lsd_graph_nitrogen <- lsd_graph(model, "Nitrogen")
+})
+
+test_that("lsd_graph creates expected output for Nitrogen", {
+    skip_if_no_asreml()
     vdiffr::expect_doppelganger(
         "oats_lsd_graph_nitrogen",
-        oats_lsd_graph_nitrogen
+        lsd_graph(get_oats_model(), "Nitrogen")
     )
 })

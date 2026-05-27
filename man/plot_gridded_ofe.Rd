@@ -57,8 +57,6 @@ establish why.
 \examples{
 \dontshow{if (requireNamespace("asreml", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 library(CBADASReml)
-library(dplyr)
-library(sf)
 
 data <- agridat::lasrosas.corn |>
 filter(year == 2001) |>

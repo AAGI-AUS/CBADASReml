@@ -24,17 +24,11 @@ library(asreml)
 
 ## Introduction
 
-A typical type of experimental analysis that this package will assist with is
-the small plot trial. Here we will show the general workflow for performing a
-small-plot analysis and how each function from the package can be used.
-Analysis of small plot trials is done using linear mixed-effects models (LMMs),
-using {ASReml} or [{glmmTMB}](https://glmmtmb.github.io/glmmTMB/), and this
-package contains helper functions for this type of modelling.
+A typical type of experimental analysis that this package will assist with is the small plot trial.
+Here we will show the general workflow for performing a small-plot analysis and how each function from the package can be used.
+Analysis of small plot trials is done using linear mixed-effects models (LMMs), using {ASReml} or [{glmmTMB}](https://glmmtmb.github.io/glmmTMB/), and this package contains helper functions for this type of modelling.
 
-Note that the trial design is not handled at all by this package, and we
-recommend the use of [{speed}](https://biometryhub.github.io/speed/) or
-[{FielDHub}](https://didiermurillof.github.io/FielDHub/index.html) for creating
-small plot trial designs.
+Note that the trial design is not handled at all by this package, and we recommend the use of [{speed}](https://biometryhub.github.io/speed/) or [{FielDHub}](https://didiermurillof.github.io/FielDHub/index.html) for creating small plot trial designs.
 
 ## Mathematical Background
 
@@ -59,8 +53,7 @@ Where
 - $Z \in \mathbb{R}^{n \times q}$ is the design matrix for the random effects.
 - $e \in \mathbb{R}^{n}$ is the vector of residuals.
 
-It is assumed that the vectors $u$ and $e$ are independent, and their joint
-distribution is a multivariate Gaussian described by:
+It is assumed that the vectors $u$ and $e$ are independent, and their joint distribution is a multivariate Gaussian described by:
 
 \begin{equation*}
 \begin{bmatrix}
@@ -81,9 +74,7 @@ N \bigg(
 \bigg)
 \end{equation*}
 
-Where $G$ and $R$ are covariance matrices for $u$ and $e$ and are functions of
-the *variance parameters* $\sigma_g$ and $\sigma_r$, and finally the dependent
-variable $y$ is described by:
+Where $G$ and $R$ are covariance matrices for $u$ and $e$ and are functions of the *variance parameters* $\sigma_g$ and $\sigma_r$, and finally the dependent variable $y$ is described by:
 
 \begin{equation*}
 y
@@ -97,24 +88,15 @@ R
 \big)
 \end{equation*}
 
-These $G$ and $R$ covariance matrices, or *covariance structures*, are very
-important. These represent the way the random effects and the residuals behave,
-and $\sigma_g$ and $\sigma_r$, the *covariance structure parameters* are the
-things we try and estimate when we use ASReml.
+These $G$ and $R$ covariance matrices, or *covariance structures*, are very important.
+These represent the way the random effects and the residuals behave, and $\sigma_g$ and $\sigma_r$, the *covariance structure parameters* are the things we try and estimate when we use ASReml.
 
-In the case of independent and identically distributed (IID) residual
-structures, the residual covariance parameter $\sigma_r$ will be some *variance
-component* $\sigma_e^2$.
+In the case of independent and identically distributed (IID) residual structures, the residual covariance parameter $\sigma_r$ will be some *variance component* $\sigma_e^2$.
 
 ### Exploratory Data Analysis
 
-After gathering data from an experiment, it is useful to perform an exploratory
-data analysis on the raw data, and for this you will likely use a combination
-of `tidyverse` and `gplot2` for this, to visualise outliers, the data
-distribution, etc. in order to get a preliminary grasp of what you are working
-with, and to observe the data for any issues that will hinder the actual
-analysis. As an assistance with this process, the function `exploratory_table`
-is provided.
+After gathering data from an experiment, it is useful to perform an exploratory data analysis on the raw data, and for this you will likely use a combination of `tidyverse` and `gplot2` for this, to visualise outliers, the data distribution, etc. in order to get a preliminary grasp of what you are working with, and to observe the data for any issues that will hinder the actual analysis.
+As an assistance with this process, the function `exploratory_table` is provided.
 
 ```{r}
 CBADASReml::exploratory_table(
@@ -126,9 +108,8 @@ CBADASReml::exploratory_table(
 
 ### Model Fitting and Validation
 
-We may use the R package `asreml` as follows to implement an LMM. For the purpose
-of this vignette we will fit a few different models, so we can demonstrate
-different techniques from the package.
+We may use the R package `asreml` as follows to implement an LMM.
+For the purpose of this vignette we will fit a few different models, so we can demonstrate different techniques from the package.
 
 ```{r}
 # The needs to be ordered so that the model can run
@@ -158,27 +139,28 @@ mod_rats <- update(mod_rats, aom = TRUE)
 In the first model, `mod_oats`, we are using the `oats` data:
 
 ##### Data
-- The `oats` data has 72 rows, 2 treatments (Nitrogen and Variety), and plots
-  (3 levels) within blocks (6 levels). Therefore:
-  + $n = 72$ (number of observations)
-  + $p = 3$ (number of fixed effects, including an interaction effect)
-  + $q = 2$ (number of random effects, blocks, and plots within blocks)
+
+- The `oats` data has 72 rows, 2 treatments (Nitrogen and Variety), and plots (3 levels) within blocks (6 levels). Therefore:
+  - $n = 72$ (number of observations)
+  - $p = 3$ (number of fixed effects, including an interaction effect)
+  - $q = 2$ (number of random effects, blocks, and plots within blocks)
 
 ##### $y$
+
 - `yield` is our $y \in \mathbb{R}^{72}$ ($72 \times 1$) vector.
 
 ##### $X$
+
 - `Variety`, `Nitrogen` and their interaction `Variety:Nitrogen` are in the $X
   \in \mathbb{R}^{72 \times 3}$ ($72 \times 3$) matrix.
 
 ##### $b$
-- There are 3 fixed effects which are continuous, therefore our fixed effects
-  vector is given by $b \in \mathbb{R}^{3 \times 1}$
+
+- There are 3 fixed effects which are continuous, therefore our fixed effects vector is given by $b \in \mathbb{R}^{3 \times 1}$
 
 ##### $Z$
-- `Blocks` and `Blocks:Wplots` make up our $Z \in \mathbb{R}^{n \times q}$
-  matrix. Since these are factors, each level is treated as it's own dummy
-  variable. We end up with two $Z_i$ matrices which make up $Z = [ \; Z_1 \; Z_2
+
+- `Blocks` and `Blocks:Wplots` make up our $Z \in \mathbb{R}^{n \times q}$ matrix. Since these are factors, each level is treated as it's own dummy variable. We end up with two $Z_i$ matrices which make up $Z = [ \; Z_1 \; Z_2
   \; ]$ which are given as follows (if ordered by their respective variables):
 
 \begin{equation*}
@@ -195,7 +177,6 @@ Z_{1}
 \in
 \mathbb{R}^{72 \times 6}
 \end{equation*}
-
 \begin{equation*}
 Z_{2}
 =
@@ -211,76 +192,62 @@ Z_{2}
 \mathbb{R}^{72 \times 18}
 \end{equation*}
 
-  Where each column in $Z_1$ represents the $6$ `Blocks`, and the columns in
-  $Z_2$ represent the $6 \times 3 = 18$ `Blocks` $\times$ `Wplots`.
+Where each column in $Z_1$ represents the $6$ `Blocks`, and the columns in $Z_2$ represent the $6 \times 3 = 18$ `Blocks` $\times$ `Wplots`.
 
 ##### $u$
-- Since we have $2$ model terms (`idv(Blocks)` and `idv(Blocks):id(Wplots)`),
-  we have two $Z_i$ matrices, and also two $u_i$ vectors. Our random effects
-  vector is given by:
-  + $u = \begin{bmatrix} u_1 \\ u_2 \end{bmatrix}$
-  + $u_1 \sim N(0, G_1) \in \mathbb{R}^{6}$
-  + $u_2 \sim N(0, G_2) \in \mathbb{R}^{18}$.
+
+- Since we have $2$ model terms (`idv(Blocks)` and `idv(Blocks):id(Wplots)`), we have two $Z_i$ matrices, and also two $u_i$ vectors. Our random effects vector is given by:
+  - $u = \begin{bmatrix} u_1 \\ u_2 \end{bmatrix}$
+  - $u_1 \sim N(0, G_1) \in \mathbb{R}^{6}$
+  - $u_2 \sim N(0, G_2) \in \mathbb{R}^{18}$.
 
 ##### $G$
-- `idv(Blocks) + idv(Blocks):id(Wplots)` is the random effects variance
-  structure. Since we have two terms, we again have two $G_i$'s. We specify the
-  `idv` variance model function, which is the homogeneous scaled identity
-  variance structure, i.e. $\sigma^2 I$. The second term has a /direct product/
-  implied by the `:` operator, which in the case of matrices is a /Kronecker
-  product/, of `idv(Blocks)` and `id(Wplots)`. `id` variance model means it is
-  simply a correlation structure, i.e. $I$, and there is no estimation of a
-  variance parameter. Noting we have 2 random effects terms:
-  + $G_1 = \sigma_1^2 I_6$ ($I_6$ is the $6 \times 6$ identity matrix)
-  + $G_2 = (\sigma_2^2 I_6) \otimes I_3$
-  + $G = \bigoplus_{i = 1}^2 G_i = \begin{bmatrix} \sigma_1^2 I_6 & 0 \\ 0 &
+
+- `idv(Blocks) + idv(Blocks):id(Wplots)` is the random effects variance structure. Since we have two terms, we again have two $G_i$'s. We specify the `idv` variance model function, which is the homogeneous scaled identity variance structure, i.e. $\sigma^2 I$. The second term has a /direct product/ implied by the `:` operator, which in the case of matrices is a /Kronecker product/, of `idv(Blocks)` and `id(Wplots)`. `id` variance model means it is simply a correlation structure, i.e. $I$, and there is no estimation of a variance parameter. Noting we have 2 random effects terms:
+  - $G_1 = \sigma_1^2 I_6$ ($I_6$ is the $6 \times 6$ identity matrix)
+  - $G_2 = (\sigma_2^2 I_6) \otimes I_3$
+  - $G = \bigoplus_{i = 1}^2 G_i = \begin{bmatrix} \sigma_1^2 I_6 & 0 \\ 0 &
     (\sigma_2^2 I_6 \otimes I_3) \end{bmatrix}$
 
 ##### $e$
-- The error vector is specified by the single model term
-  `ar1(Column):ar1(Row)`, therefore the error is given by:
-  + $e \sim N(0, R)$ where $R$ is the $R$ structure
+
+- The error vector is specified by the single model term `ar1(Column):ar1(Row)`, therefore the error is given by:
+  - $e \sim N(0, R)$ where $R$ is the $R$ structure
 
 ##### $R$
-- `ar1(Column):ar1(Row)` specifies the residual variance structure. In this
-  case we refer to an autoregressive model of order 1 (AR(1)) on both `Row` and
-  `Column`, where the `:` operator implies a separable Kronecker product
-  structure. The variance model `ar1` is of the form: $\Sigma_{ii} = 1,
+
+- `ar1(Column):ar1(Row)` specifies the residual variance structure. In this case we refer to an autoregressive model of order 1 (AR(1)) on both `Row` and `Column`, where the `:` operator implies a separable Kronecker product structure. The variance model `ar1` is of the form: $\Sigma_{ii} = 1,
   \Sigma_{ij} = \phi \Sigma_{i-1, j}, i > j+1, \lvert \phi \rvert < 1$.
-  + $R = \Sigma_c(\phi_c) \otimes \Sigma_r(\phi_r)$
-  + Where $\phi$ refers to the correlation within the columns ($\phi_c$) or the
-    rows ($\phi_r$).
+  - $R = \Sigma_c(\phi_c) \otimes \Sigma_r(\phi_r)$
+  - Where $\phi$ refers to the correlation within the columns ($\phi_c$) or the rows ($\phi_r$).
 
 In the second model, `mod_rats`, we are using the `rats` data:
 
 - `weight` is our $y$ vector.
 - `littersize`, `Sex` and `Dose` are in the $X$ matrix.
-- `Dam` is in the $Z$ matrix. We specify the `idv` variance model function,
-  which is the homogeneous scaled identity variance structure, i.e. $\sigma^2
+- `Dam` is in the $Z$ matrix. We specify the `idv` variance model function, which is the homogeneous scaled identity variance structure, i.e. $\sigma^2
   I$. In other words, the term is IID:
-  + $u \in \mathbb{R}^d \sim N(0, G)$
-  + $Z$ is the design matrix for `Dam`.
-  + $G = \sigma_d^2 I_d$.
-- `idv(units)` is the residual variance structure, in this case the residual
-  term has the homogeneous covariance matrix: $\sigma^2 I$. This is basically
-  saying all observations have the same error distribution (IID):
-  + $e \in \mathbb{R}^n \sim N(0, R)$
-  + $R = \sigma_e^2 I_n$
+  - $u \in \mathbb{R}^d \sim N(0, G)$
+  - $Z$ is the design matrix for `Dam`.
+  - $G = \sigma_d^2 I_d$.
+- `idv(units)` is the residual variance structure, in this case the residual term has the homogeneous covariance matrix: $\sigma^2 I$. This is basically saying all observations have the same error distribution (IID):
+  - $e \in \mathbb{R}^n \sim N(0, R)$
+  - $R = \sigma_e^2 I_n$
 
-Upon executing the above in R, the `ASReml-R` code will attempt to
-*estimate* the variance components $\sigma_d^2$ and $\sigma_e^2$, using the
-REML algorithm.
+Upon executing the above in R, the `ASReml-R` code will attempt to *estimate* the variance components $\sigma_d^2$ and $\sigma_e^2$, using the REML algorithm.
 
 ## Function examples {.tabset}
 
 ### Traditional Diagnostics (`ASReml-R`)
 
 #### `plot.asreml`
+
 ```{r plot_mod_oats}
 plot(mod_oats)
 ```
 
 #### `plot(varioGram(mod))`
+
 ```{r variogram_mod_oats}
 plot(varioGram(mod_oats))
 ```
@@ -289,9 +256,8 @@ plot(varioGram(mod_oats))
 
 #### `outlier_summary`
 
-The purpose of the `outlier_summary` function is to observe potential outliers
-that can then be discussed with the data provider. Below is an example for the
-rats dataset that is included within `ASReml-R`.
+The purpose of the `outlier_summary` function is to observe potential outliers that can then be discussed with the data provider.
+Below is an example for the rats dataset that is included within `ASReml-R`.
 
 ```{r}
 outlier_summary(mod_rats)
@@ -299,8 +265,7 @@ outlier_summary(mod_rats)
 
 #### `directional_variograms`
 
-The purpose of this function is to view the autocorrelation structure in both
-directions, rather than the traditional approach with `ASReml-R`.
+The purpose of this function is to view the autocorrelation structure in both directions, rather than the traditional approach with `ASReml-R`.
 
 ```{r directional_variograms_mod_oats}
 plot(directional_variograms(mod_oats))
@@ -328,8 +293,7 @@ predict.asreml(mod_oats, classify = "Nitrogen")
 
 ### `anova_table`
 
-Show an ANOVA table for multiple models, with p-values for each effect against
-each response.
+Show an ANOVA table for multiple models, with p-values for each effect against each response.
 
 ```{r}
 rats[["newresp"]] <- rats[["weight"]] * runif(nrow(rats))
@@ -349,8 +313,7 @@ anova_table(mod_rats, mod_rats2)
 
 ### `pred_table`
 
-Get the mean for each level of a fixed effect, as well as standard error, and
-confidence intervals.
+Get the mean for each level of a fixed effect, as well as standard error, and confidence intervals.
 
 ```{r}
 pred_table(mod_rats, classify = "Dose")

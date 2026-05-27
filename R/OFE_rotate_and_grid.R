@@ -4,7 +4,7 @@
 #'
 #' @param data `data.frame`.
 #'   The dataframe to be rotated.
-#'   This should be goereferenced per the `sf` pacakge.
+#'   This should be georeferenced per the \CRANpkg{sf} package.
 #'
 #' @param angle `numeric`.
 #'   Clockwise angle in degrees to rotate the dataframe.
@@ -19,8 +19,6 @@
 #'
 #' @examplesIf requireNamespace("asreml", quietly = TRUE)
 #' library(CBADASReml)
-#' library(dplyr)
-#' library(sf)
 #'
 #' data <- agridat::lasrosas.corn |>
 #' filter(year == 2001) |>
@@ -37,55 +35,59 @@
 #' @autoglobal
 #' @author Braden Thorne, \email{braden.thorne@@curtin.edu.au}
 #' @export
-ofe_rotate_data <- function(data, angle){
-  rotation_angle <- angle*pi/180
-  rotation_matrix <- matrix(c(
-    cos(rotation_angle),
-    sin(rotation_angle),
-    -sin(rotation_angle),
-    cos(rotation_angle)
-  ), nrow=2, ncol=2)
-
-  original_coordinates <- sf::st_coordinates(data)
-  translation_matrix <- apply(
-    original_coordinates,
-    2,
-    function(x){(max(x)+min(x))/2}
-  )
-
-  rotated_coordinates <- (
-    rotation_matrix %*% (
-      original_coordinates |>
-        as.matrix() |>
-        t() -
-        translation_matrix
+ofe_rotate_data <- function(data, angle) {
+    rotation_angle <- angle * pi / 180
+    rotation_matrix <- matrix(
+        c(
+            cos(rotation_angle),
+            sin(rotation_angle),
+            -sin(rotation_angle),
+            cos(rotation_angle)
+        ),
+        nrow = 2,
+        ncol = 2
     )
-  ) + translation_matrix
 
-  return(
-    data |>
-      sf::st_drop_geometry() |>
-      dplyr::mutate(
-        x_original = as.numeric(original_coordinates[,1]),
-        y_original = as.numeric(original_coordinates[,2]),
-        x = rotated_coordinates[1,],
-        y = rotated_coordinates[2,]
-      ) |>
-      sf::st_as_sf(
-        coords = c("x", "y"),
-        crs = sf::st_crs(data)
-      )
-  )
+    original_coordinates <- sf::st_coordinates(data)
+    translation_matrix <- apply(
+        original_coordinates,
+        2,
+        function(x) {
+            (max(x) + min(x)) / 2
+        }
+    )
+
+    rotated_coordinates <- (rotation_matrix %*%
+        (original_coordinates |>
+            as.matrix() |>
+            t() -
+            translation_matrix)) +
+        translation_matrix
+
+    return(
+        data |>
+            sf::st_drop_geometry() |>
+            dplyr::mutate(
+                x_original = as.numeric(original_coordinates[, 1]),
+                y_original = as.numeric(original_coordinates[, 2]),
+                x = rotated_coordinates[1, ],
+                y = rotated_coordinates[2, ]
+            ) |>
+            sf::st_as_sf(
+                coords = c("x", "y"),
+                crs = sf::st_crs(data)
+            )
+    )
 }
 
 
-#' Grid data ready for ASReml analysis.
+#' Grid data ready for ASReml analysis
 #'
 #' Optimally rotate and grid a georeferenced dataframe
 #'
 #' @param data_in `data.frame`.
 #'   The dataframe to be rotated.
-#'   This should be goereferenced per the `sf` pacakge.
+#'   This should be georeferenced per the \CRANpkg{sf} package.
 #'
 #'   We assume there are only three column of actual interest in the dataframe,
 #'   which are:
@@ -110,8 +112,8 @@ ofe_rotate_data <- function(data, angle){
 #'
 #' @param trim_ends `bool`.
 #'   Boolean determining whether the gridded data should be trimmed
-#'   to remove NAs occuring at the ends of columns.
-#'   Defaults to TRUE.
+#'   to remove NAs occurring at the ends of columns.
+#'   Defaults to FALSE.
 #'
 #' @returns `gridded.ofe`.
 #'     `list` containing the following items:
@@ -127,8 +129,6 @@ ofe_rotate_data <- function(data, angle){
 #'
 #' @examplesIf requireNamespace("asreml", quietly = TRUE)
 #' library(CBADASReml)
-#' library(dplyr)
-#' library(sf)
 #'
 #' data <- agridat::lasrosas.corn |>
 #' filter(year == 2001) |>
@@ -279,7 +279,6 @@ ofe_grid_data <- function(data_in, rotation_angle, nrow, ncol, trim_ends=TRUE){
         dplyr::arrange(Rep, Col, Row),
       original_data = data_out
     )
-  )
 }
 
 
@@ -391,8 +390,6 @@ ofe_make_penvs <- function(gridded_ofe, npe) {
 #'
 #' @examplesIf requireNamespace("asreml", quietly = TRUE)
 #' library(CBADASReml)
-#' library(dplyr)
-#' library(sf)
 #'
 #' data <- agridat::lasrosas.corn |>
 #' filter(year == 2001) |>
@@ -410,40 +407,46 @@ ofe_make_penvs <- function(gridded_ofe, npe) {
 #' @autoglobal
 #' @author Braden Thorne, \email{braden.thorne@@curtin.edu.au}
 #' @export
-plot_gridded_ofe <- function(gridded_ofe){
-  p1 <- gridded_ofe$original_data |>
-    ggplot2::ggplot(
-      ggplot2::aes(x=x_original, y=y_original, colour=Yield)
-    ) +
-    ggplot2::geom_point() +
-    ggplot2::labs(x="Projected Longitude", y="Projected Latitude")
-  p2 <- gridded_ofe$original_data |>
-    dplyr::mutate(`Odd Strip`= as.factor(dplyr::if_else(Col%%2==0, "No", "Yes"))) |>
-    ggplot2::ggplot(
-      ggplot2::aes(x=x_rough_rotation, y=y_rough_rotation, colour=`Odd Strip`)
-    ) +
-    ggplot2::geom_point() +
-    ggplot2::labs(x="Roughly Rotated X", y="Roughly Rotated Y")
+plot_gridded_ofe <- function(gridded_ofe) {
+    p1 <- gridded_ofe$original_data |>
+        ggplot2::ggplot(
+            ggplot2::aes(x = x_original, y = y_original, colour = Yield)
+        ) +
+        ggplot2::geom_point() +
+        ggplot2::labs(x = "Projected Longitude", y = "Projected Latitude")
+    p2 <- gridded_ofe$original_data |>
+        dplyr::mutate(
+            `Odd Strip` = as.factor(dplyr::if_else(Col %% 2 == 0, "No", "Yes"))
+        ) |>
+        ggplot2::ggplot(
+            ggplot2::aes(
+                x = x_rough_rotation,
+                y = y_rough_rotation,
+                colour = `Odd Strip`
+            )
+        ) +
+        ggplot2::geom_point() +
+        ggplot2::labs(x = "Roughly Rotated X", y = "Roughly Rotated Y")
 
-  p3 <- gridded_ofe$gridded_data |>
-    ggplot2::ggplot(
-      ggplot2::aes(x=x_rotated, y=y_rotated, colour=Yield)
-    ) +
-    ggplot2::geom_point() +
-    ggplot2::scale_colour_continuous(na.value="red") +
-    ggplot2::labs(x="Gridded X", y="Gridded Y")
+    p3 <- gridded_ofe$gridded_data |>
+        ggplot2::ggplot(
+            ggplot2::aes(x = x_rotated, y = y_rotated, colour = Yield)
+        ) +
+        ggplot2::geom_point() +
+        ggplot2::scale_colour_continuous(na.value = "red") +
+        ggplot2::labs(x = "Gridded X", y = "Gridded Y")
 
-  p4 <- gridded_ofe$gridded_data |>
-    ggplot2::ggplot(
-      ggplot2::aes(
-        x=sf::st_coordinates(geometry)[, "X"],
-        y=sf::st_coordinates(geometry)[, "Y"],
-        colour=Yield
-      )
-    ) +
-    ggplot2::geom_point() +
-    ggplot2::scale_colour_continuous(na.value="red") +
-    ggplot2::labs(x="Projected Longitude", y="Projected Latitude")
+    p4 <- gridded_ofe$gridded_data |>
+        ggplot2::ggplot(
+            ggplot2::aes(
+                x = sf::st_coordinates(geometry)[, "X"],
+                y = sf::st_coordinates(geometry)[, "Y"],
+                colour = Yield
+            )
+        ) +
+        ggplot2::geom_point() +
+        ggplot2::scale_colour_continuous(na.value = "red") +
+        ggplot2::labs(x = "Projected Longitude", y = "Projected Latitude")
 
-  cowplot::plot_grid(p1, p2, p3, p4, ncol=2)
+    cowplot::plot_grid(p1, p2, p3, p4, ncol = 2)
 }

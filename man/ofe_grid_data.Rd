@@ -15,7 +15,7 @@ ofe_grid_data(
 \arguments{
 \item{data_in}{\code{data.frame}.
 The dataframe to be rotated.
-This should be goereferenced per the \code{sf} pacakge.
+This should be georeferenced per the \CRANpkg{sf} package.
 
 We assume there are only three column of actual interest in the dataframe,
 which are:
@@ -62,8 +62,6 @@ Optimally rotate and grid a georeferenced dataframe
 \examples{
 \dontshow{if (requireNamespace("asreml", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 library(CBADASReml)
-library(dplyr)
-library(sf)
 
 data <- agridat::lasrosas.corn |>
 filter(year == 2001) |>

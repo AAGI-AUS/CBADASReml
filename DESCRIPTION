@@ -1,6 +1,6 @@
 Package: CBADASReml
 Title: Provides helper functions for ASReml
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: c(
     person("Kai", "Bagley", , "kai.bagley@curtin.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0004-6579-6959")),
@@ -8,39 +8,43 @@ Authors@R: c(
            comment = c(ORCID = "0009-0008-5014-0593")),
     person("Matthew", "Nguyen", , "matthew.nguyen@curtin.edu.au", role = "aut",
            comment = c(ORCID = "0009-0006-6773-8263")),
+    person("Braden", "Thorne", , "braden.thorne@curtin.edu.au", role = "aut",
+           comment = c(ORCID = "0000-0003-0497-1675")),
     person("Adam H.", "Sparks", , "adam.sparks@curtin.edu.au", role = "aut",
            comment = c(ORCID = "0000-0002-0061-8359")),
-    person("Curtin University", role = c("fnd", "cph"),
-           comment = "http://www.curtin.edu.au/, ROR: 02n415q13"),
     person("Grains Research and Development Corporation", role = c("fnd", "cph"),
            comment = "Project: GRDC Project CUR2210-005OPX (AAGI-CU), ROR: 02xwr1996")
   )
-Description: This package provides helper functions for ASReml,
-    particularly for use with small-plot trials.
+Description: This package provides helper functions for ASReml, for use
+    with small-plot and on-farm experimentation trials.
 License: GPL (>= 3)
 URL: https://aagi-aus.github.io/CBADASReml/
 Depends:
-    R (>= 4.1.0),
+    R (>= 4.1.0)
+Imports:
     asremlPlus,
+    car,
+    cowplot,
+    cli,
+    dplyr,
+    emmeans,
     ggplot2,
     gstat,
+    rlang,
     sf
 Suggests:
     asreml,
+    agricolae,
     agridat,
-    car,
-    emmeans,
     glmmTMB,
     knitr,
     rmarkdown,
     roxyglobals,
-    rstac,
     testthat (>= 3.0.0),
-    vdiffr,
-    cli,
-    MASS
+    vdiffr
 VignetteBuilder:
     knitr
+Config/roxygen2/version: 8.0.0
 Config/roxyglobals/filename: globals.R
 Config/roxyglobals/unique: FALSE
 Config/testthat/edition: 3
@@ -49,7 +53,6 @@ Encoding: UTF-8
 Language: en-AU
 Roxygen: list(markdown = TRUE, roclets = c("collate", "namespace", "rd",
     "roxyglobals::global_roclet"))
-RoxygenNote: 7.3.3
 X-schema.org-applicationCategory: Tools
 X-schema.org-isPartOf:
     https://grdc.com.au/research/partnerships-and-initiatives/strategic-partnerships/aagi

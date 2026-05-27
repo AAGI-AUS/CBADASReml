@@ -90,7 +90,7 @@ If \code{factor_combine} is \code{FALSE}, the factors specified in
 }
 \description{
 Generate a table of predicted values and CIs from an
-\link[asreml]{asreml} or \link[glmmTMB]{glmmTMB} model, for
+\link[asreml:asreml]{asreml} or \link[glmmTMB:glmmTMB]{glmmTMB} model, for
 the specified variables \code{asreml} or \code{glmmTMB} object.
 }
 \examples{

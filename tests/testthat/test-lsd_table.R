@@ -1,14 +1,14 @@
-skip_on_cran()
-library(asreml)
-model <- asreml(
-    fixed = yield ~ Variety,
-    random = ~units,
-    residual = ~ ar1v(Row):ar1(Column),
-    data = shf,
-    trace = FALSE
-)
-
 test_that("table matches output as if we used agricolae::orderPvalue", {
+    skip_if_no_asreml()
+    library(asreml)
+    model <- asreml(
+        fixed = yield ~ Variety,
+        random = ~units,
+        residual = ~ ar1v(Row):ar1(Column),
+        data = shf,
+        trace = FALSE
+    )
+
     agricolae_table <-
         data.frame(
             group = c(
