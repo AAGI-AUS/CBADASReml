@@ -19,6 +19,7 @@
 #'   -
 #'   \Sigma^{-1} X_2
 #'   \left( X_2^\intercal \Sigma^{-1} X_2 \right)^{-1}
+#'   X_2^\intercal
 #'   \Sigma^{-1}
 #' }
 #' For a treatment contrast \eqn{c^\intercal \tau}, the contrast standard error
@@ -156,14 +157,30 @@
 #'     )
 #' )
 #'
+#' # RCBD with AR1 x AR1 structure
 #' res_power <- design_power(
 #'     design = latinsquare,
 #'     treatment_cols = "treatment",
-#'     row_col = "row",
-#'     column_col = "col",
-#'     block_col = NULL,
-#'     rho_row = 0.3,
-#'     rho_col = 0.3,
+#'     block_col = "rep",
+#'     covariance_structure = cov_ar1ar1(
+#'         row_col = "row",
+#'         column_col = "range",
+#'         rho_row = 0.1,
+#'         rho_col = 0.1
+#'     ),
+#'     sigma2 = 1,
+#'     delta = 1,
+#'     alpha = 0.05
+#' )
+#'
+#' # Split plot design
+#' res_power <- design_power(
+#'     design = latinsquare,
+#'     treatment_cols = "treatment",
+#'     block_col = "rep",
+#'     covariance_structure =
+#'         cov_ar1ar1("row", "range", rho_row = 0.1, rho_col = 0.1) +
+#'         cov_random(cov_iid("whole_plot"), sd_ratio = 1)
 #'     sigma2 = 1,
 #'     delta = 1,
 #'     alpha = 0.05
@@ -172,17 +189,14 @@
 #'
 #' @export
 design_power <- function(
-  design,
-  treatment_cols = "treatment",
-  row_col = "row",
-  column_col = "col",
-  block_col = NULL,
-  rho_row = 0.1,
-  rho_col = 0.1,
-  sigma2 = 1,
-  delta = 1,
-  alpha = 0.05,
-  tolerance = 1e-10
+    design,
+    treatment_cols = "treatment",
+    block_col = NULL,
+    covariance_structure = cov_iid(),
+    sigma2 = 1,
+    delta = 1,
+    alpha = 0.05,
+    tolerance = 1e-10
 ) {
     # arg checks
     if (sigma2 <= 0) stop("sigma2 must be positive.")
@@ -191,12 +205,8 @@ design_power <- function(
     ti <- compute_treatment_info(
         design = design,
         treatment_cols = treatment_cols,
-        row_col = row_col,
-        column_col = column_col,
         block_col = block_col,
-        rho_row = rho_row,
-        rho_col = rho_col,
-        alpha = alpha,
+        covariance_structure = covariance_structure,
         tolerance = tolerance
     )
 
@@ -260,7 +270,7 @@ design_power <- function(
 
     # return power for all comparisons
     contrast_power <- do.call(rbind, out)
-    return(list(
+    return(structure(list(
         contrast_power = contrast_power,
         design_power = min(contrast_power$power, na.rm = TRUE),
         average_power = mean(contrast_power$power, na.rm = TRUE),
@@ -273,13 +283,14 @@ design_power <- function(
             sigma2 = sigma2,
             delta = delta,
             alpha = alpha,
-            rho_row = rho_row,
-            rho_col = rho_col,
+            covariance_structure = format_covariance_structure(
+                covariance_structure
+            ),
             block_col = block_col,
             treatment_cols = treatment_cols,
             power_method = "known-covariance Fisher-information z power"
         )
-    ))
+    ), class = c("cbadas_design_power", "list")))
 }
 
 #' Calculate the design efficiency/optimality of a small-plot trial design.
@@ -382,11 +393,13 @@ design_power <- function(
 #' res_eff <- design_efficiency(
 #'     design = latinsquare,
 #'     treatment_cols = "treatment",
-#'     row_col = "row",
-#'     column_col = "col",
 #'     block_col = NULL,
-#'     rho_row = 0.3,
-#'     rho_col = 0.3
+#'     covariance_structure = cov_ar1ar1(
+#'         row_col = "row",
+#'         column_col = "range",
+#'         rho_row = 0.1,
+#'         rho_col = 0.1
+#'     )
 #' )
 #' }
 #'
@@ -397,23 +410,16 @@ design_power <- function(
 design_efficiency <- function(
     design,
     treatment_cols = c("treatment"),
-    row_col = "row",
-    column_col = "col",
     block_col = NULL,
-    rho_row = 0.1,
-    rho_col = 0.1,
+    covariance_structure = cov_iid(),
     alpha = 0.05,
     tolerance = 1e-10
 ) {
     ti <- compute_treatment_info(
         design = design,
         treatment_cols = treatment_cols,
-        row_col = row_col,
-        column_col = column_col,
         block_col = block_col,
-        rho_row = rho_row,
-        rho_col = rho_col,
-        alpha = alpha,
+        covariance_structure = covariance_structure,
         tolerance = tolerance
     )
 
@@ -466,21 +472,389 @@ design_efficiency <- function(
     })
 
     contrast_eff <- do.call(rbind, out)
-    return(list(
+    return(structure(list(
         fisher_info = ti$info,
         eigenvalues = ti$eigenvalues,
         rank = ti$rank,
-        estimable_design = ti$rank >= v-1,
+        estimable_design = ti$rank >= v - 1,
         a_optimality = a_val,
         d_optimality = d_val,
         pairwise_efficiency = contrast_eff,
         assumptions = list(
-            rho_row = rho_row,
-            rho_col = rho_col,
+            covariance_structure = format_covariance_structure(
+                covariance_structure
+            ),
             block = block_col,
             treatment_cols = treatment_cols
         )
+    ), class = c("cbadas_design_efficiency", "list")))
+}
+
+#' @export
+print.cbadas_design_power <- function(x, ..., n = 5) {
+    contrast_power <- x$contrast_power
+    estimable <- contrast_power$estimable %in% TRUE
+    n_estimable <- sum(estimable)
+    n_total <- nrow(contrast_power)
+
+    ui_h1("Design power")
+    ui_text(paste0(
+        "Design power: ",
+        format_ui_percent(x$design_power),
+        "  |  Average power: ",
+        format_ui_percent(x$average_power)
     ))
+    ui_text(paste0(
+        "Worst comparison: ",
+        format_ui_value(x$worst_comparison),
+        "  |  Estimable comparisons: ",
+        n_estimable,
+        "/",
+        n_total
+    ))
+    ui_text(paste0(
+        "Assumptions: delta = ",
+        format_ui_number(x$assumptions$delta),
+        ", sigma2 = ",
+        format_ui_number(x$assumptions$sigma2),
+        ", alpha = ",
+        format_ui_number(x$assumptions$alpha),
+        ", covariance = ",
+        x$assumptions$covariance_structure
+    ))
+
+    if (n_estimable > 0) {
+        ui_h2("Lowest-power comparisons")
+        power_table <- contrast_power[estimable, , drop = FALSE]
+        power_table <- power_table[
+            order(power_table$power, power_table$se),
+            ,
+            drop = FALSE
+        ]
+        power_table <- utils::head(power_table, n)
+        print(format_power_table(power_table), row.names = FALSE)
+    } else {
+        ui_alert("No estimable pairwise comparisons.")
+    }
+
+    invisible(x)
+}
+
+#' @export
+print.cbadas_design_efficiency <- function(x, ..., n = 5) {
+    pairwise_efficiency <- x$pairwise_efficiency
+    estimable <- pairwise_efficiency$estimable %in% TRUE
+    n_estimable <- sum(estimable)
+    n_total <- nrow(pairwise_efficiency)
+
+    ui_h1("Design efficiency")
+    ui_text(paste0(
+        "Estimable design: ",
+        if (isTRUE(x$estimable_design)) "yes" else "no",
+        "  |  Rank: ",
+        x$rank,
+        "  |  Estimable comparisons: ",
+        n_estimable,
+        "/",
+        n_total
+    ))
+    ui_text(paste0(
+        "A-optimality: ",
+        format_ui_number(x$a_optimality),
+        "  |  D-optimality: ",
+        format_ui_number(x$d_optimality)
+    ))
+    ui_text(paste0(
+        "Assumptions: covariance = ",
+        x$assumptions$covariance_structure
+    ))
+
+    if (n_estimable > 0) {
+        ui_h2("Least-precise comparisons")
+        efficiency_table <- pairwise_efficiency[estimable, , drop = FALSE]
+        efficiency_table <- efficiency_table[
+            order(-efficiency_table$variance),
+            ,
+            drop = FALSE
+        ]
+        efficiency_table <- utils::head(efficiency_table, n)
+        print(format_efficiency_table(efficiency_table), row.names = FALSE)
+    } else {
+        ui_alert("No estimable pairwise comparisons.")
+    }
+
+    invisible(x)
+}
+
+## Covariance structure builders
+
+#' Build a covariance structure
+#'
+#' Builds the "relative" covariance for a design:
+#' \deqn{
+#'   V_{\text{rel}} = R + ZGZ
+#' }
+build_covariance_matrix <- function(design, covariance_structure) {
+    components <- as_cov_components(covariance_structure)
+
+    n <- nrow(design)
+    V <- matrix(0, n, n)
+
+    for (component in components) {
+        if (component$type == "iid") {
+            V <- V + diag(n)
+        } else if (component$type == "ar1") {
+            V <- V + apply_group_mask(
+                cor_ar1(
+                    index = get_design_column(
+                        design,
+                        component$index_col,
+                        "index"
+                    ),
+                    rho = component$rho
+                ),
+                design = design,
+                group = component$group
+            )
+        } else if (component$type == "ar1ar1") {
+            V <- V + apply_group_mask(
+                cor_ar1ar1(
+                    row = get_design_column(
+                        design,
+                        component$row_col,
+                        "row"
+                    ),
+                    column = get_design_column(
+                        design,
+                        component$column_col,
+                        "column"
+                    ),
+                    rho_row = component$rho_row,
+                    rho_col = component$rho_col
+                ),
+                design = design,
+                group = component$group
+            )
+        } else if (component$type == "cs") {
+            V <- V + cor_cs(
+                group = get_design_column(
+                    design,
+                    component$group_col,
+                    "group"
+                ),
+                rho = component$rho
+            )
+        } else if (component$type == "exponential") {
+            y <- if (is.null(component$y_col)) {
+                NULL
+            } else {
+                get_design_column(design, component$y_col, "y")
+            }
+            V <- V + apply_group_mask(
+                cor_exponential(
+                    x = get_design_column(design, component$x_col, "x"),
+                    y = y,
+                    range = component$range
+                ),
+                design = design,
+                group = component$group
+            )
+        } else if (component$type == "random") {
+            group <- component$component$group
+
+            if (is.null(group)) {
+                stop("random() covariance components need a grouping column")
+            }
+            get_design_column(design, group, "group")
+
+            form <- stats::as.formula(paste0("~ 0 + factor(", group, ")"))
+            Z <- stats::model.matrix(form, data = design)
+
+            G <- diag(ncol(Z))
+            V <- V + (component$sd_ratio^2) * Z %*% G %*% t(Z)
+        } else {
+            stop("Unknown covariance component: ", component$type)
+        }
+    }
+
+    if (nrow(V) != n || ncol(V) != n) {
+        stop(
+            "Covariance matrix must have ",
+            "dimension = nrow(design) x nrow(design)"
+        )
+    }
+
+    if (!isSymmetric(V, tol = 1e-10)) {
+        stop("Covariance matrix must be symmetric")
+    }
+
+    return((V + t(V)) / 2)
+}
+
+as_cov_components <- function(x) {
+    if (inherits(x, "cov_structure")) {
+        return(x$components)
+    }
+
+    if (inherits(x, "cov_component")) {
+        return(list(x))
+    }
+
+    stop("Invalid covariance structure.")
+}
+
+#' Independent, identically distributed covariance component
+#'
+#' @param group Optional grouping column used when wrapped in [cov_random()].
+#'
+#' @rdname covariance_helpers
+#' @export
+cov_iid <- function(group = NULL) {
+    structure(
+        list(
+            type = "iid",
+            group = group
+        ),
+        class = "cov_component"
+    )
+}
+
+#' One-dimensional AR1 covariance component
+#'
+#' @param index_col Column containing the ordered coordinate.
+#' @param rho AR1 correlation parameter.
+#' @param group Optional grouping column. When supplied, covariance is zero
+#'   between different groups.
+#'
+#' @rdname covariance_helpers
+#' @export
+cov_ar1 <- function(index_col, rho = 0.1, group = NULL) {
+    structure(
+        list(
+            type = "ar1",
+            index_col = index_col,
+            rho = rho,
+            group = group
+        ),
+        class = "cov_component"
+    )
+}
+
+#' Two-dimensional separable AR1 covariance component
+#'
+#' @param row_col Column containing row coordinates.
+#' @param column_col Column containing column coordinates.
+#' @param rho_row AR1 correlation parameter in the row direction.
+#' @param rho_col AR1 correlation parameter in the column direction.
+#' @param group Optional grouping column. When supplied, covariance is zero
+#'   between different groups.
+#'
+#' @rdname covariance_helpers
+#' @export
+cov_ar1ar1 <- function(
+    row_col,
+    column_col,
+    rho_row = 0.1,
+    rho_col = 0.1,
+    group = NULL
+) {
+    structure(
+        list(
+            type = "ar1ar1",
+            row_col = row_col,
+            column_col = column_col,
+            rho_row = rho_row,
+            rho_col = rho_col,
+            group = group
+        ),
+        class = "cov_component"
+    )
+}
+
+#' Compound-symmetry covariance component
+#'
+#' @param group_col Column defining independent compound-symmetry groups.
+#' @param rho Common within-group correlation.
+#'
+#' @rdname covariance_helpers
+#' @export
+cov_cs <- function(group_col, rho = 0.1) {
+    structure(
+        list(
+            type = "cs",
+            group_col = group_col,
+            rho = rho
+        ),
+        class = "cov_component"
+    )
+}
+
+#' Exponential-distance covariance component
+#'
+#' @param x_col Column containing x coordinates.
+#' @param y_col Optional column containing y coordinates.
+#' @param range Positive distance scale.
+#' @param group Optional grouping column. When supplied, covariance is zero
+#'   between different groups.
+#'
+#' @rdname covariance_helpers
+#' @export
+cov_exponential <- function(x_col, y_col = NULL, range = 1, group = NULL) {
+    structure(
+        list(
+            type = "exponential",
+            x_col = x_col,
+            y_col = y_col,
+            range = range,
+            group = group
+        ),
+        class = "cov_component"
+    )
+}
+
+#' Transform a random covariance structure into observation space
+#'
+#' @param x Covariance component or grouping column name.
+#' @param sd_ratio Standard deviation ratio relative to the residual scale.
+#'
+#' @rdname covariance_helpers
+#' @export
+cov_random <- function(x, sd_ratio = 1) {
+    if (is.character(x) && length(x) == 1) {
+        x <- cov_iid(x)
+    }
+
+    if (!inherits(x, "cov_component")) {
+        stop(
+            "cov_random() must wrap a covariance component or grouping ",
+            "variable name"
+        )
+    }
+
+    structure(
+        list(
+            type = "random",
+            component = x,
+            sd_ratio = sd_ratio
+        ),
+        class = "cov_component"
+    )
+}
+
+#' @export
+`+.cov_component` <- function(e1, e2) {
+    structure(
+        list(components = c(as_cov_components(e1), as_cov_components(e2))),
+        class = "cov_structure"
+    )
+}
+
+#' @export
+`+.cov_structure` <- function(e1, e2) {
+    structure(
+        list(components = c(as_cov_components(e1), as_cov_components(e2))),
+        class = "cov_structure"
+    )
 }
 
 
@@ -501,11 +875,269 @@ mpinv <- function(mat, tol = 1e-10) {
     s$v %*% diag(d_inv, length(d_inv)) %*% t(s$u)
 }
 
+format_power_table <- function(x) {
+    data.frame(
+        comparison = x$comparison,
+        power = format_ui_percent(x$power),
+        se = format_ui_number(x$se),
+        lambda = format_ui_number(x$lambda),
+        effective_replicates = format_ui_number(x$effective_replicates),
+        check.names = FALSE
+    )
+}
+
+format_efficiency_table <- function(x) {
+    data.frame(
+        comparison = x$comparison,
+        variance = format_ui_number(x$variance),
+        effective_replicates = format_ui_number(x$effective_replicates),
+        check.names = FALSE
+    )
+}
+
+format_covariance_structure <- function(covariance_structure) {
+    components <- as_cov_components(covariance_structure)
+
+    paste(
+        vapply(
+            components,
+            format_covariance_component,
+            character(1)
+        ),
+        collapse = " + "
+    )
+}
+
+format_covariance_component <- function(component) {
+    if (component$type == "iid") {
+        if (is.null(component$group)) {
+            return("iid")
+        }
+
+        return(paste0("iid(", component$group, ")"))
+    }
+
+    if (component$type == "ar1") {
+        out <- paste0(
+            "ar1(index = ",
+            component$index_col,
+            ", rho = ",
+            format_ui_number(component$rho)
+        )
+        if (!is.null(component$group)) {
+            out <- paste0(out, ", group = ", component$group)
+        }
+
+        return(paste0(out, ")"))
+    }
+
+    if (component$type == "ar1ar1") {
+        out <- paste0(
+            "ar1ar1(row = ",
+            component$row_col,
+            ", column = ",
+            component$column_col,
+            ", rho_row = ",
+            format_ui_number(component$rho_row),
+            ", rho_col = ",
+            format_ui_number(component$rho_col)
+        )
+        if (!is.null(component$group)) {
+            out <- paste0(out, ", group = ", component$group)
+        }
+
+        return(paste0(out, ")"))
+    }
+
+    if (component$type == "cs") {
+        return(paste0(
+            "cs(group = ",
+            component$group_col,
+            ", rho = ",
+            format_ui_number(component$rho),
+            ")"
+        ))
+    }
+
+    if (component$type == "exponential") {
+        out <- paste0(
+            "exponential(x = ",
+            component$x_col
+        )
+        if (!is.null(component$y_col)) {
+            out <- paste0(out, ", y = ", component$y_col)
+        }
+        out <- paste0(
+            out,
+            ", range = ",
+            format_ui_number(component$range)
+        )
+        if (!is.null(component$group)) {
+            out <- paste0(out, ", group = ", component$group)
+        }
+
+        return(paste0(out, ")"))
+    }
+
+    if (component$type == "random") {
+        return(paste0(
+            "random(",
+            format_covariance_component(component$component),
+            ", sd_ratio = ",
+            format_ui_number(component$sd_ratio),
+            ")"
+        ))
+    }
+
+    component$type
+}
+
+format_ui_value <- function(x) {
+    if (length(x) == 0 || is.na(x)) {
+        return("NA")
+    }
+
+    as.character(x)
+}
+
+format_ui_number <- function(x, digits = 3) {
+    if (length(x) == 0) {
+        return("NA")
+    }
+
+    vapply(
+        x,
+        \(value) {
+            if (is.na(value)) {
+                return("NA")
+            }
+
+            if (is.infinite(value)) {
+                return(as.character(value))
+            }
+
+            formatC(value, digits = digits, format = "f")
+        },
+        character(1)
+    )
+}
+
+format_ui_percent <- function(x, digits = 1) {
+    if (length(x) == 0) {
+        return("NA")
+    }
+
+    vapply(
+        x,
+        \(value) {
+            if (is.na(value)) {
+                return("NA")
+            }
+
+            if (is.infinite(value)) {
+                return(as.character(value))
+            }
+
+            paste0(formatC(100 * value, digits = digits, format = "f"), "%")
+        },
+        character(1)
+    )
+}
+
+ui_h1 <- function(text) {
+    if (requireNamespace("cli", quietly = TRUE)) {
+        cli::cli_h1(text)
+    } else {
+        cat("\n", text, "\n", sep = "")
+    }
+}
+
+ui_h2 <- function(text) {
+    if (requireNamespace("cli", quietly = TRUE)) {
+        cli::cli_h2(text)
+    } else {
+        cat("\n", text, "\n", sep = "")
+    }
+}
+
+ui_text <- function(text) {
+    if (requireNamespace("cli", quietly = TRUE)) {
+        cli::cli_text(text)
+    } else {
+        cat(text, "\n", sep = "")
+    }
+}
+
+ui_alert <- function(text) {
+    if (requireNamespace("cli", quietly = TRUE)) {
+        cli::cli_alert_info(text)
+    } else {
+        cat(text, "\n", sep = "")
+    }
+}
+
+get_design_column <- function(design, column, label) {
+    if (!column %in% names(design)) {
+        stop(sprintf("%s column '%s' not in design", label, column))
+    }
+
+    design[[column]]
+}
+
+apply_group_mask <- function(mat, design, group = NULL) {
+    if (is.null(group)) {
+        return(mat)
+    }
+
+    group_values <- get_design_column(design, group, "group")
+    if (anyNA(group_values)) {
+        stop("NAs in grouping column")
+    }
+
+    same_group <- outer(group_values, group_values, "==")
+    mat * same_group
+}
+
+validate_correlation <- function(x, name = "rho") {
+    invalid <- !is.numeric(x) ||
+        length(x) != 1 ||
+        is.na(x) ||
+        x < 0 ||
+        x >= 1
+
+    if (invalid) {
+        stop(sprintf("%s must be in [0, 1).", name))
+    }
+}
+
+validate_positive_number <- function(x, name) {
+    invalid <- !is.numeric(x) ||
+        length(x) != 1 ||
+        is.na(x) ||
+        x <= 0
+
+    if (invalid) {
+        stop(sprintf("%s must be positive.", name))
+    }
+}
+
+## one-dimensional ar1 correlation structure
+cor_ar1 <- function(index, rho) {
+    validate_correlation(rho)
+    if (length(index) == 0) stop("index values must not be empty")
+    if (!is.numeric(index)) index <- as.numeric(factor(index))
+    if (anyNA(index)) stop("NAs in index")
+
+    index_dist <- abs(outer(index, index, "-"))
+    R <- rho^index_dist
+
+    return((R + t(R)) / 2)
+}
+
 ## ar1 x ar1 correlation structure
-cor_ar1_ar1 <- function(row, column, rho_row, rho_col, alpha) {
-    if (alpha <= 0 || alpha >= 1) stop("alpha must be between 0 and 1.")
-    if (rho_row < 0 || rho_row >= 1) stop("rho_row must be in [0, 1).")
-    if (rho_col < 0 || rho_col >= 1) stop("rho_col must be in [0, 1).")
+cor_ar1ar1 <- function(row, column, rho_row, rho_col) {
+    validate_correlation(rho_row, "rho_row")
+    validate_correlation(rho_col, "rho_col")
     if (!is.numeric(row)) row <- as.numeric(factor(row))
     if (!is.numeric(column)) column <- as.numeric(factor(column))
 
@@ -515,6 +1147,45 @@ cor_ar1_ar1 <- function(row, column, rho_row, rho_col, alpha) {
     col_dist <- abs(outer(column, column, "-"))
 
     R <- (rho_row^row_dist) * (rho_col^col_dist)
+
+    return((R + t(R)) / 2)
+}
+
+## compound-symmetry correlation structure
+cor_cs <- function(group, rho) {
+    validate_correlation(rho)
+    if (length(group) == 0) stop("group values must not be empty")
+    if (anyNA(group)) stop("NAs in group")
+
+    same_group <- outer(group, group, "==")
+    R <- ifelse(same_group, rho, 0)
+    diag(R) <- 1
+
+    return((R + t(R)) / 2)
+}
+
+## exponential spatial correlation structure
+cor_exponential <- function(x, y = NULL, range) {
+    validate_positive_number(range, "range")
+    if (length(x) == 0) stop("x values must not be empty")
+    if (!is.numeric(x)) stop("x must be numeric")
+
+    if (is.null(y)) {
+        if (anyNA(x)) stop("NAs in x")
+        dist <- abs(outer(x, x, "-"))
+    } else {
+        if (!is.numeric(y)) stop("y must be numeric")
+        if (length(y) != length(x)) {
+            stop("x and y must have the same length")
+        }
+        if (anyNA(x) || anyNA(y)) stop("NAs in x or y")
+
+        x_dist <- outer(x, x, "-")
+        y_dist <- outer(y, y, "-")
+        dist <- sqrt(x_dist^2 + y_dist^2)
+    }
+
+    R <- exp(-dist / range)
 
     return((R + t(R)) / 2)
 }
@@ -549,12 +1220,8 @@ build_nuisance_matrix <- function(design, block = NULL) {
 compute_treatment_info <- function(
     design,
     treatment_cols = c("treatment"),
-    row_col = "row",
-    column_col = "col",
     block_col = NULL,
-    rho_row = 0.1,
-    rho_col = 0.1,
-    alpha = alpha,
+    covariance_structure = cov_iid(),
     tolerance = 1e-10
 ) {
     ## combine multiple treatment columns into a treatment-combo factor
@@ -568,23 +1235,20 @@ compute_treatment_info <- function(
     x2 <- build_nuisance_matrix(design, block = block_col)
 
     ## spatial structure
-    r <- cor_ar1_ar1(
-        row = design[[row_col]],
-        column = design[[column_col]],
-        rho_row = rho_row,
-        rho_col = rho_col,
-        alpha = alpha
+    V <- build_covariance_matrix(
+        design = design,
+        covariance_structure = covariance_structure
     )
-    r_inv <- solve(r)
-    r_inv_x2 <- r_inv %*% x2
+    V_inv <- solve(V)
+    V_inv_x2 <- V_inv %*% x2
 
     ## GLS projection that removes nuisance effects
     ## L = I - X2 (X2t X2)^{-1} X2t
     ## under spatial R structure's geometry:
     ## L = R^{-1} - R^{-1} X2 (X2t R^{-1} X2)^{-1} X2t R^{-1}
-    mid <- t(x2) %*% r_inv_x2
+    mid <- t(x2) %*% V_inv_x2
     mid_inv <- mpinv(mid, tol = tolerance)
-    proj <- r_inv - r_inv_x2 %*% mid_inv %*% t(r_inv_x2)
+    proj <- V_inv - V_inv_x2 %*% mid_inv %*% t(V_inv_x2)
 
     ## fisher information in GLS nuisanceless geometry
     info <- t(x1) %*% proj %*% x1
@@ -605,7 +1269,7 @@ compute_treatment_info <- function(
         info = info,
         info_inv = info_inv,
         L = proj,
-        R = r,
+        V = V,
         X1 = x1,
         X2 = x2,
         trt_levels = trt_levels,
