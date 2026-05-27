@@ -17,5 +17,8 @@ test_that("expected names", {
 })
 
 test_that("expected table", {
-    expect_identical(table[["Nitrogen"]], lsd_table(model, classify = "Nitrogen"))
+    expect_identical(
+        table[["Nitrogen"]],
+        lsd_table(model, classify = "Nitrogen")
+    )
 })
