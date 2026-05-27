@@ -29,7 +29,7 @@ outliers.
 }
 }
 \description{
-Provides a summary of the outliers present in the \link[asreml]{asreml}
+Provides a summary of the outliers present in the \link[asreml:asreml]{asreml}
 model. Gives context to the outliers by showing the responses for the same
 factor combinations as the outliers
 }

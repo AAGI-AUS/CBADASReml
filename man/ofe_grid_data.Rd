@@ -2,14 +2,14 @@
 % Please edit documentation in R/OFE_rotate_and_grid.R
 \name{ofe_grid_data}
 \alias{ofe_grid_data}
-\title{Grid data ready for ASReml analysis.}
+\title{Grid data ready for ASReml analysis}
 \usage{
 ofe_grid_data(data_in, rotation_angle, nrow, npe, ncol, trim_ends = TRUE)
 }
 \arguments{
 \item{data_in}{\code{data.frame}.
 The dataframe to be rotated.
-This should be goereferenced per the \code{sf} pacakge.
+This should be goereferenced per the \CRANpkg{sf} package.
 
 We assume there are only three column of actual interest in the dataframe,
 which are:
@@ -39,7 +39,7 @@ in this gap when determining this number.}
 
 \item{trim_ends}{\code{bool}.
 Boolean determining whether the gridded data should be trimmed
-to remove NAs occuring at the ends of columns.
+to remove NAs occurring at the ends of columns.
 Defaults to FALSE.}
 }
 \value{
@@ -61,8 +61,6 @@ Optimally rotate and grid a georeferenced dataframe
 \examples{
 \dontshow{if (requireNamespace("asreml", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 library(CBADASReml)
-library(dplyr)
-library(sf)
 
 data <- agridat::lasrosas.corn |>
 filter(year == 2001) |>

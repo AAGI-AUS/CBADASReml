@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-This package provides helper functions for ASReml, particularly for use with small-plot trials.
+This package provides helper functions for ASReml, for use with small-plot and on-farm experimentation trials.
 }
 \seealso{
 Useful links:
@@ -22,14 +22,15 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Kai Bagley \email{kai.bagley@curtin.edu.au} (\href{https://orcid.org/0009-0004-6579-6959}{ORCID})
   \item Jordan Brown \email{jordan.brown@curtin.edu.au} (\href{https://orcid.org/0009-0008-5014-0593}{ORCID})
   \item Matthew Nguyen \email{matthew.nguyen@curtin.edu.au} (\href{https://orcid.org/0009-0006-6773-8263}{ORCID})
+  \item Braden Thorne \email{braden.thorne@curtin.edu.au} (\href{https://orcid.org/0000-0003-0497-1675}{ORCID})
   \item Adam H. Sparks \email{adam.sparks@curtin.edu.au} (\href{https://orcid.org/0000-0002-0061-8359}{ORCID})
 }
 
 Other contributors:
 \itemize{
-  \item Curtin University (http://www.curtin.edu.au/, ROR: 02n415q13) [funder, copyright holder]
   \item Grains Research and Development Corporation (Project: GRDC Project CUR2210-005OPX (AAGI-CU), ROR: 02xwr1996) [funder, copyright holder]
 }
 

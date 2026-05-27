@@ -9,7 +9,7 @@ ofe_rotate_data(data, angle)
 \arguments{
 \item{data}{\code{data.frame}.
 The dataframe to be rotated.
-This should be goereferenced per the \code{sf} pacakge.}
+This should be goereferenced per the \CRANpkg{sf} package.}
 
 \item{angle}{\code{numeric}.
 Clockwise angle in degrees to rotate the dataframe.}
@@ -29,8 +29,6 @@ Rotate a provided georeferenced dataframe by a specified angle in degrees.
 \examples{
 \dontshow{if (requireNamespace("asreml", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 library(CBADASReml)
-library(dplyr)
-library(sf)
 
 data <- agridat::lasrosas.corn |>
 filter(year == 2001) |>
