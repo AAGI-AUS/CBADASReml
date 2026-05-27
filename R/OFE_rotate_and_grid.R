@@ -4,7 +4,7 @@
 #'
 #' @param data `data.frame`.
 #'   The dataframe to be rotated.
-#'   This should be goereferenced per the \CRANpkg{sf} package.
+#'   This should be georeferenced per the \CRANpkg{sf} package.
 #'
 #' @param angle `numeric`.
 #'   Clockwise angle in degrees to rotate the dataframe.
@@ -87,7 +87,7 @@ ofe_rotate_data <- function(data, angle) {
 #'
 #' @param data_in `data.frame`.
 #'   The dataframe to be rotated.
-#'   This should be goereferenced per the \CRANpkg{sf} package.
+#'   This should be georeferenced per the \CRANpkg{sf} package.
 #'
 #'   We assume there are only three column of actual interest in the dataframe,
 #'   which are:
