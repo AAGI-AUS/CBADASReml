@@ -1,24 +1,14 @@
-skip_on_cran()
-model <- asreml(
-    fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen,
-    random = ~ idv(Blocks) + idv(Blocks):idv(Wplots),
-    residual = ~ idv(units),
-    data = oats,
-    trace = FALSE
-)
-
-table <- report_tables(
-    model,
-    classify = "Nitrogen:Variety"
-)
-
 test_that("expected names", {
+    skip_if_no_asreml()
+    table <- report_tables(get_oats_model(), classify = "Nitrogen:Variety")
     expect_named(table, c("Anova", "Nitrogen", "Variety", "Nitrogen:Variety"))
 })
 
-test_that("expected table", {
+test_that("expected Nitrogen table", {
+    skip_if_no_asreml()
+    table <- report_tables(get_oats_model(), classify = "Nitrogen:Variety")
     expect_identical(
         table[["Nitrogen"]],
-        lsd_table(model, classify = "Nitrogen")
+        lsd_table(get_oats_model(), classify = "Nitrogen")
     )
 })

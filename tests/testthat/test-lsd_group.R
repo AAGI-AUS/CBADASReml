@@ -1,14 +1,14 @@
-skip_on_cran()
-library(asreml)
-model <- asreml::asreml(
-    fixed = yield ~ Variety,
-    random = ~units,
-    residual = ~ ar1v(Row):ar1(Column),
-    data = shf,
-    trace = FALSE
-)
-
 test_that("groups are same as agricolae::orderPvalue", {
+    skip_if_no_asreml()
+    library(asreml)
+    model <- asreml::asreml(
+        fixed = yield ~ Variety,
+        random = ~units,
+        residual = ~ ar1v(Row):ar1(Column),
+        data = shf,
+        trace = FALSE
+    )
+
     agricolae_groups <- c(
         "a",
         "a",

@@ -4,7 +4,7 @@
 \alias{lsd_table}
 \title{Create an LSD table from an ASReml model}
 \usage{
-lsd_table(model, classify, ...)
+lsd_table(model, classify, alpha = 0.05, ...)
 }
 \arguments{
 \item{model}{The model object to calculate LSDs from.
@@ -17,6 +17,8 @@ The value may be:
 
 \item{classify}{\code{character}
 A string specifying which variables to predict and calculate LSDs from.}
+
+\item{alpha}{xxxxxxx}
 
 \item{...}{Arguments to pass to \code{predictPlus.asreml}}
 }
