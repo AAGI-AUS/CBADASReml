@@ -71,7 +71,7 @@ rename(
  st_as_sf(coords = c("long", "lat"), crs = 4326) |>
  st_transform(3395)
 
-gridded_data <- ofe_grid_data(data, -60, 80, 5, 18, trim_ends=FALSE)
+gridded_data <- ofe_grid_data(data, -60, 80, 18, trim_ends=FALSE)
 plot_gridded_ofe(gridded_data)
 \dontshow{\}) # examplesIf}
 }
