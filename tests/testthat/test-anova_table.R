@@ -27,8 +27,11 @@ mod3 <- asreml(
     trace = FALSE
 )
 out <- data.frame(
-    Effect = c("Variety", "Nitrogen", "Variety:Nitrogen"),
-    yield = c(0.226, 0.000, 0.936)
+    c(
+        Effect = c("Variety", "Nitrogen", "Variety:Nitrogen"),
+        yield = c(0.226, 0.000, 0.936)
+    ),
+    stringsAsFactors = FALSE
 )
 
 ## Tests
