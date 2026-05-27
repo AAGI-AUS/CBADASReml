@@ -10,7 +10,7 @@
 #'   * `glmmTMB` (not yet implemented)
 #' @param classify `character`
 #'   A string specifying which variables to predict and calculate LSDs from.
-#' @param alpha xxxxxxx
+#' @param alpha significance level `numeric`.
 #' @param ...
 #'   Arguments to pass to `predictPlus.asreml`
 #'

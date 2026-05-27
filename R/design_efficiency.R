@@ -41,7 +41,7 @@
 #'        AR1 correlation parameter in the row direction.
 #' @param rho_col `numeric`.
 #'        AR1 correlation parameter in the column direction.
-#' @param alpha xxxxxxxx.
+#' @param alpha significance level `numeric`.
 #' @param tolerance `numeric`.
 #'        Tolerance for numerical stability.
 #'
