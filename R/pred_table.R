@@ -1,7 +1,7 @@
 #' Generate prediction table from model
 #'
 #' Generate a table of predicted values and CIs from an
-#' \link[asreml]{asreml} or \link[glmmTMB]{glmmTMB} model, for
+#' [asreml][asreml::asreml] or [glmmTMB][glmmTMB::glmmTMB] model, for
 #' the specified variables `asreml` or `glmmTMB` object.
 #'
 #' @param mod

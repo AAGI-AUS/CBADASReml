@@ -11,8 +11,8 @@
 #'   * `glmmTBM` (not yet implemented)
 #' @param classify `character`
 #'   A string specifying the factors in the model to predict on. If multiple
-#'   are specified separate with either \code{*} or \code{:}. For example
-#'   \code{Nitrogen:Variety} or \code{Nitrogen*Variety}.
+#'   are specified separate with either `*` or `:`. For example
+#'   `Nitrogen:Variety` or `Nitrogen*Variety`.
 #'
 #' @returns `list` of `data.frame`
 #'   A list of data frames. The first data frame is the ANOVA for the model.
