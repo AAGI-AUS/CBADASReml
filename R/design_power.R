@@ -186,10 +186,10 @@ design_power <- function(
 ) {
     # arg checks
     if (sigma2 <= 0) {
-        stop("sigma2 must be positive.")
+        cli::cli_abort("sigma2 must be positive.")
     }
     if (delta <= 0) {
-        stop("delta must be positive.")
+        cli::cli_abort("delta must be positive.")
     }
 
     ti <- compute_treatment_info(
