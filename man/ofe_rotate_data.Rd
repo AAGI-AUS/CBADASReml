@@ -9,7 +9,7 @@ ofe_rotate_data(data, angle)
 \arguments{
 \item{data}{\code{data.frame}.
 The dataframe to be rotated.
-This should be goereferenced per the \CRANpkg{sf} package.}
+This should be georeferenced per the \CRANpkg{sf} package.}
 
 \item{angle}{\code{numeric}.
 Clockwise angle in degrees to rotate the dataframe.}

@@ -9,7 +9,7 @@ ofe_grid_data(data_in, rotation_angle, nrow, npe, ncol, trim_ends = TRUE)
 \arguments{
 \item{data_in}{\code{data.frame}.
 The dataframe to be rotated.
-This should be goereferenced per the \CRANpkg{sf} package.
+This should be georeferenced per the \CRANpkg{sf} package.
 
 We assume there are only three column of actual interest in the dataframe,
 which are:

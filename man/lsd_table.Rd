@@ -18,7 +18,7 @@ The value may be:
 \item{classify}{\code{character}
 A string specifying which variables to predict and calculate LSDs from.}
 
-\item{alpha}{xxxxxxx}
+\item{alpha}{significance level \code{numeric}.}
 
 \item{...}{Arguments to pass to \code{predictPlus.asreml}}
 }

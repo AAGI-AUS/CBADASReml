@@ -41,7 +41,7 @@ AR1 correlation parameter in the row direction.}
 \item{rho_col}{\code{numeric}.
 AR1 correlation parameter in the column direction.}
 
-\item{alpha}{xxxxxxxx.}
+\item{alpha}{significance level \code{numeric}.}
 
 \item{tolerance}{\code{numeric}.
 Tolerance for numerical stability.}
