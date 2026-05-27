@@ -66,6 +66,7 @@ anova_table <- function(..., n_digits = 3) {
 #' @method anova_table asreml
 #' @export
 anova_table.asreml <- function(..., n_digits = 3) {
+    is_asreml_installed()
     models <- list(...)
 
     response_names <- sapply(

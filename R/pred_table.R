@@ -159,6 +159,7 @@ pred_table <- function(
     }
 
     if (modtype == "asreml") {
+        is_asreml_installed()
         utils::capture.output(
             pred <- asremlPlus::predictPlus.asreml(
                 mod,

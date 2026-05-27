@@ -10,6 +10,7 @@
 #'   * `glmmTMB` (not yet implemented)
 #' @param classify `character`
 #'   A string specifying which variables to predict and calculate LSDs from.
+#' @param alpha xxxxxxx
 #' @param ...
 #'   Arguments to pass to `predictPlus.asreml`
 #'
@@ -26,9 +27,11 @@
 #' lsd_table(model, classify = "Variety")
 #' @autoglobal
 #' @export
-lsd_table <- function(model, classify, ...) {
-    ## Suppress all prints
-    utils::capture.output(
+
+lsd_table <- function(model, classify, alpha = 0.05, ...) {
+    is_asreml_installed()
+
+    suppressMessages(
         pred <- asremlPlus::predictPlus.asreml(
             model,
             classify = classify,
@@ -41,21 +44,14 @@ lsd_table <- function(model, classify, ...) {
 
     lsd <- pred$LSD$assignedLSD
 
-    prob_matrix <- ifelse(is.na(pred$p.differences), 1, pred$p.differences)
+    prob_matrix <- pred$p.differences
+    prob_matrix[is.na(prob_matrix)] <- 1
+
     treatments <- colnames(prob_matrix)
     means <- pred$predictions$predicted.value
-    alpha <- 0.05
 
-    lsdmeantab <-
-        lsd_group(
-            treatments,
-            means,
-            alpha,
-            prob_matrix
-        )
-
+    lsdmeantab <- lsd_group(treatments, means, alpha, prob_matrix)
     lsdmeantab$lsd <- lsd
     lsdmeantab$means <- sort(means, decreasing = TRUE, na.last = TRUE)
-
     return(lsdmeantab)
 }
