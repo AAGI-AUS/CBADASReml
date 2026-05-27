@@ -20,25 +20,28 @@ Description: This package provides helper functions for ASReml, for use
 License: GPL (>= 3)
 URL: https://aagi-aus.github.io/CBADASReml/
 Depends:
-    R (>= 4.1.0),
+    R (>= 4.1.0)
+Imports:
     asremlPlus,
+    car,
+    cowplot,
+    cli,
+    dplyr,
+    emmeans,
     ggplot2,
     gstat,
+    rlang,
     sf
 Suggests:
     asreml,
+    agricolae,
     agridat,
-    car,
-    emmeans,
     glmmTMB,
     knitr,
     rmarkdown,
     roxyglobals,
-    rstac,
     testthat (>= 3.0.0),
-    vdiffr,
-    cli,
-    MASS
+    vdiffr
 VignetteBuilder:
     knitr
 Config/roxyglobals/filename: globals.R
