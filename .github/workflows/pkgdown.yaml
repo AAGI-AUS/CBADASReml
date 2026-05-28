@@ -29,10 +29,14 @@ jobs:
 
       - uses: r-lib/actions/setup-r@v2
 
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          extra-packages: any::pkgdown, local::.
-          needs: website
+
+      - name: Install dependencies
+        run: |
+          pak::pkg_install(
+            c("pkgdown", "sessioninfo"),
+            dependencies = c("Imports", "Depends", "LinkingTo")
+          )
+        shell: Rscript {0}
 
       - name: Build site
         env:
