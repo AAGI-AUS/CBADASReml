@@ -1,9 +1,10 @@
-pandoc: 3.7.0.2
-pkgdown: 2.1.3
+pandoc: 3.8.3
+pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
+  design-power: design-power.html
   small_plot_analysis: small_plot_analysis.html
-last_built: 2025-08-22T04:59Z
+last_built: 2026-05-28T02:34Z
 urls:
   reference: https://aagi-aus.github.io/CBADASReml/reference
   article: https://aagi-aus.github.io/CBADASReml/articles

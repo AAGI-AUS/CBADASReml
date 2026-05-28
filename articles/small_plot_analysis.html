@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Small-plot analysis">
 </head>
@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">CBADASReml</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,10 +35,11 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item dropdown">
+<li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/small_plot_analysis.html">Small-plot analysis</a></li>
+<li><a class="dropdown-item" href="../articles/design-power.html">Experimental design power</a></li>
+    <li><a class="dropdown-item" href="../articles/small_plot_analysis.html">Small-plot analysis</a></li>
   </ul>
 </li>
       </ul>
@@ -76,10 +77,10 @@
 <span><span class="co">#&gt; Loading required package: ggplot2</span></span>
 <span><span class="co">#&gt; Loading required package: gstat</span></span>
 <span><span class="co">#&gt; Loading required package: sf</span></span>
-<span><span class="co">#&gt; Linking to GEOS 3.13.0, GDAL 3.8.5, PROJ 9.5.1; sf_use_s2() is TRUE</span></span>
+<span><span class="co">#&gt; Linking to GEOS 3.12.1, GDAL 3.8.4, PROJ 9.3.1; sf_use_s2() is TRUE</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">asreml</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: Matrix</span></span>
-<span><span class="co">#&gt; Online License checked out Fri Aug 22 12:51:01 2025</span></span>
+<span><span class="co">#&gt; Online License checked out Fri Aug 22 14:18:11 2025</span></span>
 <span><span class="co">#&gt; Loading ASReml-R version 4.2</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="cbadasreml">CBADASReml<a class="anchor" aria-label="anchor" href="#cbadasreml"></a>
@@ -215,32 +216,19 @@ assistance with this process, the function
 <span>    response <span class="op">=</span> <span class="st">"yield"</span>,</span>
 <span>    groupby <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Variety"</span>, <span class="st">"Nitrogen"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt;        Variety Nitrogen             mean median               sd</span></span>
-<span><span class="co">#&gt; 1  Golden_rain    0_cwt               80     75 21.0047613649858</span></span>
-<span><span class="co">#&gt; 2  Golden_rain  0.2_cwt             98.5  102.5 13.4721935853075</span></span>
-<span><span class="co">#&gt; 3  Golden_rain  0.4_cwt 114.666666666667    110 29.9443929086343</span></span>
-<span><span class="co">#&gt; 4  Golden_rain  0.6_cwt 124.833333333333  129.5 20.8750249500849</span></span>
-<span><span class="co">#&gt; 5   Marvellous    0_cwt 86.6666666666667   92.5 16.5730705262081</span></span>
-<span><span class="co">#&gt; 6   Marvellous  0.2_cwt            108.5  111.5 26.8533051969399</span></span>
-<span><span class="co">#&gt; 7   Marvellous  0.4_cwt 117.166666666667  118.5 9.78604448521805</span></span>
-<span><span class="co">#&gt; 8   Marvellous  0.6_cwt 126.833333333333  122.5 20.2920345620311</span></span>
-<span><span class="co">#&gt; 9      Victory    0_cwt             71.5     65   20.59854363784</span></span>
-<span><span class="co">#&gt; 10     Victory  0.2_cwt 89.6666666666667   89.5 22.5092573548455</span></span>
-<span><span class="co">#&gt; 11     Victory  0.4_cwt 110.833333333333    106 26.0108951531213</span></span>
-<span><span class="co">#&gt; 12     Victory  0.6_cwt            118.5  114.5 30.0915270466622</span></span>
-<span><span class="co">#&gt;                  cv reps min max     range</span></span>
-<span><span class="co">#&gt; 1  26.2559517062322    6  60 117  60 - 117</span></span>
-<span><span class="co">#&gt; 2  13.6773538937132    6  82 114  82 - 114</span></span>
-<span><span class="co">#&gt; 3  26.1142961412508    6  86 161  86 - 161</span></span>
-<span><span class="co">#&gt; 4  16.7223163819105    6  96 149  96 - 149</span></span>
-<span><span class="co">#&gt; 5  19.1227736840862    6  63 105  63 - 105</span></span>
-<span><span class="co">#&gt; 6  24.7495900432626    6  70 140  70 - 140</span></span>
-<span><span class="co">#&gt; 7  8.35224280388454    6 104 132 104 - 132</span></span>
-<span><span class="co">#&gt; 8  15.9989760016014    6  99 156  99 - 156</span></span>
-<span><span class="co">#&gt; 9   28.809151941035    6  53 111  53 - 111</span></span>
-<span><span class="co">#&gt; 10  25.103260990534    6  64 130  64 - 130</span></span>
-<span><span class="co">#&gt; 11 23.4684768298838    6  81 157  81 - 157</span></span>
-<span><span class="co">#&gt; 12 25.3936937102634    6  86 174  86 - 174</span></span></code></pre></div>
+<span><span class="co">#&gt;        Variety Nitrogen             mean median               sd               cv reps min max     range</span></span>
+<span><span class="co">#&gt; 1  Golden_rain    0_cwt               80     75 21.0047613649858 26.2559517062322    6  60 117  60 - 117</span></span>
+<span><span class="co">#&gt; 2  Golden_rain  0.2_cwt             98.5  102.5 13.4721935853075 13.6773538937132    6  82 114  82 - 114</span></span>
+<span><span class="co">#&gt; 3  Golden_rain  0.4_cwt 114.666666666667    110 29.9443929086343 26.1142961412508    6  86 161  86 - 161</span></span>
+<span><span class="co">#&gt; 4  Golden_rain  0.6_cwt 124.833333333333  129.5 20.8750249500849 16.7223163819105    6  96 149  96 - 149</span></span>
+<span><span class="co">#&gt; 5   Marvellous    0_cwt 86.6666666666667   92.5 16.5730705262081 19.1227736840862    6  63 105  63 - 105</span></span>
+<span><span class="co">#&gt; 6   Marvellous  0.2_cwt            108.5  111.5 26.8533051969399 24.7495900432626    6  70 140  70 - 140</span></span>
+<span><span class="co">#&gt; 7   Marvellous  0.4_cwt 117.166666666667  118.5 9.78604448521805 8.35224280388454    6 104 132 104 - 132</span></span>
+<span><span class="co">#&gt; 8   Marvellous  0.6_cwt 126.833333333333  122.5 20.2920345620311 15.9989760016014    6  99 156  99 - 156</span></span>
+<span><span class="co">#&gt; 9      Victory    0_cwt             71.5     65   20.59854363784  28.809151941035    6  53 111  53 - 111</span></span>
+<span><span class="co">#&gt; 10     Victory  0.2_cwt 89.6666666666667   89.5 22.5092573548455  25.103260990534    6  64 130  64 - 130</span></span>
+<span><span class="co">#&gt; 11     Victory  0.4_cwt 110.833333333333    106 26.0108951531213 23.4684768298838    6  81 157  81 - 157</span></span>
+<span><span class="co">#&gt; 12     Victory  0.6_cwt            118.5  114.5 30.0915270466622 25.3936937102634    6  86 174  86 - 174</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="model-fitting-and-validation">Model Fitting and Validation<a class="anchor" aria-label="anchor" href="#model-fitting-and-validation"></a>
@@ -252,19 +240,19 @@ models, so we can demonstrate different techniques from the package.</p>
 <code class="sourceCode R"><span><span class="co"># The needs to be ordered so that the model can run</span></span>
 <span><span class="va">oats</span> <span class="op">&lt;-</span> <span class="va">oats</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">oats</span><span class="op">$</span><span class="va">Column</span><span class="op">)</span>, <span class="op">]</span></span>
 <span></span>
-<span><span class="va">mod_oats</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/asreml/man/asreml.html" class="external-link">asreml</a></span><span class="op">(</span></span>
+<span><span class="va">mod_oats</span> <span class="op">&lt;-</span> <span class="fu">asreml</span><span class="op">(</span></span>
 <span>    fixed <span class="op">=</span> <span class="va">yield</span> <span class="op">~</span> <span class="va">Variety</span> <span class="op">+</span> <span class="va">Nitrogen</span> <span class="op">+</span> <span class="va">Variety</span><span class="op">:</span><span class="va">Nitrogen</span>,</span>
 <span>    random <span class="op">=</span> <span class="op">~</span> <span class="fu">idv</span><span class="op">(</span><span class="va">Blocks</span><span class="op">)</span> <span class="op">+</span> <span class="fu">idv</span><span class="op">(</span><span class="va">Blocks</span><span class="op">)</span><span class="op">:</span><span class="fu">id</span><span class="op">(</span><span class="va">Wplots</span><span class="op">)</span>,</span>
 <span>    residual <span class="op">=</span> <span class="op">~</span> <span class="fu">ar1</span><span class="op">(</span><span class="va">Column</span><span class="op">)</span><span class="op">:</span><span class="fu">ar1</span><span class="op">(</span><span class="va">Row</span><span class="op">)</span>,</span>
 <span>    data <span class="op">=</span> <span class="va">oats</span>,</span>
 <span>    trace <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in asreml(fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen, : Some</span></span>
-<span><span class="co">#&gt; components changed by more than 1% on the last iteration</span></span>
+<span><span class="co">#&gt; Warning in asreml(fixed = yield ~ Variety + Nitrogen + Variety:Nitrogen, : Some components changed by more than 1% on</span></span>
+<span><span class="co">#&gt; the last iteration</span></span>
 <span></span>
 <span><span class="va">mod_oats</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">mod_oats</span>, aom <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">mod_rats</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/asreml/man/asreml.html" class="external-link">asreml</a></span><span class="op">(</span></span>
+<span><span class="va">mod_rats</span> <span class="op">&lt;-</span> <span class="fu">asreml</span><span class="op">(</span></span>
 <span>    fixed <span class="op">=</span> <span class="va">weight</span> <span class="op">~</span> <span class="va">littersize</span> <span class="op">+</span> <span class="va">Sex</span> <span class="op">+</span> <span class="va">Dose</span>,</span>
 <span>    random <span class="op">=</span> <span class="op">~</span><span class="fu">idv</span><span class="op">(</span><span class="va">Dam</span><span class="op">)</span>,</span>
 <span>    residual <span class="op">=</span> <span class="op">~</span><span class="va">units</span>,</span>
@@ -533,9 +521,8 @@ using the REML algorithm.</p>
 </div>
 </div>
 <div class="section level3">
-<h3 id="function-examples">Function examples<a class="anchor" aria-label="anchor" href="#function-examples"></a>
+<h3 class="tabset" id="function-examples">Function examples<a class="anchor" aria-label="anchor" href="#function-examples"></a>
 </h3>
-<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px">
 <div class="section level4">
 <h4 id="traditional-diagnostics-asreml-r">Traditional Diagnostics (<code>ASReml-R</code>)<a class="anchor" aria-label="anchor" href="#traditional-diagnostics-asreml-r"></a>
 </h4>
@@ -554,7 +541,7 @@ using the REML algorithm.</p>
 <code>plot(varioGram(mod))</code><a class="anchor" aria-label="anchor" href="#plotvariogrammod"></a>
 </h5>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/asreml/man/varioGram.html" class="external-link">varioGram</a></span><span class="op">(</span><span class="va">mod_oats</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">varioGram</span><span class="op">(</span><span class="va">mod_oats</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="float">
 <img src="variogram_mod_oats-1.png" alt="plot of chunk variogram_mod_oats"><div class="figcaption">plot of chunk variogram_mod_oats</div>
 </div>
@@ -574,7 +561,7 @@ within <code>ASReml-R</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/outlier_summary.html">outlier_summary</a></span><span class="op">(</span><span class="va">mod_rats</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Outliers detected: 2 ────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; ── Outliers detected: 2 ───────────────────────────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt;    Dose Sex littersize Dam weight units combined_trt residuals</span></span>
 <span><span class="co">#&gt; 56    C   F         13   5   5.02    56       13_F_C -4.090506</span></span>
 <span><span class="co">#&gt; 66    C   F          9   6   3.68    66        9_F_C -7.941340</span></span>
@@ -614,11 +601,9 @@ directional_variograms_mod_oats</div>
 </div>
 </div>
 </div>
-</div>
 <div class="section level3">
-<h3 id="model-outputs">Model Outputs<a class="anchor" aria-label="anchor" href="#model-outputs"></a>
+<h3 class="tabset" id="model-outputs">Model Outputs<a class="anchor" aria-label="anchor" href="#model-outputs"></a>
 </h3>
-<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px">
 <div class="section level4">
 <h4 id="traditional-outputs-asreml-r">Traditional Outputs (<code>ASReml-R</code>)<a class="anchor" aria-label="anchor" href="#traditional-outputs-asreml-r"></a>
 </h4>
@@ -628,10 +613,10 @@ directional_variograms_mod_oats</div>
 </h5>
 <p>For getting the significance of each variable in the model</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/asreml/man/wald.html" class="external-link">wald</a></span><span class="op">(</span><span class="va">mod_rats</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">Wald tests for fixed effects.</span></span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">Response: weight</span></span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">Terms added sequentially; adjusted for those above.</span></span></span>
+<code class="sourceCode R"><span><span class="fu">wald</span><span class="op">(</span><span class="va">mod_rats</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Wald tests for fixed effects.</span></span>
+<span><span class="co">#&gt; Response: weight</span></span>
+<span><span class="co">#&gt; Terms added sequentially; adjusted for those above.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;               Df Sum of Sq Wald statistic Pr(Chisq)    </span></span>
 <span><span class="co">#&gt; (Intercept)    1   1477.67         8981.5 &lt; 2.2e-16 ***</span></span>
@@ -647,17 +632,17 @@ directional_variograms_mod_oats</div>
 <code>predict</code><a class="anchor" aria-label="anchor" href="#predict"></a>
 </h5>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/asreml/man/predict.asreml.html" class="external-link">predict.asreml</a></span><span class="op">(</span><span class="va">mod_oats</span>, classify <span class="op">=</span> <span class="st">"Nitrogen"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu">predict.asreml</span><span class="op">(</span><span class="va">mod_oats</span>, classify <span class="op">=</span> <span class="st">"Nitrogen"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $pvals</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Notes:</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">- The predictions are obtained by averaging across the hypertable</span></span></span>
-<span><span class="co"><span style="color: #0000BB;">#&gt;   calculated from model terms constructed solely from factors in</span></span></span>
-<span><span class="co"><span style="color: #0000BB;">#&gt;   the averaging and classify sets.</span></span></span>
-<span><span class="co"><span style="color: #0000BB;">#&gt; - Use 'average' to move ignored factors into the averaging set.</span></span></span>
-<span><span class="co"><span style="color: #0000BB;">#&gt; - The simple averaging set: Variety</span></span></span>
-<span><span class="co"><span style="color: #0000BB;">#&gt; - The ignored set: Blocks,Wplots</span></span></span>
-<span><span class="co"><span style="color: #0000BB;">#&gt; </span></span></span>
+<span><span class="co">#&gt; - The predictions are obtained by averaging across the hypertable</span></span>
+<span><span class="co">#&gt;   calculated from model terms constructed solely from factors in</span></span>
+<span><span class="co">#&gt;   the averaging and classify sets.</span></span>
+<span><span class="co">#&gt; - Use 'average' to move ignored factors into the averaging set.</span></span>
+<span><span class="co">#&gt; - The simple averaging set: Variety</span></span>
+<span><span class="co">#&gt; - The ignored set: Blocks,Wplots</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Nitrogen predicted.value std.error    status</span></span>
 <span><span class="co">#&gt; 1    0_cwt        77.76388  6.929776 Estimable</span></span>
 <span><span class="co">#&gt; 2  0.2_cwt       100.15097  6.896569 Estimable</span></span>
@@ -669,7 +654,6 @@ directional_variograms_mod_oats</div>
 <span><span class="co">#&gt; 3.748427</span></span></code></pre></div>
 </div>
 </div>
-<div>
 <div class="section level4">
 <h4 id="cbadasreml-outputs">CBADASReml Outputs<a class="anchor" aria-label="anchor" href="#cbadasreml-outputs"></a>
 </h4>
@@ -683,7 +667,7 @@ effect against each response.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rats</span><span class="op">[[</span><span class="st">"newresp"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">rats</span><span class="op">[[</span><span class="st">"weight"</span><span class="op">]</span><span class="op">]</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">rats</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">mod_rats2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/asreml/man/asreml.html" class="external-link">asreml</a></span><span class="op">(</span></span>
+<span><span class="va">mod_rats2</span> <span class="op">&lt;-</span> <span class="fu">asreml</span><span class="op">(</span></span>
 <span>    fixed <span class="op">=</span> <span class="va">newresp</span> <span class="op">~</span> <span class="va">littersize</span> <span class="op">+</span> <span class="va">Sex</span> <span class="op">+</span> <span class="va">Dose</span>,</span>
 <span>    random <span class="op">=</span> <span class="op">~</span><span class="fu">idv</span><span class="op">(</span><span class="va">Dam</span><span class="op">)</span>,</span>
 <span>    residual <span class="op">=</span> <span class="op">~</span><span class="va">units</span>,</span>
@@ -695,9 +679,9 @@ effect against each response.</p>
 <span></span>
 <span><span class="fu"><a href="../reference/anova_table.html">anova_table</a></span><span class="op">(</span><span class="va">mod_rats</span>, <span class="va">mod_rats2</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       Effect weight newresp</span></span>
-<span><span class="co">#&gt; 1 littersize      0   0.804</span></span>
-<span><span class="co">#&gt; 2        Sex      0   0.208</span></span>
-<span><span class="co">#&gt; 3       Dose      0   0.008</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 littersize      0   0.626</span></span>
+<span><span class="co">#&gt; 2        Sex      0   0.011</span></span>
+<span><span class="co">#&gt; 3       Dose      0   0.058</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="pred_table">
@@ -709,8 +693,6 @@ error, and confidence intervals.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pred_table.html">pred_table</a></span><span class="op">(</span><span class="va">mod_rats</span>, classify <span class="op">=</span> <span class="st">"Dose"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Error:</span></span>
 <span><span class="co">#&gt; ! Classify must be type character</span></span></code></pre></div>
-</div>
-</div>
 </div>
 </div>
 <div class="section level3">
@@ -748,11 +730,11 @@ error, and confidence intervals.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Kai Bagley, Jordan Brown, Matthew Nguyen, Adam H. Sparks, Curtin University, Grains Research and Development Corporation.</p>
+  <p>Developed by Kai Bagley, Jordan Brown, Matthew Nguyen, Braden Thorne, Adam H. Sparks, Grains Research and Development Corporation.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
