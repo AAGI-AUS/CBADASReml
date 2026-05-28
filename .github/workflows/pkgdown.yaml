@@ -31,8 +31,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))
-          pak::local_install_dev_deps(dependencies = TRUE)
+          install.packages("remotes")
+          remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
         env:
           _R_CHECK_FORCE_SUGGESTS_: "false"
