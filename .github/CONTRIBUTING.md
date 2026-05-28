@@ -40,6 +40,8 @@ See our guide on [how to create a great issue](https://code-review.tidyverse.org
 - We use [testthat](https://cran.r-project.org/package=testthat) for unit tests.
   Contributions with test cases included are easier to accept.
 
+- We use [{cli}](https://cli.r-lib.org/) for errors, warnings and other messages.
+
 ## Code of Conduct
 
 Please note that the {CBADASReml} project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By contributing to this project you agree to abide by its terms.
