@@ -49,11 +49,12 @@ A list containing:
 \describe{
 \item{contrast_power}{Pairwise treatment-comparison standard errors,
 noncentrality parameters, power values, and effective replicates.}
-\item{design_power}{The minimum power across estimable pairwise comparisons,
-or \code{NA} if none are estimable.}
-\item{average_power}{The average power across estimable pairwise comparisons,
-or \code{NA} if none are estimable.}
-\item{worst_comparison}{The estimable comparison with the lowest power.}
+\item{design_power}{The minimum pairwise power when every pairwise comparison
+is estimable, otherwise \code{NA}.}
+\item{average_power}{The average pairwise power when every pairwise comparison
+is estimable, otherwise \code{NA}.}
+\item{worst_comparison}{The comparison with the lowest power when every
+pairwise comparison is estimable, otherwise \code{NA}.}
 \item{fisher_info}{The treatment information matrix.}
 \item{treatment_cov}{The model-based treatment covariance matrix,
 \eqn{\sigma^2 I_T^+}.}
@@ -92,32 +93,52 @@ otherwise.
 
 The covariance structure and \code{sigma2} are planning values, so the result
 is conditional on those values, \code{delta}, and \code{alpha}.
+
+Overall power summaries are only returned for a fully connected treatment
+design. The contrast-level output still identifies which comparisons are
+estimable when the design is disconnected or partially confounded.
 }
 \examples{
 \dontrun{
-latinsquare <- data.frame(
-    row = rep(1:4, each = 4),
-    col = rep(1:4, times = 4),
-    treatment = c(
-        "A", "B", "C", "D",
-        "B", "C", "D", "A",
-        "C", "D", "A", "B",
-        "D", "A", "B", "C"
-    )
+rcbd <- data.frame(
+    row = rep(1:6, each = 4),
+    col = rep(1:4, times = 6),
+    treatment = rep(LETTERS[1:8], 3),
+    block = rep(1:3, each = 8)
 )
 
 res_power <- design_power(
-    design = latinsquare,
+    design = rcbd,
     treatment_cols = "treatment",
+    block_col = "block",
     covariance_structure = cov_ar1ar1(
         row_col = "row",
         column_col = "col",
-        rho_row = 0.3,
-        rho_col = 0.3
+        rho_row = 0.1,
+        rho_col = 0.1
     ),
     sigma2 = 1,
     delta = 1,
     alpha = 0.05
+)
+
+split_plot <- expand.grid(
+    block = factor(1:4),
+    whole_trt = c("W1", "W2"),
+    subplot_trt = c("S1", "S2")
+)
+split_plot$whole_plot <- interaction(
+    split_plot$block,
+    split_plot$whole_trt,
+    drop = TRUE
+)
+
+design_power(
+    split_plot,
+    treatment_cols = c("whole_trt", "subplot_trt"),
+    block_col = "block",
+    covariance_structure = cov_iid() +
+        cov_random("whole_plot", sd_ratio = 1)
 )
 }
 }
