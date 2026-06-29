@@ -8,19 +8,20 @@
 #'
 #' The calculation is based on the treatment information matrix
 #' \deqn{
-#'   I_T = X_1^\intercal L_R X_1,
+#'   I_T = X_1^\intercal L_V X_1,
 #' }
-#' where \eqn{X_1} is the treatment indicator matrix and \eqn{L_R} is the
+#' where \eqn{X_1} is the treatment indicator matrix, the observational
+#' covariance is \eqn{\sigma^2 V}, and \eqn{L_V} is the relative
 #' covariance-adjusted projection matrix that removes nuisance effects:
 #' \deqn{
-#'   L
+#'   L_V
 #'   =
-#'   \Sigma^{-1}
+#'   V^{-1}
 #'   -
-#'   \Sigma^{-1} X_2
-#'   \left( X_2^\intercal \Sigma^{-1} X_2 \right)^{-1}
+#'   V^{-1} X_2
+#'   \left( X_2^\intercal V^{-1} X_2 \right)^{-1}
 #'   X_2^\intercal
-#'   \Sigma^{-1}
+#'   V^{-1}
 #' }
 #' For a treatment contrast \eqn{c^\intercal \tau}, the contrast standard error
 #' is computed from
@@ -37,8 +38,9 @@
 #'   =
 #'   \frac{\delta}{\operatorname{SE}(c^\intercal \hat{\tau})},
 #' }
-#' and power is calculated using a two-sided known-covariance Z-test
-#' approximation.
+#' and power is calculated using a two-sided Wald test. A noncentral
+#' t-distribution is used when finite denominator degrees of freedom are
+#' available; otherwise, the known-covariance normal approximation is used.
 #'
 #' @param design \code{data.frame}.
 #'        The design data frame, one row per experimental unit.
@@ -46,24 +48,24 @@
 #'        Column name of the treatment in \code{design}. If multiple columns
 #'        are provided, each unique combination is treated as a distinct
 #'        treatment combination.
-#' @param row_col \code{character} vector.
-#'        Column name of the experiment's rows in \code{design}.
-#' @param column_col \code{character} vector.
-#'        Column name of the experiment's columns in \code{design}.
-#' @param block_col \code{character} vector or \code{NULL}.
+#' @param block_col A single \code{character} column name or \code{NULL}.
 #'        Column name of the experiment's blocking factor in \code{design}.
 #'        Use \code{NULL} for unblocked designs.
-#' @param rho_row \code{numeric}.
-#'        AR1 correlation parameter in the row direction.
-#' @param rho_col \code{numeric}.
-#'        AR1 correlation parameter in the column direction.
+#' @param covariance_structure Covariance structure created with
+#'        [cov_iid()], [cov_ar1()], [cov_ar1ar1()], or another covariance
+#'        helper.
 #' @param sigma2 \code{numeric}.
 #'        Assumed residual variance.
 #' @param delta \code{numeric}.
 #'        Treatment difference that is "worth detecting". The minimum
 #'        difference between treatments that we care about.
 #' @param alpha \code{numeric}.
-#'        Significance/p-value threshold for the two-sided z-tests.
+#'        Significance threshold for the two-sided Wald tests.
+#' @param denom_df Positive denominator degrees of freedom for a noncentral
+#'        t-test, or \code{Inf} for the known-covariance normal approximation.
+#'        If \code{NULL}, residual degrees of freedom are calculated from the
+#'        fixed-effect design matrix. This residual value is only approximate
+#'        when covariance parameters will be estimated.
 #' @param tolerance \code{numeric}.
 #'        Tolerance for numerical stability.
 #'
@@ -73,9 +75,9 @@
 #'     errors, noncentrality parameters, power values, and effective
 #'     replicates.}
 #'   \item{design_power}{The minimum pairwise power across all estimable
-#'     treatment comparisons.}
+#'     treatment comparisons, or \code{NA} if none are estimable.}
 #'   \item{average_power}{The average pairwise power across all estimable
-#'     treatment comparisons.}
+#'     treatment comparisons, or \code{NA} if none are estimable.}
 #'   \item{worst_comparison}{The treatment comparison with the lowest power.}
 #'   \item{fisher_info}{The treatment information matrix.}
 #'   \item{treatment_cov}{The model-based covariance matrix of treatment
@@ -88,44 +90,12 @@
 #' }
 #'
 #' @details
-#' The spatial covariance parameters \code{rho_row}, \code{rho_col}, and
-#' \code{sigma2} are treated as assumed planning values, not estimated from the
-#' data. The returned power is therefore conditional on the supplied covariance
-#' structure, the chosen effect size \code{delta}, and the significance level
-#' \code{alpha}.
-#'
-#' Thus, you as the statistician must select four parameters based on previous
-#' trials, domain knowledge, or \emph{conservative} assumptions:
-#' \describe{
-#'   \item{\eqn{\rho_{\text{row}}}}{
-#'     AR1 row dependence parameter.
-#'     How correlated are observations that are one row apart? This is hard to
-#'     select, I would recommend testing multiple different values such as
-#'     \eqn{0.0} for no dependence, \eqn{0.3} for moderate, and \eqn{0.5} for
-#'     strong dependence, and reporting each.
-#'   }
-#'   \item{\eqn{\rho_{\text{col}}}}{
-#'     AR1 column dependence parameter.
-#'     How correlated are observations that are one column apart? This is hard
-#'     to select, I would recommend testing multiple different values such as
-#'     \eqn{0.0} for no dependence, \eqn{0.3} for moderate, and \eqn{0.5} for
-#'     strong dependence, and reporting each.
-#'     }
-#'   \item{\eqn{\sigma^2}}{
-#'     The residual variance.
-#'     This should be based on previous similar experiments, or a conservative
-#'     estimate. Underestimating \eqn{\sigma^2} will result in \emph{overstated
-#'     power}.
-#'     }
-#'   \item{\eqn{\delta}}{
-#'     Detectable treatment difference.
-#'     Choose \eqn{\delta} as the \emph{smallest} treatment
-#'     difference that would matter scientifically, agronomically,
-#'     commercially, etc. So if yield differences of less than \eqn{0.1} t/ha
-#'     are not important to the farmer, then use \eqn{\delta = 0.1}. Otherwise,
-#'     test multiple deltas and report the power of each of them.
-#'     }
-#' }
+#' The covariance structure and \code{sigma2} are treated as planning values.
+#' The returned power is therefore conditional on the supplied covariance
+#' structure, the scientifically relevant difference \code{delta}, and the
+#' significance level \code{alpha}. Underestimating \code{sigma2} overstates
+#' power. Evaluate plausible covariance structures when their parameters are
+#' uncertain.
 #'
 #' @examples
 #' \dontrun{
@@ -180,7 +150,7 @@
 #'     block_col = "rep",
 #'     covariance_structure =
 #'         cov_ar1ar1("row", "range", rho_row = 0.1, rho_col = 0.1) +
-#'         cov_random(cov_iid("whole_plot"), sd_ratio = 1)
+#'         cov_random(cov_iid("whole_plot"), sd_ratio = 1),
 #'     sigma2 = 1,
 #'     delta = 1,
 #'     alpha = 0.05
@@ -196,9 +166,9 @@ design_power <- function(
     sigma2 = 1,
     delta = 1,
     alpha = 0.05,
+    denom_df = NULL,
     tolerance = 1e-10
 ) {
-    # arg checks
     if (sigma2 <= 0) stop("sigma2 must be positive.")
     if (delta <= 0) stop("delta must be positive.")
 
@@ -212,6 +182,31 @@ design_power <- function(
 
     trt_levels <- ti$trt_levels
     v <- length(trt_levels)
+    ## pairwise power requires at least one treatment contrast
+    if (v < 2) {
+        stop("design must contain at least two treatment levels.")
+    }
+
+    ## use fixed-effect residual df unless we have denominator df
+    if (is.null(denom_df)) {
+        df <- ti$resid_df
+        ## fall back to normal power when residual df are unavailable
+        if (!is.finite(df) || df <= 0) {
+            warning(
+                "No residual degrees of freedom; using normal approximation."
+            )
+            df <- Inf
+        } else if (ti$has_random) {
+            ## warn that mixed-model denominator df usually need refinement
+            warning(
+                "Residual degrees of freedom may be optimistic when ",
+                "covariance parameters are estimated; set denom_df ",
+                "explicitly if known."
+            )
+        }
+    } else {
+        df <- denom_df
+    }
 
     # Pairwise treatment stat power
     pairs <- combn(trt_levels, 2, simplify = FALSE)
@@ -247,11 +242,8 @@ design_power <- function(
         ## effect size that we want to have the power to detect in units of SE
         lambda <- abs(delta / se)
 
-        ## Fisher-information z power
-        ### this is called the known-covariance z-test approximation
-        crit <- stats::qnorm(1 - alpha / 2)
-        power <- stats::pnorm(-crit, mean = lambda, sd = 1) +
-            (1 - stats::pnorm(crit, mean = lambda, sd = 1))
+        ## Fisher-information Wald power
+        power <- wald_power(lambda, alpha, df)
 
         ## iid-equivalent replication for this contrast
         ## converts contrast variance into number of balanced iid replicates
@@ -268,13 +260,37 @@ design_power <- function(
         )
     })
 
-    # return power for all comparisons
+    ## power for all comparisons
     contrast_power <- do.call(rbind, out)
+    estimable <- contrast_power$estimable %in% TRUE
+    ## summarise estimable contrasts
+    if (any(estimable)) {
+        estimable_power <- contrast_power$power[estimable]
+        design_power_value <- min(estimable_power)
+        average_power_value <- mean(estimable_power)
+        estimable_rows <- which(estimable)
+        worst_comparison <- contrast_power$comparison[
+            estimable_rows[which.min(estimable_power)]
+        ]
+    } else {
+        ## else return NA when there are none
+        design_power_value <- NA_real_
+        average_power_value <- NA_real_
+        worst_comparison <- NA_character_
+    }
+
+    ## record which reference distribution was used for the wald test
+    power_method <- if (is.finite(df)) {
+        "Fisher-information noncentral-t Wald power"
+    } else {
+        "known-covariance Fisher-information normal power"
+    }
+
     return(structure(list(
         contrast_power = contrast_power,
-        design_power = min(contrast_power$power, na.rm = TRUE),
-        average_power = mean(contrast_power$power, na.rm = TRUE),
-        worst_comparison = contrast_power$comparison[which.min(contrast_power$power)],
+        design_power = design_power_value,
+        average_power = average_power_value,
+        worst_comparison = worst_comparison,
         fisher_info = ti$info,
         treatment_cov = sigma2 * ti$info_inv,
         eigenvalues = ti$eigenvalues,
@@ -288,7 +304,8 @@ design_power <- function(
             ),
             block_col = block_col,
             treatment_cols = treatment_cols,
-            power_method = "known-covariance Fisher-information z power"
+            denom_df = df,
+            power_method = power_method
         )
     ), class = c("cbadas_design_power", "list")))
 }
@@ -519,6 +536,8 @@ print.cbadas_design_power <- function(x, ..., n = 5) {
         format_ui_number(x$assumptions$sigma2),
         ", alpha = ",
         format_ui_number(x$assumptions$alpha),
+        ", denominator df = ",
+        format_ui_number(x$assumptions$denom_df),
         ", covariance = ",
         x$assumptions$covariance_structure
     ))
@@ -875,6 +894,29 @@ mpinv <- function(mat, tol = 1e-10) {
     s$v %*% diag(d_inv, length(d_inv)) %*% t(s$u)
 }
 
+## Two sided power of a Wald test at lambda noncentrality
+## noncentral t at finite df, else normal
+wald_power <- function(lambda, alpha, df = Inf) {
+    if (is.finite(df)) {
+        crit <- stats::qt(1 - alpha / 2, df)
+        return(
+            stats::pt(-crit, df, ncp = lambda) +
+                stats::pt(crit, df, ncp = lambda, lower.tail = FALSE)
+        )
+    } else {
+        crit <- stats::qnorm(1 - alpha / 2)
+        return(
+            stats::pnorm(-crit, mean = lambda, sd = 1) +
+                stats::pnorm(
+                    crit,
+                    mean = lambda,
+                    sd = 1,
+                    lower.tail = FALSE
+                )
+        )
+    }
+}
+
 format_power_table <- function(x) {
     data.frame(
         comparison = x$comparison,
@@ -1226,6 +1268,9 @@ compute_treatment_info <- function(
 ) {
     ## combine multiple treatment columns into a treatment-combo factor
     treatments <- combine_treatments(design, treatment_cols)
+    if (nlevels(treatments) < 2) {
+        stop("design must contain at least two treatment levels.")
+    }
     trt <- build_treatment_matrix(treatments)
     ## x1 is the treatment indicator
     x1 <- trt$x1
@@ -1233,6 +1278,14 @@ compute_treatment_info <- function(
 
     ## x2 is the nuisance matrix, intercept and block indicators
     x2 <- build_nuisance_matrix(design, block = block_col)
+
+    ## random covariance terms for the denominator df warning
+    components <- as_cov_components(covariance_structure)
+    has_random <- any(vapply(
+        components,
+        \(cmp) identical(cmp$type, "random"),
+        FALSE
+    ))
 
     ## spatial structure
     V <- build_covariance_matrix(
@@ -1253,17 +1306,29 @@ compute_treatment_info <- function(
     ## fisher information in GLS nuisanceless geometry
     info <- t(x1) %*% proj %*% x1
     info <- (info + t(info)) / 2
-    info_inv <- mpinv(info, tol = tolerance)
 
-    ## eigenvals for contrasts and optimality
-    eig <- eigen(info, symmetric = TRUE, only.values = TRUE)$values
-    max_eig <- max(eig)
-
-    pos_eig <- if (max_eig <= 0) {
-        numeric(0)
+    ## only keep positive information eigenvalues above tolerance
+    eig <- eigen(info, symmetric = TRUE)
+    vals <- eig$values
+    max_val <- max(vals)
+    keep <- if (max_val <= 0) {
+        rep(FALSE, length(vals))
     } else {
-        eig[eig > tolerance * max_eig]
+        vals > tolerance * max(dim(info)) * max_val
     }
+    ## invert only the estimable positive information eigenspace
+    if (any(keep)) {
+        vectors <- eig$vectors[, keep, drop = FALSE]
+        info_inv <- sweep(vectors, 2, vals[keep], "/") %*% t(vectors)
+    } else {
+        info_inv <- matrix(0, nrow = nrow(info), ncol = ncol(info))
+    }
+    ## force symmetric after floating point ops
+    info_inv <- (info_inv + t(info_inv)) / 2
+    pos_eig <- vals[keep]
+
+    ## provide the default denominator df for fixed effect wald tests
+    resid_df <- nrow(design) - qr(cbind(x1, x2))$rank
 
     return(list(
         info = info,
@@ -1272,6 +1337,8 @@ compute_treatment_info <- function(
         V = V,
         X1 = x1,
         X2 = x2,
+        resid_df = resid_df,
+        has_random = has_random,
         trt_levels = trt_levels,
         eigenvalues = sort(pos_eig, decreasing = TRUE),
         rank = length(pos_eig)
