@@ -102,12 +102,8 @@ ofe_rotate_data <- function(data, angle) {
 #'
 #' @param nrow `numeric`.
 #'   The number of rows in the final grid.
-#'   This should be as large as possible without introducing spurious NA values.
-#'
-#' @param npe `numeric`.
-#'   Number of pseudo-environments to be generated along the strips.
-#'   PEs will be evenly spaced, so may not be appropriate in all cases.
-#'   Always assess PEs visually before use.
+#'   This should be as large as possible without introducing spurious NA
+#'   values.
 #'
 #' @param ncol `numeric`.
 #'   The actual number of strips in the data.
@@ -146,18 +142,11 @@ ofe_rotate_data <- function(data, angle) {
 #'  st_as_sf(coords = c("long", "lat"), crs = 4326) |>
 #'  st_transform(3395)
 #'
-#' ofe_grid_data(data, -60, 80, 5, 18, trim_ends=FALSE)
+#' ofe_grid_data(data, -60, 80, 18, trim_ends=FALSE)
 #' @autoglobal
 #' @author Braden Thorne, \email{braden.thorne@@curtin.edu.au}
 #' @export
-ofe_grid_data <- function(
-    data_in,
-    rotation_angle,
-    nrow,
-    npe,
-    ncol,
-    trim_ends = TRUE
-) {
+ofe_grid_data <- function(data_in, rotation_angle, nrow, ncol, trim_ends=TRUE) {
     ### Start with the rough angle rotation to determine strip labels
     data_pre_angle <- ofe_rotate_data(data_in, rotation_angle) |>
         dplyr::mutate(
@@ -167,26 +156,23 @@ ofe_grid_data <- function(
             Col = 0
         )
 
-    x_gap <- (max(data_pre_angle$x) - min(data_pre_angle$x)) / (ncol - 1)
+    x_gap <- (max(data_pre_angle$x)-min(data_pre_angle$x))/(ncol-1)
     col_breaks <- seq(
-        min(data_pre_angle$x) - x_gap / 2,
-        max(data_pre_angle$x) + x_gap / 2,
-        length = (ncol + 1)
+        min(data_pre_angle$x)-x_gap/2,
+        max(data_pre_angle$x)+x_gap/2,
+        length=(ncol+1)
     )
-    for (i in 1:ncol) {
-        data_pre_angle$Col <- data_pre_angle$Col +
-            (data_pre_angle$x > col_breaks[i])
+    for (i in 1:ncol){
+        data_pre_angle$Col <- data_pre_angle$Col + (data_pre_angle$x>col_breaks[i])
     }
 
     ### Based on the labels, determine the actual rotation angle and rotate data.
-    true_angle <- (180 / pi) *
-        atan(
-            1 /
-                stats::lm(
-                    y_original ~ x_original,
-                    data = dplyr::filter(data_pre_angle, Col == 1)
-                )$coefficients[[2]]
-        )
+    true_angle <- (180/pi)*atan(
+        1/stats::lm(
+            y_original~x_original,
+            data=dplyr::filter(data_pre_angle, Col==1)
+        )$coefficients[[2]]
+    )
 
     data <- ofe_rotate_data(data_in, true_angle)
 
@@ -205,22 +191,22 @@ ofe_grid_data <- function(
         )
 
     ### Assign strip labels
-    x_gap <- (max(data_out$x) - min(data_out$x)) / (ncol - 1)
+    x_gap <- (max(data_out$x)-min(data_out$x))/(ncol-1)
     col_breaks <- seq(
-        min(data_out$x) - x_gap / 2,
-        max(data_out$x) + x_gap / 2,
-        length = (ncol + 1)
+        min(data_out$x)-x_gap/2,
+        max(data_out$x)+x_gap/2,
+        length=(ncol+1)
     )
-    col_mid_points <- col_breaks[1:ncol] + diff(col_breaks) / 2
-    for (i in 1:ncol) {
-        data_out$Col <- data_out$Col + (data_out$x > col_breaks[i])
+    col_mid_points <- col_breaks[1:ncol] + diff(col_breaks)/2
+    for (i in 1:ncol){
+        data_out$Col <- data_out$Col + (data_out$x>col_breaks[i])
     }
 
     ### Can trim ends to not contain NAs if required.
     if (trim_ends) {
         y_extrema <- data_out |>
             sf::st_drop_geometry() |>
-            dplyr::mutate(Col = as.factor(Col)) |>
+            dplyr::mutate(Col=as.factor(Col)) |>
             dplyr::group_by(Col) |>
             dplyr::summarise(
                 min(y),
@@ -228,28 +214,28 @@ ofe_grid_data <- function(
             )
         data_out <- data_out |>
             dplyr::filter(
-                y >= max(y_extrema[["min(y)"]]),
-                y <= min(y_extrema[["max(y)"]])
+                y>=max(y_extrema[["min(y)"]]),
+                y<=min(y_extrema[["max(y)"]])
             )
     }
 
     ### Assign specified number of rows.
     row_breaks <- seq(
-        min(data_out$y) - 1e-6,
-        max(data_out$y) + 1e-6,
-        length = (nrow + 1)
+        min(data_out$y)-1e-6,
+        max(data_out$y)+1e-6,
+        length=(nrow+1)
     )
-    row_mid_points <- row_breaks[1:nrow] + diff(row_breaks) / 2
-    for (i in 1:nrow) {
-        data_out$Row <- data_out$Row + (data_out$y > row_breaks[i])
+    row_mid_points <- row_breaks[1:nrow] + diff(row_breaks)/2
+    for (i in 1:nrow){
+        data_out$Row <- data_out$Row + (data_out$y>row_breaks[i])
     }
 
     ### Summarise and reference to the gridded coordinates.
     data_out_summary <- data_out |>
         sf::st_drop_geometry() |>
         dplyr::mutate(
-            Col = as.factor(Col),
-            Row = as.factor(Row)
+            Col=as.factor(Col),
+            Row=as.factor(Row)
         ) |>
         dplyr::group_by(Col, Row) |>
         dplyr::summarise(
@@ -267,8 +253,8 @@ ofe_grid_data <- function(
         dplyr::mutate(
             x = col_mid_points[Col],
             y = row_mid_points[Row],
-            x_rotated = col_mid_points[Col] - col_mid_points[1],
-            y_rotated = row_mid_points[Row] - row_mid_points[1]
+            x_rotated = col_mid_points[Col]-col_mid_points[1],
+            y_rotated = row_mid_points[Row]-row_mid_points[1]
         ) |>
         dplyr::left_join(
             data_out |>
@@ -278,7 +264,8 @@ ofe_grid_data <- function(
                 dplyr::summarise(
                     Treatment = dplyr::first(Treatment),
                     Rep = dplyr::first(Rep)
-                )
+                ),
+            by = "Col"
         ) |>
         sf::st_as_sf(coords = c("x", "y"), crs = sf::st_crs(data)) |>
         ofe_rotate_data(-true_angle)
@@ -287,17 +274,70 @@ ofe_grid_data <- function(
         class = "gridded.ofe",
         list(
             gridded_data = point_reference_frame |>
-                dplyr::left_join(data_out_summary) |>
+                dplyr::left_join(data_out_summary, by = c("Row", "Col")) |>
                 dplyr::select(-temp_filter) |>
-                dplyr::mutate(
-                    Pe = as.factor(
-                        1 + floor(npe * as.numeric(Row) / (nrow + 1e-6))
-                    )
-                ) |>
                 dplyr::arrange(Rep, Col, Row),
             original_data = data_out
         )
     )
+}
+
+
+#' Make pseudo-environments for gridded OFE data
+#'
+#' Adds evenly-spaced pseudo-environment labels along the grid rows.
+#' Always assess pseudo-environments visually before use.
+#'
+#' @param gridded_ofe `gridded.ofe`.
+#'   A gridded OFE object generated by [ofe_grid_data()].
+#'
+#' @param npe `numeric`.
+#'   Number of pseudo-environments to generate along the strips.
+#'
+#' @returns `gridded.ofe`.
+#'   `gridded_ofe` with a `Pe` factor added to `gridded_data`.
+#'
+#' @examplesIf requireNamespace("asreml", quietly = TRUE)
+#' library(CBADASReml)
+#' library(dplyr)
+#' library(sf)
+#'
+#' data <- agridat::lasrosas.corn |>
+#' filter(year == 2001) |>
+#' rename(
+#'   Yield = yield,
+#'   Treatment = nf,
+#'   Rep = rep
+#'  ) |>
+#'  dplyr::select(Yield, Treatment, Rep, long, lat) |>
+#'  st_as_sf(coords = c("long", "lat"), crs = 4326) |>
+#'  st_transform(3395)
+#'
+#' gridded_data <- ofe_grid_data(data, -60, 80, 18, trim_ends=FALSE)
+#' ofe_make_penvs(gridded_data, 5)
+#' @autoglobal
+#' @author Braden Thorne, \email{braden.thorne@@curtin.edu.au}
+#' @export
+ofe_make_penvs <- function(gridded_ofe, npe) {
+    if (!inherits(gridded_ofe, "gridded.ofe")) {
+        stop(
+            "`gridded_ofe` must be a gridded OFE object generated by `ofe_grid_data()`.",
+            call. = FALSE
+        )
+    }
+
+    row_numbers <- suppressWarnings(
+        as.numeric(as.character(gridded_ofe$gridded_data$Row))
+    )
+    if (anyNA(row_numbers)) {
+        row_numbers <- as.numeric(gridded_ofe$gridded_data$Row)
+    }
+    nrow <- max(row_numbers, na.rm = TRUE)
+    gridded_ofe$gridded_data$Pe <- as.factor(
+        1 + floor(npe * row_numbers / (nrow + 1e-6))
+    )
+
+    gridded_ofe
 }
 
 
@@ -363,7 +403,7 @@ ofe_grid_data <- function(
 #'  st_as_sf(coords = c("long", "lat"), crs = 4326) |>
 #'  st_transform(3395)
 #'
-#' gridded_data <- ofe_grid_data(data, -60, 80, 5, 18, trim_ends=FALSE)
+#' gridded_data <- ofe_grid_data(data, -60, 80, 18, trim_ends=FALSE)
 #' plot_gridded_ofe(gridded_data)
 #' @autoglobal
 #' @author Braden Thorne, \email{braden.thorne@@curtin.edu.au}
