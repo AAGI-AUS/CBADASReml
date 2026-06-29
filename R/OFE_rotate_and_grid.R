@@ -102,7 +102,8 @@ ofe_rotate_data <- function(data, angle) {
 #'
 #' @param nrow `numeric`.
 #'   The number of rows in the final grid.
-#'   This should be as large as possible without introducing spurious NA values.
+#'   This should be as large as possible without introducing spurious NA
+#'   values.
 #'
 #' @param ncol `numeric`.
 #'   The actual number of strips in the data.
@@ -145,139 +146,139 @@ ofe_rotate_data <- function(data, angle) {
 #' @autoglobal
 #' @author Braden Thorne, \email{braden.thorne@@curtin.edu.au}
 #' @export
-ofe_grid_data <- function(data_in, rotation_angle, nrow, ncol, trim_ends=TRUE){
+ofe_grid_data <- function(data_in, rotation_angle, nrow, ncol, trim_ends=TRUE) {
+    ### Start with the rough angle rotation to determine strip labels
+    data_pre_angle <- ofe_rotate_data(data_in, rotation_angle) |>
+        dplyr::mutate(
+            x = as.numeric(sf::st_coordinates(geometry)[, "X"]),
+            y = as.numeric(sf::st_coordinates(geometry)[, "Y"]),
+            Row = 0,
+            Col = 0
+        )
 
-  ### Start with the rough angle rotation to determine strip labels
-  data_pre_angle <- ofe_rotate_data(data_in, rotation_angle) |>
-    dplyr::mutate(
-      x = as.numeric(sf::st_coordinates(geometry)[, "X"]),
-      y = as.numeric(sf::st_coordinates(geometry)[, "Y"]),
-      Row = 0,
-      Col = 0
+    x_gap <- (max(data_pre_angle$x)-min(data_pre_angle$x))/(ncol-1)
+    col_breaks <- seq(
+        min(data_pre_angle$x)-x_gap/2,
+        max(data_pre_angle$x)+x_gap/2,
+        length=(ncol+1)
+    )
+    for (i in 1:ncol){
+        data_pre_angle$Col <- data_pre_angle$Col + (data_pre_angle$x>col_breaks[i])
+    }
+
+    ### Based on the labels, determine the actual rotation angle and rotate data.
+    true_angle <- (180/pi)*atan(
+        1/stats::lm(
+            y_original~x_original,
+            data=dplyr::filter(data_pre_angle, Col==1)
+        )$coefficients[[2]]
     )
 
-  x_gap <- (max(data_pre_angle$x)-min(data_pre_angle$x))/(ncol-1)
-  col_breaks <- seq(
-    min(data_pre_angle$x)-x_gap/2,
-    max(data_pre_angle$x)+x_gap/2,
-    length=(ncol+1)
-  )
-  for (i in 1:ncol){
-    data_pre_angle$Col <- data_pre_angle$Col + (data_pre_angle$x>col_breaks[i])
-  }
+    data <- ofe_rotate_data(data_in, true_angle)
 
-  ### Based on the labels, determine the actual rotation angle and rotate data.
-  true_angle <- (180/pi)*atan(
-    1/stats::lm(
-      y_original~x_original,
-      data=dplyr::filter(data_pre_angle, Col==1)
-    )$coefficients[[2]]
-  )
+    ### Prepare output data.
+    data_out <- data |>
+        dplyr::mutate(
+            Yield = as.numeric(Yield),
+            Treatment = as.factor(Treatment),
+            Rep = as.factor(Rep),
+            x = as.numeric(sf::st_coordinates(geometry)[, "X"]),
+            y = as.numeric(sf::st_coordinates(geometry)[, "Y"]),
+            x_rough_rotation = data_pre_angle$x,
+            y_rough_rotation = data_pre_angle$y,
+            Row = 0,
+            Col = 0
+        )
 
-  data <- ofe_rotate_data(data_in, true_angle)
-
-  ### Prepare output data.
-  data_out <- data |>
-    dplyr::mutate(
-      Yield = as.numeric(Yield),
-      Treatment = as.factor(Treatment),
-      Rep = as.factor(Rep),
-      x = as.numeric(sf::st_coordinates(geometry)[, "X"]),
-      y = as.numeric(sf::st_coordinates(geometry)[, "Y"]),
-      x_rough_rotation = data_pre_angle$x,
-      y_rough_rotation = data_pre_angle$y,
-      Row = 0,
-      Col = 0
+    ### Assign strip labels
+    x_gap <- (max(data_out$x)-min(data_out$x))/(ncol-1)
+    col_breaks <- seq(
+        min(data_out$x)-x_gap/2,
+        max(data_out$x)+x_gap/2,
+        length=(ncol+1)
     )
+    col_mid_points <- col_breaks[1:ncol] + diff(col_breaks)/2
+    for (i in 1:ncol){
+        data_out$Col <- data_out$Col + (data_out$x>col_breaks[i])
+    }
 
-  ### Assign strip labels
-  x_gap <- (max(data_out$x)-min(data_out$x))/(ncol-1)
-  col_breaks <- seq(
-    min(data_out$x)-x_gap/2,
-    max(data_out$x)+x_gap/2,
-    length=(ncol+1)
-  )
-  col_mid_points <- col_breaks[1:ncol] + diff(col_breaks)/2
-  for (i in 1:ncol){
-    data_out$Col <- data_out$Col + (data_out$x>col_breaks[i])
-  }
+    ### Can trim ends to not contain NAs if required.
+    if (trim_ends) {
+        y_extrema <- data_out |>
+            sf::st_drop_geometry() |>
+            dplyr::mutate(Col=as.factor(Col)) |>
+            dplyr::group_by(Col) |>
+            dplyr::summarise(
+                min(y),
+                max(y)
+            )
+        data_out <- data_out |>
+            dplyr::filter(
+                y>=max(y_extrema[["min(y)"]]),
+                y<=min(y_extrema[["max(y)"]])
+            )
+    }
 
-  ### Can trim ends to not contain NAs if required.
-  if (trim_ends) {
-    y_extrema <- data_out |>
-      sf::st_drop_geometry() |>
-      dplyr::mutate(Col=as.factor(Col)) |>
-      dplyr::group_by(Col) |>
-      dplyr::summarise(
-        min(y),
-        max(y)
-      )
-    data_out <- data_out |>
-      dplyr::filter(
-        y>=max(y_extrema[["min(y)"]]),
-        y<=min(y_extrema[["max(y)"]])
-      )
-  }
-
-  ### Assign specified number of rows.
-  row_breaks <- seq(
-    min(data_out$y)-1e-6,
-    max(data_out$y)+1e-6,
-    length=(nrow+1)
-  )
-  row_mid_points <- row_breaks[1:nrow] + diff(row_breaks)/2
-  for (i in 1:nrow){
-    data_out$Row <- data_out$Row + (data_out$y>row_breaks[i])
-  }
-
-  ### Summarise and reference to the gridded coordinates.
-  data_out_summary <- data_out |>
-    sf::st_drop_geometry() |>
-    dplyr::mutate(
-      Col=as.factor(Col),
-      Row=as.factor(Row)
-    ) |>
-    dplyr::group_by(Col, Row) |>
-    dplyr::summarise(
-      Yield = mean(Yield)
-    ) |>
-    as.data.frame() |>
-    dplyr::mutate(
-      temp_filter = paste(Row, Col)
+    ### Assign specified number of rows.
+    row_breaks <- seq(
+        min(data_out$y)-1e-6,
+        max(data_out$y)+1e-6,
+        length=(nrow+1)
     )
+    row_mid_points <- row_breaks[1:nrow] + diff(row_breaks)/2
+    for (i in 1:nrow){
+        data_out$Row <- data_out$Row + (data_out$y>row_breaks[i])
+    }
 
-  point_reference_frame <- data.frame(
-    Row = as.factor(rep(1:nrow, ncol)),
-    Col = as.factor(rep(1:ncol, each = nrow))
-  ) |>
-    dplyr::mutate(
-      x = col_mid_points[Col],
-      y = row_mid_points[Row],
-      x_rotated = col_mid_points[Col]-col_mid_points[1],
-      y_rotated = row_mid_points[Row]-row_mid_points[1]
-    ) |>
-    dplyr::left_join(
-      data_out |>
+    ### Summarise and reference to the gridded coordinates.
+    data_out_summary <- data_out |>
         sf::st_drop_geometry() |>
-        dplyr::mutate(Col = as.factor(Col)) |>
-        dplyr::group_by(Col) |>
+        dplyr::mutate(
+            Col=as.factor(Col),
+            Row=as.factor(Row)
+        ) |>
+        dplyr::group_by(Col, Row) |>
         dplyr::summarise(
-          Treatment = dplyr::first(Treatment),
-          Rep = dplyr::first(Rep)
-        ),
-      by = "Col"
-    ) |>
-    sf::st_as_sf(coords = c("x", "y"), crs = sf::st_crs(data)) |>
-    ofe_rotate_data(-true_angle)
+            Yield = mean(Yield)
+        ) |>
+        as.data.frame() |>
+        dplyr::mutate(
+            temp_filter = paste(Row, Col)
+        )
 
-  structure(
-    class = "gridded.ofe",
-    list(
-      gridded_data = point_reference_frame |>
-        dplyr::left_join(data_out_summary, by = c("Row", "Col")) |>
-        dplyr::select(-temp_filter) |>
-        dplyr::arrange(Rep, Col, Row),
-      original_data = data_out
+    point_reference_frame <- data.frame(
+        Row = as.factor(rep(1:nrow, ncol)),
+        Col = as.factor(rep(1:ncol, each = nrow))
+    ) |>
+        dplyr::mutate(
+            x = col_mid_points[Col],
+            y = row_mid_points[Row],
+            x_rotated = col_mid_points[Col]-col_mid_points[1],
+            y_rotated = row_mid_points[Row]-row_mid_points[1]
+        ) |>
+        dplyr::left_join(
+            data_out |>
+                sf::st_drop_geometry() |>
+                dplyr::mutate(Col = as.factor(Col)) |>
+                dplyr::group_by(Col) |>
+                dplyr::summarise(
+                    Treatment = dplyr::first(Treatment),
+                    Rep = dplyr::first(Rep)
+                ),
+            by = "Col"
+        ) |>
+        sf::st_as_sf(coords = c("x", "y"), crs = sf::st_crs(data)) |>
+        ofe_rotate_data(-true_angle)
+
+    structure(
+        class = "gridded.ofe",
+        list(
+            gridded_data = point_reference_frame |>
+                dplyr::left_join(data_out_summary, by = c("Row", "Col")) |>
+                dplyr::select(-temp_filter) |>
+                dplyr::arrange(Rep, Col, Row),
+            original_data = data_out
+        )
     )
 }
 
@@ -318,25 +319,25 @@ ofe_grid_data <- function(data_in, rotation_angle, nrow, ncol, trim_ends=TRUE){
 #' @author Braden Thorne, \email{braden.thorne@@curtin.edu.au}
 #' @export
 ofe_make_penvs <- function(gridded_ofe, npe) {
-  if (!inherits(gridded_ofe, "gridded.ofe")) {
-    stop(
-      "`gridded_ofe` must be a gridded OFE object generated by `ofe_grid_data()`.",
-      call. = FALSE
+    if (!inherits(gridded_ofe, "gridded.ofe")) {
+        stop(
+            "`gridded_ofe` must be a gridded OFE object generated by `ofe_grid_data()`.",
+            call. = FALSE
+        )
+    }
+
+    row_numbers <- suppressWarnings(
+        as.numeric(as.character(gridded_ofe$gridded_data$Row))
     )
-  }
+    if (anyNA(row_numbers)) {
+        row_numbers <- as.numeric(gridded_ofe$gridded_data$Row)
+    }
+    nrow <- max(row_numbers, na.rm = TRUE)
+    gridded_ofe$gridded_data$Pe <- as.factor(
+        1 + floor(npe * row_numbers / (nrow + 1e-6))
+    )
 
-  row_numbers <- suppressWarnings(
-    as.numeric(as.character(gridded_ofe$gridded_data$Row))
-  )
-  if (anyNA(row_numbers)) {
-    row_numbers <- as.numeric(gridded_ofe$gridded_data$Row)
-  }
-  nrow <- max(row_numbers, na.rm = TRUE)
-  gridded_ofe$gridded_data$Pe <- as.factor(
-    1 + floor(npe * row_numbers / (nrow + 1e-6))
-  )
-
-  gridded_ofe
+    gridded_ofe
 }
 
 
