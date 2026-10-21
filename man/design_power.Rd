@@ -9,136 +9,136 @@ design_power(
   treatment_cols = "treatment",
   block_col = NULL,
   covariance_structure = cov_iid(),
-  sigma2 = 1,
-  delta = 1,
+  sigma2 = NULL,
+  delta = NULL,
   alpha = 0.05,
-  denom_df = NULL,
-  tolerance = 1e-10
+  alpha_adjustment = c("bonferroni", "none"),
+  sd = NULL
 )
 }
 \arguments{
-\item{design}{\code{data.frame} with one row per experimental unit.}
+\item{design}{\code{data.frame}.
+The design data frame, one row per independently randomised
+experimental unit. Do not count repeated measurements or subsamples
+as independent replication.}
 
-\item{treatment_cols}{Character vector of treatment column names. If multiple
-columns are supplied, each unique combination is treated as a distinct
-treatment combination.}
+\item{treatment_cols}{\code{character} vector.
+Column name of the treatment in \code{design}. If multiple columns
+are provided, each unique combination is treated as a distinct
+treatment combination. Missing treatment assignments are not allowed.}
 
-\item{block_col}{A single blocking-factor column name, or \code{NULL} for an
-unblocked design.}
+\item{block_col}{A single \code{character} column name or \code{NULL}.
+Column name of the experiment's blocking factor in \code{design}.
+Use \code{NULL} for unblocked designs.}
 
-\item{covariance_structure}{A covariance structure created with
-\code{cov_iid()}, \code{cov_ar1()}, \code{cov_ar1ar1()}, or another covariance
-helper.}
+\item{covariance_structure}{Covariance structure created with
+\code{\link[=cov_iid]{cov_iid()}}, \code{\link[=cov_ar1]{cov_ar1()}}, \code{\link[=cov_ar1ar1]{cov_ar1ar1()}}, or another covariance
+helper. General correlated structures provide precision estimates,
+but power is unavailable unless the simple test described below
+applies.}
 
-\item{sigma2}{Positive assumed residual variance.}
+\item{sigma2}{\code{numeric}.
+Optional residual variance, retained for compatibility. Supply
+either \code{sd} or \code{sigma2}, not both.}
 
-\item{delta}{Positive treatment difference worth detecting.}
+\item{delta}{\code{numeric}.
+Treatment difference that is "worth detecting". The minimum
+difference between treatments that we care about. Must be supplied,
+finite and positive, and expressed in the response's units.}
 
-\item{alpha}{Significance threshold for the two-sided Wald tests.}
+\item{alpha}{\code{numeric}.
+Family-wise significance threshold for the two-sided tests when
+\code{alpha_adjustment = "bonferroni"}; otherwise the per-comparison
+significance threshold. Must be a finite number between 0 and 1.}
 
-\item{denom_df}{Positive denominator degrees of freedom for a noncentral
-t-test, or \code{Inf} for the known-covariance normal approximation. If
-\code{NULL}, residual degrees of freedom are calculated from the fixed-effect
-design matrix. This residual value is only approximate when covariance
-parameters will be estimated.}
+\item{alpha_adjustment}{Pairwise multiplicity adjustment. The default,
+\code{"bonferroni"}, uses \code{alpha / choose(v, 2)} for \code{v}
+treatment levels. Use \code{"none"} only for unadjusted marginal
+power.}
 
-\item{tolerance}{Positive numerical tolerance.}
+\item{sd}{\code{numeric}.
+Required finite positive residual standard deviation, unless
+\code{sigma2} is supplied. Use variation remaining after treatment
+and block effects, in the same units as \code{delta}. An
+upper-plausible value is appropriate for cautious planning.
+With covariance helpers, the observational covariance is
+\code{sd^2 * V}; for \code{cov_cs()}, this is the marginal scale,
+whereas \code{cov_iid() + cov_random()} uses the independent
+residual scale.}
 }
 \value{
 A list containing:
 \describe{
-\item{contrast_power}{Pairwise treatment-comparison standard errors,
-noncentrality parameters, power values, and effective replicates.}
-\item{design_power}{The minimum pairwise power when every pairwise comparison
-is estimable, otherwise \code{NA}.}
-\item{average_power}{The average pairwise power when every pairwise comparison
-is estimable, otherwise \code{NA}.}
+\item{contrast_power}{Data frame of pairwise treatment-comparison standard
+errors, noncentrality parameters, power values, and effective
+replicates.}
+\item{design_power}{The minimum pairwise power when every pairwise
+treatment comparison is estimable and power is supported, otherwise
+\code{NA}.}
+\item{average_power}{The average pairwise power when every pairwise
+treatment comparison is estimable and power is supported, otherwise
+\code{NA}.}
 \item{worst_comparison}{The comparison with the lowest power when every
-pairwise comparison is estimable, otherwise \code{NA}.}
+pairwise comparison is estimable and power is supported, otherwise
+\code{NA}.}
 \item{fisher_info}{The treatment information matrix.}
-\item{treatment_cov}{The model-based treatment covariance matrix,
-\eqn{\sigma^2 I_T^+}.}
-\item{eigenvalues}{Positive eigenvalues of the treatment information matrix.}
+\item{treatment_cov}{The model-based covariance matrix of treatment
+estimates on the estimable treatment-contrast space.}
+\item{eigenvalues}{Positive eigenvalues of the treatment information
+matrix.}
 \item{rank}{Numerical rank of the treatment information matrix.}
-\item{assumptions}{Covariance, effect-size, denominator-df, and testing
+\item{assumptions}{List of covariance, effect-size, and testing
 assumptions used.}
 }
 }
 \description{
-Calculates pairwise treatment-comparison power from the Fisher information of
-an experimental design under a specified relative covariance structure.
+Calculate pairwise treatment-comparison power from the Fisher information of
+the provided experimental design using the treatment information matrix
+induced by a specified relative covariance structure. This function
+evaluates how much power the design has to detect a specified treatment
+difference after adjusting for nuisance effects such as blocks.
+Supply the difference worth detecting (\code{delta}) and the expected
+residual standard deviation (\code{sd}). The headline is the lowest
+pairwise power, with Bonferroni adjustment by default.
 }
 \details{
-The treatment information matrix is
-\deqn{
-  I_T = X_1^\intercal L_V X_1,
-}
-where \eqn{X_1} is the treatment indicator matrix, the observational covariance
-is \eqn{\sigma^2 V}, and
-\deqn{
-  L_V = V^{-1} - V^{-1}X_2
-  \left(X_2^\intercal V^{-1}X_2\right)^{-1}
-  X_2^\intercal V^{-1}
-}
-removes the nuisance effects in \eqn{X_2}. For a treatment contrast
-\eqn{c^\intercal\tau},
-\deqn{
-  \operatorname{SE}(c^\intercal\hat{\tau}) =
-  \sqrt{\sigma^2 c^\intercal I_T^+c}.
-}
-The noncentrality parameter is \eqn{\lambda = \delta / \operatorname{SE}}.
-Power is calculated using a two-sided noncentral-t Wald test when finite
-denominator degrees of freedom are available, and the normal approximation
-otherwise.
+The mathematics has three steps: calculate a comparison's standard error
+after adjusting for blocks, form \code{delta / SE}, and use a two-sided
+noncentral t distribution to calculate rejection probability. The error
+degrees of freedom are the number of observations minus the rank of the
+treatment-and-block model; users do not need to supply them.
 
-The covariance structure and \code{sigma2} are planning values, so the result
-is conditional on those values, \code{delta}, and \code{alpha}.
+This test is justified for normally distributed, independent errors with
+a common variance, including fixed-block designs. Random intercepts and
+compound-symmetry components are also supported when their group effects
+are entirely absorbed by the fixed blocks (or the intercept), leaving
+independent errors with a common variance. No general mixed-model or
+spatial power approximation is made. Unsupported covariance structures
+return \code{NA} power with a warning, while retaining model-based standard
+errors. These standard errors treat the covariance as supplied, without
+allowing for its estimation from future data.
 
-Overall power summaries are only returned for a fully connected treatment
-design. The contrast-level output still identifies which comparisons are
-estimable when the design is disconnected or partially confounded.
+Bonferroni adjustment and the weakest-comparison summary are cautious
+choices, not a guarantee against incorrect noise or independence
+assumptions. Power is conditional on the supplied planning values.
+The headline is not the probability of detecting every difference.
+Multiple treatment columns define comparisons between treatment
+combinations, not tests of main effects or interactions.
+
+Overall power is unavailable when any comparison is confounded with blocks
+or there is insufficient replication to estimate the residual variance.
+Estimable comparisons remain available in the contrast-level output.
 }
 \examples{
-\dontrun{
-rcbd <- data.frame(
-    row = rep(1:6, each = 4),
-    col = rep(1:4, times = 6),
-    treatment = rep(LETTERS[1:8], 3),
-    block = rep(1:3, each = 8)
-)
+trial <- data.frame(treatment = rep(c("A", "B"), each = 12))
+design_power(trial, delta = 5, sd = 10)
 
-res_power <- design_power(
-    design = rcbd,
-    treatment_cols = "treatment",
-    block_col = "block",
-    covariance_structure = cov_ar1ar1(
-        row_col = "row",
-        column_col = "col",
-        rho_row = 0.1,
-        rho_col = 0.1
-    ),
-    sigma2 = 1,
-    delta = 1,
-    alpha = 0.05
-)
-
-split_plot <- expand.grid(
-    block = factor(1:4),
-    whole_trt = c("W1", "W2"),
-    subplot_trt = c("S1", "S2")
-)
-split_plot$whole_plot <- interaction(
-    split_plot$block,
-    split_plot$whole_trt,
-    drop = TRUE
-)
-
+rcbd <- expand.grid(treatment = LETTERS[1:3], block = 1:8)
 design_power(
-    split_plot,
-    treatment_cols = c("whole_trt", "subplot_trt"),
-    block_col = "block",
-    covariance_structure = cov_iid() +
-        cov_random("whole_plot", sd_ratio = 1)
+    rcbd,
+    delta = 5,
+    sd = 10,
+    block_col = "block"
 )
-}
+
 }

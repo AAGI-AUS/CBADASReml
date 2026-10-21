@@ -1,73 +1,54 @@
-#' Calculate the statistical power for an experimental design.
+#' Calculate the statistical power for an experimental design
 #'
 #' Calculate pairwise treatment-comparison power from the Fisher information of
 #' the provided experimental design using the treatment information matrix
 #' induced by a specified relative covariance structure. This function
 #' evaluates how much power the design has to detect a specified treatment
 #' difference after adjusting for nuisance effects such as blocks.
-#'
-#' The calculation is based on the treatment information matrix
-#' \deqn{
-#'   I_T = X_1^\intercal L_V X_1,
-#' }
-#' where \eqn{X_1} is the treatment indicator matrix, the observational
-#' covariance is \eqn{\sigma^2 V}, and \eqn{L_V} is the relative
-#' covariance-adjusted projection matrix that removes nuisance effects:
-#' \deqn{
-#'   L_V
-#'   =
-#'   V^{-1}
-#'   -
-#'   V^{-1} X_2
-#'   \left( X_2^\intercal V^{-1} X_2 \right)^{-1}
-#'   X_2^\intercal
-#'   V^{-1}
-#' }
-#' For a treatment contrast \eqn{c^\intercal \tau}, the contrast standard error
-#' is computed from
-#' \deqn{
-#'   \operatorname{SE}(c^\intercal \hat{\tau})
-#'   =
-#'   \sqrt{\sigma^2 c^\intercal I_T^+ c},
-#' }
-#' where \eqn{I_T^+} is the Moore-Penrose pseudoinverse of the treatment
-#' information matrix. The effect size \code{delta} is then converted into a
-#' noncentrality parameter,
-#' \deqn{
-#'   \lambda
-#'   =
-#'   \frac{\delta}{\operatorname{SE}(c^\intercal \hat{\tau})},
-#' }
-#' and power is calculated using a two-sided Wald test. A noncentral
-#' t-distribution is used when finite denominator degrees of freedom are
-#' available; otherwise, the known-covariance normal approximation is used.
+#' Supply the difference worth detecting (\code{delta}) and the expected
+#' residual standard deviation (\code{sd}). The headline is the lowest
+#' pairwise power, with Bonferroni adjustment by default.
 #'
 #' @param design \code{data.frame}.
-#'        The design data frame, one row per experimental unit.
+#'        The design data frame, one row per independently randomised
+#'        experimental unit. Do not count repeated measurements or subsamples
+#'        as independent replication.
 #' @param treatment_cols \code{character} vector.
 #'        Column name of the treatment in \code{design}. If multiple columns
 #'        are provided, each unique combination is treated as a distinct
-#'        treatment combination.
+#'        treatment combination. Missing treatment assignments are not allowed.
 #' @param block_col A single \code{character} column name or \code{NULL}.
 #'        Column name of the experiment's blocking factor in \code{design}.
 #'        Use \code{NULL} for unblocked designs.
 #' @param covariance_structure Covariance structure created with
 #'        [cov_iid()], [cov_ar1()], [cov_ar1ar1()], or another covariance
-#'        helper.
+#'        helper. General correlated structures provide precision estimates,
+#'        but power is unavailable unless the simple test described below
+#'        applies.
 #' @param sigma2 \code{numeric}.
-#'        Assumed residual variance.
+#'        Optional residual variance, retained for compatibility. Supply
+#'        either \code{sd} or \code{sigma2}, not both.
 #' @param delta \code{numeric}.
 #'        Treatment difference that is "worth detecting". The minimum
-#'        difference between treatments that we care about.
+#'        difference between treatments that we care about. Must be supplied,
+#'        finite and positive, and expressed in the response's units.
+#' @param sd \code{numeric}.
+#'        Required finite positive residual standard deviation, unless
+#'        \code{sigma2} is supplied. Use variation remaining after treatment
+#'        and block effects, in the same units as \code{delta}. An
+#'        upper-plausible value is appropriate for cautious planning.
+#'        With covariance helpers, the observational covariance is
+#'        \code{sd^2 * V}; for \code{cov_cs()}, this is the marginal scale,
+#'        whereas \code{cov_iid() + cov_random()} uses the independent
+#'        residual scale.
 #' @param alpha \code{numeric}.
-#'        Significance threshold for the two-sided Wald tests.
-#' @param denom_df Positive denominator degrees of freedom for a noncentral
-#'        t-test, or \code{Inf} for the known-covariance normal approximation.
-#'        If \code{NULL}, residual degrees of freedom are calculated from the
-#'        fixed-effect design matrix. This residual value is only approximate
-#'        when covariance parameters will be estimated.
-#' @param tolerance \code{numeric}.
-#'        Tolerance for numerical stability.
+#'        Family-wise significance threshold for the two-sided tests when
+#'        \code{alpha_adjustment = "bonferroni"}; otherwise the per-comparison
+#'        significance threshold. Must be a finite number between 0 and 1.
+#' @param alpha_adjustment Pairwise multiplicity adjustment. The default,
+#'        \code{"bonferroni"}, uses \code{alpha / choose(v, 2)} for \code{v}
+#'        treatment levels. Use \code{"none"} only for unadjusted marginal
+#'        power.
 #'
 #' @return A list containing:
 #' \describe{
@@ -75,14 +56,17 @@
 #'     errors, noncentrality parameters, power values, and effective
 #'     replicates.}
 #'   \item{design_power}{The minimum pairwise power when every pairwise
-#'     treatment comparison is estimable, otherwise \code{NA}.}
+#'     treatment comparison is estimable and power is supported, otherwise
+#'     \code{NA}.}
 #'   \item{average_power}{The average pairwise power when every pairwise
-#'     treatment comparison is estimable, otherwise \code{NA}.}
+#'     treatment comparison is estimable and power is supported, otherwise
+#'     \code{NA}.}
 #'   \item{worst_comparison}{The comparison with the lowest power when every
-#'     pairwise comparison is estimable, otherwise \code{NA}.}
+#'     pairwise comparison is estimable and power is supported, otherwise
+#'     \code{NA}.}
 #'   \item{fisher_info}{The treatment information matrix.}
 #'   \item{treatment_cov}{The model-based covariance matrix of treatment
-#'     estimates, equal to \eqn{\sigma^2 I_T^+}.}
+#'     estimates on the estimable treatment-contrast space.}
 #'   \item{eigenvalues}{Positive eigenvalues of the treatment information
 #'     matrix.}
 #'   \item{rank}{Numerical rank of the treatment information matrix.}
@@ -91,60 +75,44 @@
 #' }
 #'
 #' @details
-#' The covariance structure and \code{sigma2} are treated as planning values.
-#' The returned power is therefore conditional on the supplied covariance
-#' structure, the scientifically relevant difference \code{delta}, and the
-#' significance level \code{alpha}. Underestimating \code{sigma2} overstates
-#' power. Evaluate plausible covariance structures when their parameters are
-#' uncertain.
+#' The mathematics has three steps: calculate a comparison's standard error
+#' after adjusting for blocks, form \code{delta / SE}, and use a two-sided
+#' noncentral t distribution to calculate rejection probability. The error
+#' degrees of freedom are the number of observations minus the rank of the
+#' treatment-and-block model; users do not need to supply them.
 #'
-#' Overall power summaries are only returned for a fully connected treatment
-#' design. The contrast-level output still identifies which comparisons are
-#' estimable when the design is disconnected or partially confounded.
+#' This test is justified for normally distributed, independent errors with
+#' a common variance, including fixed-block designs. Random intercepts and
+#' compound-symmetry components are also supported when their group effects
+#' are entirely absorbed by the fixed blocks (or the intercept), leaving
+#' independent errors with a common variance. No general mixed-model or
+#' spatial power approximation is made. Unsupported covariance structures
+#' return \code{NA} power with a warning, while retaining model-based standard
+#' errors. These standard errors treat the covariance as supplied, without
+#' allowing for its estimation from future data.
+#'
+#' Bonferroni adjustment and the weakest-comparison summary are cautious
+#' choices, not a guarantee against incorrect noise or independence
+#' assumptions. Power is conditional on the supplied planning values.
+#' The headline is not the probability of detecting every difference.
+#' Multiple treatment columns define comparisons between treatment
+#' combinations, not tests of main effects or interactions.
+#'
+#' Overall power is unavailable when any comparison is confounded with blocks
+#' or there is insufficient replication to estimate the residual variance.
+#' Estimable comparisons remain available in the contrast-level output.
 #'
 #' @examples
-#' \dontrun{
-#' rcbd <- data.frame(
-#'     row = rep(1:6, each = 4),
-#'     col = rep(1:4, times = 6),
-#'     treatment = rep(LETTERS[1:8], 3),
-#'     block = rep(1:3, each = 8)
-#' )
+#' trial <- data.frame(treatment = rep(c("A", "B"), each = 12))
+#' design_power(trial, delta = 5, sd = 10)
 #'
-#' res_power <- design_power(
-#'     design = rcbd,
-#'     treatment_cols = "treatment",
-#'     block_col = "block",
-#'     covariance_structure = cov_ar1ar1(
-#'         row_col = "row",
-#'         column_col = "col",
-#'         rho_row = 0.1,
-#'         rho_col = 0.1
-#'     ),
-#'     sigma2 = 1,
-#'     delta = 1,
-#'     alpha = 0.05
-#' )
-#'
-#' split_plot <- expand.grid(
-#'     block = factor(1:4),
-#'     whole_trt = c("W1", "W2"),
-#'     subplot_trt = c("S1", "S2")
-#' )
-#' split_plot$whole_plot <- interaction(
-#'     split_plot$block,
-#'     split_plot$whole_trt,
-#'     drop = TRUE
-#' )
-#'
+#' rcbd <- expand.grid(treatment = LETTERS[1:3], block = 1:8)
 #' design_power(
-#'     split_plot,
-#'     treatment_cols = c("whole_trt", "subplot_trt"),
-#'     block_col = "block",
-#'     covariance_structure = cov_iid() +
-#'         cov_random("whole_plot", sd_ratio = 1)
+#'     rcbd,
+#'     delta = 5,
+#'     sd = 10,
+#'     block_col = "block"
 #' )
-#' }
 #'
 #' @export
 design_power <- function(
@@ -152,14 +120,42 @@ design_power <- function(
     treatment_cols = "treatment",
     block_col = NULL,
     covariance_structure = cov_iid(),
-    sigma2 = 1,
-    delta = 1,
+    sigma2 = NULL,
+    delta = NULL,
     alpha = 0.05,
-    denom_df = NULL,
-    tolerance = 1e-10
+    alpha_adjustment = c("bonferroni", "none"),
+    sd = NULL
 ) {
-    if (sigma2 <= 0) stop("sigma2 must be positive.")
-    if (delta <= 0) stop("delta must be positive.")
+    ## require a meaningful difference and noise scale instead of guessing
+    if (is.null(delta)) {
+        stop("Supply delta: the smallest treatment difference worth detecting.")
+    }
+    if (is.null(sd) && is.null(sigma2)) {
+        stop("Supply sd: the expected residual standard deviation.")
+    }
+    if (!is.null(sd) && !is.null(sigma2)) {
+        stop("Supply either sd or sigma2, not both.")
+    }
+    ## accept standard deviation in response units or the legacy variance
+    if (!is.null(sd)) {
+        validate_positive_number(sd, "sd")
+        sigma2 <- sd^2
+        if (!is.finite(sigma2) || sigma2 == 0) {
+            stop("sd is too large or too small; rescale the response units.")
+        }
+    }
+    validate_positive_number(sigma2, "sigma2")
+    validate_positive_number(delta, "delta")
+    if (
+        !is.numeric(alpha) || is.complex(alpha) || length(alpha) != 1 ||
+            !is.finite(alpha) || alpha <= 0 || alpha >= 1
+    ) {
+        stop("alpha must be a finite number between 0 and 1.")
+    }
+    ## resolve the default adjustment and reject unknown options
+    alpha_adjustment <- match.arg(alpha_adjustment)
+    ## keep numerical tuning internal to the user-facing power calculation
+    tolerance <- 1e-10
 
     ti <- compute_treatment_info(
         design = design,
@@ -171,34 +167,23 @@ design_power <- function(
 
     trt_levels <- ti$trt_levels
     v <- length(trt_levels)
-    ## pairwise power requires at least one treatment contrast
-    if (v < 2) {
-        stop("design must contain at least two treatment levels.")
+
+    n_comparisons <- choose(v, 2)
+    comparison_alpha <- if (alpha_adjustment == "bonferroni") {
+        alpha / n_comparisons
+    } else {
+        alpha
     }
 
-    ## use fixed-effect residual df unless we have denominator df
-    if (is.null(denom_df)) {
-        df <- ti$resid_df
-        ## fall back to normal power when residual df are unavailable
-        if (!is.finite(df) || df <= 0) {
-            warning(
-                "No residual degrees of freedom; using normal approximation."
-            )
-            df <- Inf
-        } else if (ti$has_random) {
-            ## warn that mixed-model denominator df usually need refinement
-            warning(
-                "Residual degrees of freedom may be optimistic when ",
-                "covariance parameters are estimated; set denom_df ",
-                "explicitly if known."
-            )
-        }
-    } else {
-        df <- denom_df
+    ## only use a t reference distribution when the simple error model applies
+    reference <- power_reference(design, ti, covariance_structure, tolerance)
+    df <- reference$df
+    if (!is.null(reference$reason)) {
+        warning(reference$reason, call. = FALSE)
     }
 
     # Pairwise treatment stat power
-    pairs <- combn(trt_levels, 2, simplify = FALSE)
+    pairs <- utils::combn(trt_levels, 2, simplify = FALSE)
 
     out <- lapply(pairs, \(pair) {
         contrast <- numeric(v)
@@ -206,11 +191,8 @@ design_power <- function(
         contrast[pair[1]] <- 1
         contrast[pair[2]] <- -1
 
-        # Estimable?
-        # contrast must lie in the row space of the information
-        # use a property of the pseudoinverse:
-        # A A+ maps all column vectors of A to themselves
-        projected <- as.numeric(contrast %*% ti$info_inv %*% ti$info)
+        ## check design connectivity independently of covariance
+        projected <- as.numeric(contrast %*% ti$estimability)
         estimable <- sqrt(sum((contrast - projected)^2)) <=
             tolerance * (1 + sqrt(sum(contrast^2)))
 
@@ -225,19 +207,28 @@ design_power <- function(
             ))
         }
 
-        contrast_var <-
-            sigma2 * as.numeric(t(contrast) %*% ti$info_inv %*% contrast)
+        ## use the covariance factor to avoid cancellation in contrast variances
+        relative_var <- sum(crossprod(contrast, ti$variance_factor)^2)
+        contrast_var <- sigma2 * relative_var
+        ## refuse numerical overflow or underflow instead of reporting certainty
+        if (!is.finite(contrast_var) || contrast_var <= 0) {
+            stop("Comparison variance is unstable; rescale the response units.")
+        }
         se <- sqrt(contrast_var)
         ## effect size that we want to have the power to detect in units of SE
         lambda <- abs(delta / se)
 
-        ## Fisher-information Wald power
-        power <- wald_power(lambda, alpha, df)
+        ## two-sided t-test power under the supported error model
+        power <- if (is.na(df)) {
+            NA_real_
+        } else {
+            wald_power(lambda, comparison_alpha, df)
+        }
 
         ## iid-equivalent replication for this contrast
         ## converts contrast variance into number of balanced iid replicates
         ## that would give the same pairwise standard error
-        effective_replicates <- 2 * sigma2 / se^2
+        effective_replicates <- 2 / relative_var
 
         data.frame(
             comparison = paste(pair, collapse = " vs "),
@@ -253,7 +244,7 @@ design_power <- function(
     contrast_power <- do.call(rbind, out)
     estimable <- contrast_power$estimable %in% TRUE
     ## only summarise designs where every pairwise contrast is estimable
-    if (all(estimable)) {
+    if (all(estimable) && all(is.finite(contrast_power$power))) {
         estimable_power <- contrast_power$power
         design_power_value <- min(estimable_power)
         average_power_value <- mean(estimable_power)
@@ -261,17 +252,24 @@ design_power <- function(
             which.min(estimable_power)
         ]
     } else {
-        ## incomplete treatment connectivity makes overall power undefined
+        ## leave overall power undefined for unsupported or disconnected designs
         design_power_value <- NA_real_
         average_power_value <- NA_real_
         worst_comparison <- NA_character_
     }
 
-    ## record which reference distribution was used for the wald test
-    power_method <- if (is.finite(df)) {
-        "Fisher-information noncentral-t Wald power"
+    ## record the supported test and explain unavailable overall power
+    power_note <- reference$reason
+    if (is.null(power_note) && !all(estimable)) {
+        power_note <- paste(
+            "Overall power is unavailable:",
+            "some treatment comparisons are confounded with blocks."
+        )
+    }
+    power_method <- if (is.na(df)) {
+        "None"
     } else {
-        "known-covariance Fisher-information normal power"
+        "Exact noncentral-t power under the stated Gaussian error model"
     }
 
     return(structure(list(
@@ -285,23 +283,28 @@ design_power <- function(
         rank = ti$rank,
         assumptions = list(
             sigma2 = sigma2,
+            sd = sqrt(sigma2),
             delta = delta,
             alpha = alpha,
+            comparison_alpha = comparison_alpha,
+            alpha_adjustment = alpha_adjustment,
             covariance_structure = format_covariance_structure(
                 covariance_structure
             ),
             block_col = block_col,
             treatment_cols = treatment_cols,
             denom_df = df,
-            power_method = power_method
+            denom_df_method = reference$method,
+            power_method = power_method,
+            power_note = power_note
         )
     ), class = c("cbadas_design_power", "list")))
 }
 
-#' Calculate the design efficiency/optimality of a small-plot trial design.
+#' Calculate the design efficiency/optimality of a small-plot trial design
 #'
 #' Calculates model-based efficiency for a design using the treatment
-#' information matrix induced by an AR1 x AR1 spatial dependence structure.
+#' information matrix induced by a supplied covariance structure.
 #' All this function does is evaluate how much information the design contains
 #' about treatment contrasts, after adjusting for nuisance effects (e.g. blocks
 #' , etc.)
@@ -319,6 +322,7 @@ design_power <- function(
 #'   -
 #'   \Sigma^{-1} X_2
 #'   \left( X_2^\intercal \Sigma^{-1} X_2 \right)^{-1}
+#'   X_2^\intercal
 #'   \Sigma^{-1}
 #' }
 #' Pairwise treatment contrast variances are then calculated from \eqn{I_T^+},
@@ -330,17 +334,13 @@ design_power <- function(
 #'        Column name of the treatment in \code{design}. If multiple columns
 #'        are provided, each unique combination is treated as a distinct
 #'        treatment combination.
-#' @param row_col \code{character} vector.
-#'        Column name of the experiment's rows in \code{design}.
-#' @param column_col \code{character} vector.
-#'        Column name of the experiment's columns in \code{design}.
 #' @param block_col \code{character} vector or \code{NULL}.
 #'        Column name of the experiment's blocking factor in \code{design}.
 #'        Use \code{NULL} for unblocked designs.
-#' @param rho_row \code{numeric}.
-#'        AR1 correlation parameter in the row direction.
-#' @param rho_col \code{numeric}.
-#'        AR1 correlation parameter in the column direction.
+#' @param covariance_structure Covariance structure created with [cov_iid()]
+#'        or another covariance helper. Precision is conditional on these
+#'        supplied values, without accounting for covariance estimation.
+#' @param alpha Unused; retained for compatibility.
 #' @param tolerance \code{numeric}.
 #'        Tolerance for numerical stability.
 #'
@@ -401,20 +401,17 @@ design_power <- function(
 #'     block_col = NULL,
 #'     covariance_structure = cov_ar1ar1(
 #'         row_col = "row",
-#'         column_col = "range",
+#'         column_col = "col",
 #'         rho_row = 0.1,
 #'         rho_col = 0.1
 #'     )
 #' )
 #' }
 #'
-#' @return
-#' A list with a lot of info in it.
-#'
 #' @export
 design_efficiency <- function(
     design,
-    treatment_cols = c("treatment"),
+    treatment_cols = "treatment",
     block_col = NULL,
     covariance_structure = cov_iid(),
     alpha = 0.05,
@@ -439,7 +436,7 @@ design_efficiency <- function(
     }
 
     # pairwise treatment comparisons
-    pairs <- combn(ti$trt_levels, 2, simplify = FALSE)
+    pairs <- utils::combn(ti$trt_levels, 2, simplify = FALSE)
 
     out <- lapply(pairs, \(pair) {
         contrast <- numeric(v)
@@ -447,12 +444,8 @@ design_efficiency <- function(
         contrast[pair[1]] <- 1
         contrast[pair[2]] <- -1
 
-        # Estimable?
-        # contrast must lie in the row space of the information
-        # use a property of the pseudoinverse:
-        # A A+ maps all column vectors of A to themselves
-        # the contrast should be theoretically unchanged if in info row space
-        projected <- as.numeric(contrast %*% ti$info_inv %*% ti$info)
+        ## use the same covariance-independent estimability check as power
+        projected <- as.numeric(contrast %*% ti$estimability)
 
         estimable <- sqrt(sum((contrast - projected)^2)) <=
             tolerance * (1 + sqrt(sum(contrast^2)))
@@ -466,7 +459,11 @@ design_efficiency <- function(
             ))
         }
 
-        contrast_var <- as.numeric(t(contrast) %*% ti$info_inv %*% contrast)
+        ## use the same stable variance calculation as power
+        contrast_var <- sum(crossprod(contrast, ti$variance_factor)^2)
+        if (!is.finite(contrast_var) || contrast_var <= 0) {
+            stop("Comparison variance is outside a safe numerical range.")
+        }
 
         return(data.frame(
             comparison = paste(pair, collapse = " vs "),
@@ -499,15 +496,15 @@ design_efficiency <- function(
 print.cbadas_design_power <- function(x, ..., n = 5) {
     contrast_power <- x$contrast_power
     estimable <- contrast_power$estimable %in% TRUE
+    available <- estimable & is.finite(contrast_power$power)
     n_estimable <- sum(estimable)
     n_total <- nrow(contrast_power)
 
     ui_h1("Design power")
+    ## headline the weakest comparison, not an average that can hide weak pairs
     ui_text(paste0(
-        "Design power: ",
-        format_ui_percent(x$design_power),
-        "  |  Average power: ",
-        format_ui_percent(x$average_power)
+        "Weakest-comparison power: ",
+        format_ui_percent(x$design_power)
     ))
     ui_text(paste0(
         "Worst comparison: ",
@@ -518,21 +515,30 @@ print.cbadas_design_power <- function(x, ..., n = 5) {
         n_total
     ))
     ui_text(paste0(
-        "Assumptions: delta = ",
+        "Assumptions: difference = ",
         format_ui_number(x$assumptions$delta),
-        ", sigma2 = ",
-        format_ui_number(x$assumptions$sigma2),
-        ", alpha = ",
+        ", noise SD (base scale) = ",
+        format_ui_number(sqrt(x$assumptions$sigma2)),
+        ", significance level = ",
         format_ui_number(x$assumptions$alpha),
-        ", denominator df = ",
-        format_ui_number(x$assumptions$denom_df),
+        " (",
+        x$assumptions$alpha_adjustment,
+        ")",
         ", covariance = ",
         x$assumptions$covariance_structure
     ))
+    ## show limitations even when some individual comparisons are available
+    if (!is.null(x$assumptions$power_note)) {
+        ui_alert(x$assumptions$power_note)
+    }
+    ui_text(paste(
+        "Conditional on the stated noise and Gaussian error model.",
+        "Not the probability of detecting every difference."
+    ))
 
-    if (n_estimable > 0) {
+    if (any(available)) {
         ui_h2("Lowest-power comparisons")
-        power_table <- contrast_power[estimable, , drop = FALSE]
+        power_table <- contrast_power[available, , drop = FALSE]
         power_table <- power_table[
             order(power_table$power, power_table$se),
             ,
@@ -540,7 +546,7 @@ print.cbadas_design_power <- function(x, ..., n = 5) {
         ]
         power_table <- utils::head(power_table, n)
         print(format_power_table(power_table), row.names = FALSE)
-    } else {
+    } else if (n_estimable == 0) {
         ui_alert("No estimable pairwise comparisons.")
     }
 
@@ -599,7 +605,7 @@ print.cbadas_design_efficiency <- function(x, ..., n = 5) {
 #'
 #' Builds the "relative" covariance for a design:
 #' \deqn{
-#'   V_{\text{rel}} = R + ZGZ
+#'   V_{\text{rel}} = R + ZGZ^\intercal
 #' }
 build_covariance_matrix <- function(design, covariance_structure) {
     components <- as_cov_components(covariance_structure)
@@ -667,15 +673,9 @@ build_covariance_matrix <- function(design, covariance_structure) {
                 group = component$group
             )
         } else if (component$type == "random") {
-            group <- component$component$group
-
-            if (is.null(group)) {
-                stop("random() covariance components need a grouping column")
-            }
-            get_design_column(design, group, "group")
-
-            form <- stats::as.formula(paste0("~ 0 + factor(", group, ")"))
-            Z <- stats::model.matrix(form, data = design)
+            ## validate the wrapper so unsupported covariance is never ignored
+            component <- cov_random(component$component, component$sd_ratio)
+            Z <- build_group_matrix(design, component$component$group)
 
             G <- diag(ncol(Z))
             V <- V + (component$sd_ratio^2) * Z %*% G %*% t(Z)
@@ -691,6 +691,10 @@ build_covariance_matrix <- function(design, covariance_structure) {
         )
     }
 
+    ## reject overflow or non-finite covariance entries before inversion
+    if (any(!is.finite(V))) {
+        stop("Covariance matrix must contain only finite values.")
+    }
     if (!isSymmetric(V, tol = 1e-10)) {
         stop("Covariance matrix must be symmetric")
     }
@@ -710,10 +714,21 @@ as_cov_components <- function(x) {
     stop("Invalid covariance structure.")
 }
 
-#' Independent, identically distributed covariance component
+#' Build covariance components for design evaluation
 #'
-#' @param group Optional grouping column used when wrapped in [cov_random()].
+#' Helpers for composing the relative covariance matrix used by
+#' [design_power()] and [design_efficiency()].
 #'
+#' @param group Optional grouping column. For spatial covariance components,
+#'   covariance is zero between groups. For [cov_iid()], this is used when
+#'   the component is wrapped in [cov_random()].
+#'
+#' @details
+#' Components can be added with \code{+}. For example, an iid residual plus a
+#' whole-plot random component can be written as
+#' \code{cov_iid() + cov_random("whole_plot", sd_ratio = 1)}.
+#'
+#' @name covariance_helpers
 #' @rdname covariance_helpers
 #' @export
 cov_iid <- function(group = NULL) {
@@ -729,9 +744,7 @@ cov_iid <- function(group = NULL) {
 #' One-dimensional AR1 covariance component
 #'
 #' @param index_col Column containing the ordered coordinate.
-#' @param rho AR1 correlation parameter.
-#' @param group Optional grouping column. When supplied, covariance is zero
-#'   between different groups.
+#' @param rho AR1 or within-group correlation parameter in \eqn{[0, 1)}.
 #'
 #' @rdname covariance_helpers
 #' @export
@@ -753,8 +766,6 @@ cov_ar1 <- function(index_col, rho = 0.1, group = NULL) {
 #' @param column_col Column containing column coordinates.
 #' @param rho_row AR1 correlation parameter in the row direction.
 #' @param rho_col AR1 correlation parameter in the column direction.
-#' @param group Optional grouping column. When supplied, covariance is zero
-#'   between different groups.
 #'
 #' @rdname covariance_helpers
 #' @export
@@ -781,7 +792,6 @@ cov_ar1ar1 <- function(
 #' Compound-symmetry covariance component
 #'
 #' @param group_col Column defining independent compound-symmetry groups.
-#' @param rho Common within-group correlation.
 #'
 #' @rdname covariance_helpers
 #' @export
@@ -800,9 +810,7 @@ cov_cs <- function(group_col, rho = 0.1) {
 #'
 #' @param x_col Column containing x coordinates.
 #' @param y_col Optional column containing y coordinates.
-#' @param range Positive distance scale.
-#' @param group Optional grouping column. When supplied, covariance is zero
-#'   between different groups.
+#' @param range Finite positive distance scale.
 #'
 #' @rdname covariance_helpers
 #' @export
@@ -819,10 +827,14 @@ cov_exponential <- function(x_col, y_col = NULL, range = 1, group = NULL) {
     )
 }
 
-#' Transform a random covariance structure into observation space
+#' Independent random-intercept covariance component
 #'
-#' @param x Covariance component or grouping column name.
-#' @param sd_ratio Standard deviation ratio relative to the residual scale.
+#' @param x Grouping column name or a [cov_iid()] component with a grouping
+#'   column. Other covariance components are not supported.
+#' @param sd_ratio Finite non-negative standard deviation ratio relative to the
+#'   residual scale. Zero removes this component's contribution to covariance.
+#'   General random-effect models provide precision estimates, but power is
+#'   only available when the group effects are absorbed by fixed blocks.
 #'
 #' @rdname covariance_helpers
 #' @export
@@ -831,11 +843,21 @@ cov_random <- function(x, sd_ratio = 1) {
         x <- cov_iid(x)
     }
 
-    if (!inherits(x, "cov_component")) {
+    ## only independent random intercepts are implemented
+    if (!inherits(x, "cov_component") || !identical(x$type, "iid")) {
         stop(
-            "cov_random() must wrap a covariance component or grouping ",
-            "variable name"
+            "cov_random() only supports a grouping column name or ",
+            "cov_iid(group); other covariance components are not supported."
         )
+    }
+    validate_column_name(x$group, "random grouping")
+
+    ## allow zero variance, but reject invalid standard deviation ratios
+    if (
+        !is.numeric(sd_ratio) || is.complex(sd_ratio) ||
+            length(sd_ratio) != 1 || !is.finite(sd_ratio) || sd_ratio < 0
+    ) {
+        stop("sd_ratio must be a finite non-negative number.")
     }
 
     structure(
@@ -868,50 +890,54 @@ cov_random <- function(x, sd_ratio = 1) {
 ## Helper functions
 
 combine_treatments <- function(design, treatment_cols) {
-    vals <-
-        apply(design[, treatment_cols, drop = FALSE], 1, paste, collapse = ":")
-    return(factor(vals, levels = unique(vals)))
-}
-
-## moore-penrose inverse/pseudoinverse
-mpinv <- function(mat, tol = 1e-10) {
-    s <- svd(mat)
-    keep <- s$d > tol * max(dim(mat)) * max(s$d)
-    d_inv <- ifelse(keep, 1 / s$d, 0)
-
-    s$v %*% diag(d_inv, length(d_inv)) %*% t(s$u)
-}
-
-## Two sided power of a Wald test at lambda noncentrality
-## noncentral t at finite df, else normal
-wald_power <- function(lambda, alpha, df = Inf) {
-    if (is.finite(df)) {
-        crit <- stats::qt(1 - alpha / 2, df)
-        return(
-            stats::pt(-crit, df, ncp = lambda) +
-                stats::pt(crit, df, ncp = lambda, lower.tail = FALSE)
-        )
-    } else {
-        crit <- stats::qnorm(1 - alpha / 2)
-        return(
-            stats::pnorm(-crit, mean = lambda, sd = 1) +
-                stats::pnorm(
-                    crit,
-                    mean = lambda,
-                    sd = 1,
-                    lower.tail = FALSE
-                )
-        )
+    ## require a non-empty design with unambiguous column selections
+    if (!is.data.frame(design) || nrow(design) == 0) {
+        stop("design must be a non-empty data frame.")
     }
+    if (
+        anyNA(names(design)) || any(!nzchar(names(design))) ||
+            anyDuplicated(names(design))
+    ) {
+        stop("design must have unique, non-empty column names.")
+    }
+    if (
+        !is.character(treatment_cols) || length(treatment_cols) == 0 ||
+            anyNA(treatment_cols) || any(!nzchar(treatment_cols)) ||
+            anyDuplicated(treatment_cols)
+    ) {
+        stop("treatment_cols must contain unique, non-empty column names.")
+    }
+    columns <- lapply(
+        unname(treatment_cols),
+        \(column) get_design_column(design, column, "treatment")
+    )
+
+    ## identify combinations using integer codes so labels cannot merge them
+    codes <- lapply(columns, \(values) match(values, unique(values)))
+    keys <- do.call(paste, c(codes, sep = ":"))
+    first <- !duplicated(keys)
+    ids <- match(keys, keys[first])
+
+    ## keep readable, unique labels in first-observed treatment order
+    labels <- do.call(paste, c(lapply(columns, as.character), sep = ":"))
+    labels <- make.unique(labels[first])
+    factor(ids, levels = seq_along(labels), labels = labels)
+}
+
+## two-sided noncentral-t power at lambda noncentrality
+wald_power <- function(lambda, alpha, df) {
+    ## an overflowing signal-to-noise ratio has limiting power one
+    if (is.infinite(lambda)) return(1)
+    crit <- stats::qt(1 - alpha / 2, df)
+    stats::pt(-crit, df, ncp = lambda) +
+        stats::pt(crit, df, ncp = lambda, lower.tail = FALSE)
 }
 
 format_power_table <- function(x) {
     data.frame(
         comparison = x$comparison,
         power = format_ui_percent(x$power),
-        se = format_ui_number(x$se),
-        lambda = format_ui_number(x$lambda),
-        effective_replicates = format_ui_number(x$effective_replicates),
+        standard_error = format_ui_number(x$se),
         check.names = FALSE
     )
 }
@@ -1106,12 +1132,62 @@ ui_alert <- function(text) {
     }
 }
 
+## validate column names before using them to select design variables
+validate_column_name <- function(column, label) {
+    if (
+        !is.character(column) || length(column) != 1 ||
+            is.na(column) || !nzchar(column)
+    ) {
+        stop(sprintf(
+            "%s column must be a single non-empty column name.",
+            label
+        ))
+    }
+}
+
 get_design_column <- function(design, column, label) {
+    validate_column_name(column, label)
     if (!column %in% names(design)) {
         stop(sprintf("%s column '%s' not in design", label, column))
     }
 
-    design[[column]]
+    ## reject missing assignments before factors can drop or relabel rows
+    values <- design[[column]]
+    if (!is.atomic(values) || !is.null(dim(values)) || is.complex(values)) {
+        stop(sprintf("%s column '%s' must be a vector.", label, column))
+    }
+    if (anyNA(values)) {
+        stop(sprintf(
+            "%s column '%s' must not contain missing values.",
+            label, column
+        ))
+    }
+    ## blank labels are missing assignments too
+    if (
+        (is.character(values) || is.factor(values)) &&
+            any(!nzchar(trimws(as.character(values))))
+    ) {
+        stop(sprintf(
+            "%s column '%s' must not contain empty values.",
+            label, column
+        ))
+    }
+    if (is.numeric(values) && any(!is.finite(values))) {
+        stop(sprintf(
+            "%s column '%s' must contain only finite values.",
+            label, column
+        ))
+    }
+    values
+}
+
+## build group indicators without parsing column names or requiring two levels
+build_group_matrix <- function(design, column, label = "group") {
+    group <- factor(get_design_column(design, column, label))
+    z <- matrix(0, nrow = nrow(design), ncol = nlevels(group))
+    z[cbind(seq_along(group), as.integer(group))] <- 1
+    colnames(z) <- levels(group)
+    z
 }
 
 apply_group_mask <- function(mat, design, group = NULL) {
@@ -1130,8 +1206,9 @@ apply_group_mask <- function(mat, design, group = NULL) {
 
 validate_correlation <- function(x, name = "rho") {
     invalid <- !is.numeric(x) ||
+        is.complex(x) ||
         length(x) != 1 ||
-        is.na(x) ||
+        !is.finite(x) ||
         x < 0 ||
         x >= 1
 
@@ -1142,12 +1219,13 @@ validate_correlation <- function(x, name = "rho") {
 
 validate_positive_number <- function(x, name) {
     invalid <- !is.numeric(x) ||
+        is.complex(x) ||
         length(x) != 1 ||
-        is.na(x) ||
+        !is.finite(x) ||
         x <= 0
 
     if (invalid) {
-        stop(sprintf("%s must be positive.", name))
+        stop(sprintf("%s must be a finite positive number.", name))
     }
 }
 
@@ -1236,15 +1314,58 @@ build_nuisance_matrix <- function(design, block = NULL) {
         return(x2)
     }
 
-    if (!block %in% names(design)) {
-        stop(sprintf("block column '%s' not in design", block))
+    ## if blocked, no intercept since block span is confounded with it
+    build_group_matrix(design, block, "block")
+}
+
+## identify models that reduce to independent errors after block adjustment
+power_reference <- function(design, ti, covariance_structure, tolerance) {
+    nuisance <- qr(ti$X2, tol = tolerance)
+    supported <- vapply(as_cov_components(covariance_structure), \(component) {
+        if (component$type == "iid") return(TRUE)
+        if (component$type == "random" && component$sd_ratio == 0) return(TRUE)
+
+        ## independent components need no extra variance-component approximation
+        component_cov <- build_covariance_matrix(design, component)
+        if (all(component_cov == diag(component_cov[1, 1], nrow(design)))) {
+            return(TRUE)
+        }
+
+        ## group intercepts disappear when already spanned by the fixed blocks
+        group <- switch(
+            component$type,
+            random = component$component$group,
+            cs = component$group_col,
+            NULL
+        )
+        if (is.null(group)) return(FALSE)
+        z <- build_group_matrix(design, group)
+        max(abs(qr.resid(nuisance, z))) <= tolerance
+    }, logical(1))
+
+    ## do not guess degrees of freedom for general mixed or spatial models
+    if (!all(supported)) {
+        return(list(
+            df = NA_real_,
+            method = "unavailable for this covariance structure",
+            reason = paste(
+                "Power unavailable: this covariance structure requires a",
+                "mixed-model or spatial test outside the simple supported",
+                "method. Standard errors are conditional on the supplied",
+                "covariance; they do not account for estimating it."
+            )
+        ))
+    }
+    if (ti$resid_df <= 0) {
+        return(list(
+            df = NA_real_,
+            method = "unavailable without residual replication",
+            reason = "Insufficient independent replication to estimate power."
+        ))
     }
 
-    ## if blocked, no intercept since block span is confounded with it
-    stats::model.matrix(
-        stats::as.formula(sprintf("~ 0 + factor(%s)", block)),
-        data = design
-    )
+    ## use the residual degrees of freedom of the ordinary linear-model test
+    list(df = ti$resid_df, method = "fixed-effect residual df", reason = NULL)
 }
 
 compute_treatment_info <- function(
@@ -1254,6 +1375,8 @@ compute_treatment_info <- function(
     covariance_structure = cov_iid(),
     tolerance = 1e-10
 ) {
+    ## validate numerical tolerance for both power and efficiency calculations
+    validate_positive_number(tolerance, "tolerance")
     ## combine multiple treatment columns into a treatment-combo factor
     treatments <- combine_treatments(design, treatment_cols)
     if (nlevels(treatments) < 2) {
@@ -1267,68 +1390,80 @@ compute_treatment_info <- function(
     ## x2 is the nuisance matrix, intercept and block indicators
     x2 <- build_nuisance_matrix(design, block = block_col)
 
-    ## random covariance terms for the denominator df warning
-    components <- as_cov_components(covariance_structure)
-    has_random <- any(vapply(
-        components,
-        \(cmp) identical(cmp$type, "random"),
-        FALSE
-    ))
+    ## determine estimable contrasts before covariance can affect numerical rank
+    raw_residual <- qr.resid(qr(x2, tol = tolerance), x1)
+    structural <- svd(raw_residual, nu = 0)
+    cutoff <- tolerance * max(dim(x1)) * sqrt(max(colSums(x1^2)))
+    basis <- structural$v[, structural$d > cutoff, drop = FALSE]
+    rank <- ncol(basis)
+    estimability <- tcrossprod(basis)
 
-    ## spatial structure
+    ## whiten with a Cholesky factor instead of explicitly inverting covariance
     V <- build_covariance_matrix(
         design = design,
         covariance_structure = covariance_structure
     )
-    V_inv <- solve(V)
-    V_inv_x2 <- V_inv %*% x2
-
-    ## GLS projection that removes nuisance effects
-    ## L = I - X2 (X2t X2)^{-1} X2t
-    ## under spatial R structure's geometry:
-    ## L = R^{-1} - R^{-1} X2 (X2t R^{-1} X2)^{-1} X2t R^{-1}
-    mid <- t(x2) %*% V_inv_x2
-    mid_inv <- mpinv(mid, tol = tolerance)
-    proj <- V_inv - V_inv_x2 %*% mid_inv %*% t(V_inv_x2)
-
-    ## fisher information in GLS nuisanceless geometry
-    info <- t(x1) %*% proj %*% x1
-    info <- (info + t(info)) / 2
-
-    ## only keep positive information eigenvalues above tolerance
-    eig <- eigen(info, symmetric = TRUE)
-    vals <- eig$values
-    max_val <- max(vals)
-    keep <- if (max_val <= 0) {
-        rep(FALSE, length(vals))
-    } else {
-        vals > tolerance * max(dim(info)) * max_val
+    scale <- max(diag(V))
+    root <- tryCatch(chol(V / scale), error = function(e) NULL)
+    if (is.null(root) || any(!is.finite(root))) {
+        stop(
+            "Covariance must be positive definite; check duplicated ",
+            "coordinates and covariance components."
+        )
     }
-    ## invert only the estimable positive information eigenspace
-    if (any(keep)) {
-        vectors <- eig$vectors[, keep, drop = FALSE]
-        info_inv <- sweep(vectors, 2, vals[keep], "/") %*% t(vectors)
-    } else {
-        info_inv <- matrix(0, nrow = nrow(info), ncol = ncol(info))
+    ## reject nearly singular covariance before calculating precision
+    if (rcond(root) <= sqrt(tolerance)) {
+        stop("Covariance is too ill-conditioned to evaluate safely.")
     }
-    ## force symmetric after floating point ops
-    info_inv <- (info_inv + t(info_inv)) / 2
-    pos_eig <- vals[keep]
 
-    ## provide the default denominator df for fixed effect wald tests
-    resid_df <- nrow(design) - qr(cbind(x1, x2))$rank
+    ## zero structural rank stays zero even when covariance arithmetic is noisy
+    info <- info_inv <- matrix(0, ncol(x1), ncol(x1))
+    variance_factor <- matrix(0, ncol(x1), 0)
+    pos_eig <- numeric(0)
+    if (rank > 0) {
+        whitened_blocks <- forwardsolve(t(root), x2)
+        whitened_treatments <- forwardsolve(t(root), x1 %*% basis)
+        block_qr <- qr(whitened_blocks, tol = tolerance)
+        if (block_qr$rank != ncol(x2)) {
+            stop("Block adjustment is too ill-conditioned to evaluate safely.")
+        }
+        ## remove blocks without subtracting nearly equal information matrices
+        adjusted <- qr.resid(block_qr, whitened_treatments)
+        decomposition <- svd(adjusted, nu = 0)
+        values <- decomposition$d
+        if (any(values <= tolerance * max(dim(adjusted)) * max(values))) {
+            stop(
+                "Treatment information is too ill-conditioned ",
+                "to evaluate safely."
+            )
+        }
+
+        ## invert only the structurally estimable treatment space
+        vectors <- basis %*% decomposition$v
+        pos_eig <- (values / sqrt(scale))^2
+        if (any(!is.finite(pos_eig)) || any(pos_eig <= 0)) {
+            stop("Treatment information is outside a safe numerical range.")
+        }
+        variance_factor <- sweep(vectors, 2, 1 / sqrt(pos_eig), "*")
+        info <- tcrossprod(sweep(vectors, 2, sqrt(pos_eig), "*"))
+        info_inv <- tcrossprod(variance_factor)
+        if (any(!is.finite(info_inv))) {
+            stop("Treatment information is outside a safe numerical range.")
+        }
+    }
+    dimnames(info) <- dimnames(info_inv) <- list(trt_levels, trt_levels)
 
     return(list(
         info = info,
         info_inv = info_inv,
-        L = proj,
+        variance_factor = variance_factor,
+        estimability = estimability,
         V = V,
         X1 = x1,
         X2 = x2,
-        resid_df = resid_df,
-        has_random = has_random,
+        resid_df = nrow(x1) - ncol(x2) - rank,
         trt_levels = trt_levels,
         eigenvalues = sort(pos_eig, decreasing = TRUE),
-        rank = length(pos_eig)
+        rank = rank
     ))
 }
