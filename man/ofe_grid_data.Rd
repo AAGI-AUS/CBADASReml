@@ -4,7 +4,13 @@
 \alias{ofe_grid_data}
 \title{Grid data ready for ASReml analysis}
 \usage{
-ofe_grid_data(data_in, rotation_angle, nrow, npe, ncol, trim_ends = TRUE)
+ofe_grid_data(
+  data_in,
+  rotation_angle,
+  nrow,
+  ncol,
+  trim_ends = TRUE
+)
 }
 \arguments{
 \item{data_in}{\code{data.frame}.
@@ -26,11 +32,6 @@ Clockwise angle in degrees to rotate the dataframe.}
 The number of rows in the final grid.
 This should be as large as possible without introducing spurious NA values.}
 
-\item{npe}{\code{numeric}.
-Number of pseudo-environments to be generated along the strips.
-PEs will be evenly spaced, so may not be appropriate in all cases.
-Always assess PEs visually before use.}
-
 \item{ncol}{\code{numeric}.
 The actual number of strips in the data.
 This should be counted/confirmed before hand.
@@ -39,8 +40,8 @@ in this gap when determining this number.}
 
 \item{trim_ends}{\code{bool}.
 Boolean determining whether the gridded data should be trimmed
-to remove NAs occurring at the ends of columns.
-Defaults to FALSE.}
+to remove NAs occuring at the ends of columns.
+Defaults to TRUE.}
 }
 \value{
 \code{gridded.ofe}.
@@ -73,7 +74,7 @@ rename(
  st_as_sf(coords = c("long", "lat"), crs = 4326) |>
  st_transform(3395)
 
-ofe_grid_data(data, -60, 80, 5, 18, trim_ends=FALSE)
+ofe_grid_data(data, -60, 80, 18, trim_ends=FALSE)
 \dontshow{\}) # examplesIf}
 }
 \author{
